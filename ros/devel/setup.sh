@@ -1,0 +1,1 @@
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/catkin_tools_prebuild/setup.sh
