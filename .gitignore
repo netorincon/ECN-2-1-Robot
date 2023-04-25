@@ -1,0 +1,3 @@
+#Ignore devel and build folders
+build/
+devel/
