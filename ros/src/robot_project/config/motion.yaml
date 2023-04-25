@@ -1,0 +1,14 @@
+joint:
+  names: [mot3, mot4, mot1, mot2]
+motion:
+  names: [right, zero, left]
+  #names: [right]
+  right:
+    step: [-3.14, -3.14, -3.14, -3.14]  # radian
+    time_from_start: 2.0  # sec
+  zero:
+    step: [0.0, 0.0, 0.0, 0.0]
+    time_from_start: 4.0
+  left:
+    step: [3.14, 3.14, 3.14, 3.14]
+    time_from_start: 6.0

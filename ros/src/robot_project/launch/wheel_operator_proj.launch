@@ -1,0 +1,4 @@
+<launch>
+  <arg name="namespace"               default="dynamixel_workbench"/>
+  <node name="wheel_operator_proj" pkg="robot_project" type="wheel_operator_proj" required="true" output="screen" ns="$(arg namespace)"/>
+</launch>

@@ -1,6 +1,0 @@
-devel_space: /home/netorincon/ECN-2-1-Robot/ros/devel
-install: false
-install_space: /home/netorincon/ECN-2-1-Robot/ros/install
-profile: default
-source_space: /home/netorincon/ECN-2-1-Robot/ros/src
-workspace: /home/netorincon/ECN-2-1-Robot/ros

@@ -1,0 +1,5 @@
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/pkgconfig/dynamixel_workbench_operators.pc
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_workbench_operators/joint_operator
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_workbench_operators/wheel_operator
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/share/dynamixel_workbench_operators/cmake/dynamixel_workbench_operatorsConfig-version.cmake
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/share/dynamixel_workbench_operators/cmake/dynamixel_workbench_operatorsConfig.cmake

@@ -1,0 +1,8 @@
+prefix=/home/turtle/ros/install
+
+Name: robot_project
+Description: Description of robot_project
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

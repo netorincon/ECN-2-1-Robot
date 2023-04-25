@@ -1,0 +1,15 @@
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/libdynamixel_sdk.so
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/pkgconfig/dynamixel_sdk.pc
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/python3/dist-packages/dynamixel_sdk/__init__.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/cmake.lock
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/packet_handler.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/group_sync_read.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/port_handler.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/robotis_def.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/group_sync_write.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/protocol2_packet_handler.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/protocol1_packet_handler.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/group_bulk_write.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/lib/dynamixel_sdk/group_bulk_read.py
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/share/dynamixel_sdk/cmake/dynamixel_sdkConfig.cmake
+Symlinking /home/turtle/ECN-2-1-Robot/ros/devel/share/dynamixel_sdk/cmake/dynamixel_sdkConfig-version.cmake
