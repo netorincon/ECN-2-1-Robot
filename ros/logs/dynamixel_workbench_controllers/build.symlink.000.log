@@ -1,5 +1,0 @@
-Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/lib/pkgconfig/dynamixel_workbench_controllers.pc
-Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/lib/dynamixel_workbench_controllers/find_dynamixel
-Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/lib/dynamixel_workbench_controllers/dynamixel_workbench_controllers
-Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/share/dynamixel_workbench_controllers/cmake/dynamixel_workbench_controllersConfig-version.cmake
-Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/share/dynamixel_workbench_controllers/cmake/dynamixel_workbench_controllersConfig.cmake
