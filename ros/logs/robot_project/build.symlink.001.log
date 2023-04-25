@@ -1,0 +1,4 @@
+Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/lib/pkgconfig/robot_project.pc
+Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj
+Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/share/robot_project/cmake/robot_projectConfig.cmake
+Symlinking /home/netorincon/ECN-2-1-Robot/ros/devel/share/robot_project/cmake/robot_projectConfig-version.cmake
