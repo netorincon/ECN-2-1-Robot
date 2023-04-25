@@ -1,4 +1,4 @@
-prefix=/home/turtle/ECN-2-1-Robot/ros/install
+prefix=/home/netorincon/ECN-2-1-Robot/ros/install
 
 Name: robot_project
 Description: Description of robot_project

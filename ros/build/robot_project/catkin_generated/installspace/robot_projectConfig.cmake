@@ -67,14 +67,14 @@ set(robot_project_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(robot_project_SOURCE_PREFIX /home/turtle/ECN-2-1-Robot/ros/src/robot_project)
-  set(robot_project_DEVEL_PREFIX /home/turtle/ECN-2-1-Robot/ros/devel)
+  set(robot_project_SOURCE_PREFIX /home/netorincon/ECN-2-1-Robot/ros/src/robot_project)
+  set(robot_project_DEVEL_PREFIX /home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project)
   set(robot_project_INSTALL_PREFIX "")
   set(robot_project_PREFIX ${robot_project_DEVEL_PREFIX})
 else()
   set(robot_project_SOURCE_PREFIX "")
   set(robot_project_DEVEL_PREFIX "")
-  set(robot_project_INSTALL_PREFIX /home/turtle/ECN-2-1-Robot/ros/install)
+  set(robot_project_INSTALL_PREFIX /home/netorincon/ECN-2-1-Robot/ros/install)
   set(robot_project_PREFIX ${robot_project_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/turtle/ECN-2-1-Robot/ros/install/lib;/opt/ros/noetic/lib)
+    foreach(path /home/netorincon/ECN-2-1-Robot/ros/install/lib;/home/netorincon/ECN-2-1-Robot/ros/devel/lib;/home/netorincon/ros/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

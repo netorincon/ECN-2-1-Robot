@@ -1,8 +1,1 @@
-prefix=/home/turtle/ECN-2-1-Robot/ros/devel
-
-Name: robot_project
-Description: Description of robot_project
-Version: 0.0.0
-Cflags: -I/home/turtle/ECN-2-1-Robot/ros/src/robot_project/include
-Libs: -L${prefix}/lib 
-Requires: 
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/pkgconfig/robot_project.pc

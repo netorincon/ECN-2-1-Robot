@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj"
-  "/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj.pdb"
+  "/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj"
+  "/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj.pdb"
   "CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o"
 )
 

@@ -1,2 +1,0 @@
-robot_project
--DCATKIN_DEVEL_PREFIX=/home/netorincon/ECN-2-1-Robot/ros/devel -DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-2-1-Robot/ros/install -G Unix Makefiles

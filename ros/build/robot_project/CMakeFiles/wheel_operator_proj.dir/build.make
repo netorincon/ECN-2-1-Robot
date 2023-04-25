@@ -43,32 +43,32 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/turtle/ECN-2-1-Robot/ros/src
+CMAKE_SOURCE_DIR = /home/netorincon/ECN-2-1-Robot/ros/src/robot_project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/turtle/ECN-2-1-Robot/ros/build
+CMAKE_BINARY_DIR = /home/netorincon/ECN-2-1-Robot/ros/build/robot_project
 
 # Include any dependencies generated for this target.
-include robot_project/CMakeFiles/wheel_operator_proj.dir/depend.make
+include CMakeFiles/wheel_operator_proj.dir/depend.make
 
 # Include the progress variables for this target.
-include robot_project/CMakeFiles/wheel_operator_proj.dir/progress.make
+include CMakeFiles/wheel_operator_proj.dir/progress.make
 
 # Include the compile flags for this target's objects.
-include robot_project/CMakeFiles/wheel_operator_proj.dir/flags.make
+include CMakeFiles/wheel_operator_proj.dir/flags.make
 
-robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o: robot_project/CMakeFiles/wheel_operator_proj.dir/flags.make
-robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o: /home/turtle/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/turtle/ECN-2-1-Robot/ros/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o"
-	cd /home/turtle/ECN-2-1-Robot/ros/build/robot_project && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o -c /home/turtle/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp
+CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o: CMakeFiles/wheel_operator_proj.dir/flags.make
+CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o: /home/netorincon/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/netorincon/ECN-2-1-Robot/ros/build/robot_project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o -c /home/netorincon/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp
 
-robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.i: cmake_force
+CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.i"
-	cd /home/turtle/ECN-2-1-Robot/ros/build/robot_project && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/turtle/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp > CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/netorincon/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp > CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.i
 
-robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.s: cmake_force
+CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.s"
-	cd /home/turtle/ECN-2-1-Robot/ros/build/robot_project && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/turtle/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp -o CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/netorincon/ECN-2-1-Robot/ros/src/robot_project/src/wheel_operator_proj.cpp -o CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.s
 
 # Object files for target wheel_operator_proj
 wheel_operator_proj_OBJECTS = \
@@ -77,39 +77,39 @@ wheel_operator_proj_OBJECTS = \
 # External object files for target wheel_operator_proj
 wheel_operator_proj_EXTERNAL_OBJECTS =
 
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: robot_project/CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: robot_project/CMakeFiles/wheel_operator_proj.dir/build.make
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libroscpp.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libpthread.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_chrono.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_filesystem.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole_log4cxx.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole_backend_interface.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/liblog4cxx.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_regex.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libxmlrpcpp.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libroscpp_serialization.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librostime.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_date_time.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libcpp_common.so
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_system.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libboost_thread.so.1.71.0
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: /usr/lib/aarch64-linux-gnu/libconsole_bridge.so.0.4
-/home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj: robot_project/CMakeFiles/wheel_operator_proj.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/turtle/ECN-2-1-Robot/ros/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj"
-	cd /home/turtle/ECN-2-1-Robot/ros/build/robot_project && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wheel_operator_proj.dir/link.txt --verbose=$(VERBOSE)
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: CMakeFiles/wheel_operator_proj.dir/src/wheel_operator_proj.cpp.o
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: CMakeFiles/wheel_operator_proj.dir/build.make
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libroscpp.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libpthread.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole_log4cxx.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librosconsole_backend_interface.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/liblog4cxx.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libxmlrpcpp.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libroscpp_serialization.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/librostime.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /opt/ros/noetic/lib/libcpp_common.so
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_system.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
+/home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj: CMakeFiles/wheel_operator_proj.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/netorincon/ECN-2-1-Robot/ros/build/robot_project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj"
+	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wheel_operator_proj.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-robot_project/CMakeFiles/wheel_operator_proj.dir/build: /home/turtle/ECN-2-1-Robot/ros/devel/lib/robot_project/wheel_operator_proj
+CMakeFiles/wheel_operator_proj.dir/build: /home/netorincon/ECN-2-1-Robot/ros/devel/.private/robot_project/lib/robot_project/wheel_operator_proj
 
-.PHONY : robot_project/CMakeFiles/wheel_operator_proj.dir/build
+.PHONY : CMakeFiles/wheel_operator_proj.dir/build
 
-robot_project/CMakeFiles/wheel_operator_proj.dir/clean:
-	cd /home/turtle/ECN-2-1-Robot/ros/build/robot_project && $(CMAKE_COMMAND) -P CMakeFiles/wheel_operator_proj.dir/cmake_clean.cmake
-.PHONY : robot_project/CMakeFiles/wheel_operator_proj.dir/clean
+CMakeFiles/wheel_operator_proj.dir/clean:
+	$(CMAKE_COMMAND) -P CMakeFiles/wheel_operator_proj.dir/cmake_clean.cmake
+.PHONY : CMakeFiles/wheel_operator_proj.dir/clean
 
-robot_project/CMakeFiles/wheel_operator_proj.dir/depend:
-	cd /home/turtle/ECN-2-1-Robot/ros/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/turtle/ECN-2-1-Robot/ros/src /home/turtle/ECN-2-1-Robot/ros/src/robot_project /home/turtle/ECN-2-1-Robot/ros/build /home/turtle/ECN-2-1-Robot/ros/build/robot_project /home/turtle/ECN-2-1-Robot/ros/build/robot_project/CMakeFiles/wheel_operator_proj.dir/DependInfo.cmake --color=$(COLOR)
-.PHONY : robot_project/CMakeFiles/wheel_operator_proj.dir/depend
+CMakeFiles/wheel_operator_proj.dir/depend:
+	cd /home/netorincon/ECN-2-1-Robot/ros/build/robot_project && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/netorincon/ECN-2-1-Robot/ros/src/robot_project /home/netorincon/ECN-2-1-Robot/ros/src/robot_project /home/netorincon/ECN-2-1-Robot/ros/build/robot_project /home/netorincon/ECN-2-1-Robot/ros/build/robot_project /home/netorincon/ECN-2-1-Robot/ros/build/robot_project/CMakeFiles/wheel_operator_proj.dir/DependInfo.cmake --color=$(COLOR)
+.PHONY : CMakeFiles/wheel_operator_proj.dir/depend
 
