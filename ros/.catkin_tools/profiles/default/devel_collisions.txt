@@ -1,5 +1,2 @@
-<<<<<<< HEAD
-/home/netorincon/ECN-2-1-Robot/ros/devel/./cmake.lock 18
-=======
-/home/netorincon/ECN-2-1-Robot/ros/devel/./cmake.lock 45
->>>>>>> main
+/home/ecn/ECN-2-1-Robot/ros/devel/./cmake.lock 16
+/home/ecn/ECN-1-2-Robot/ros/devel/./cmake.lock 8
