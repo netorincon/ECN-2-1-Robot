@@ -1,2 +1,2 @@
 dynamixel-workbench/dynamixel_workbench
-/home/netorincon/ECN-2-1-Robot/ros/devel/.private/dynamixel_workbench/cmake.lock /home/netorincon/ECN-2-1-Robot/ros/devel/./cmake.lock
+/home/ecn/ECN-1-2-Robot/ros/devel/.private/dynamixel_workbench/cmake.lock /home/ecn/ECN-1-2-Robot/ros/devel/./cmake.lock
