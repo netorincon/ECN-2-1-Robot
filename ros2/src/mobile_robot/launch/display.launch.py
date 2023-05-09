@@ -17,10 +17,10 @@ def generate_launch_description():
     use_ros2_control = LaunchConfiguration('use_ros2_control')
 
     # Process the URDF file
-    pkg_path = os.path.join(get_package_share_directory('ecn_project'))
-    xacro_file = os.path.join(pkg_path,'description','robot.urdf.xacro')
-    # robot_description_config = xacro.process_file(xacro_file).toxml()
-    robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_time:=', use_sim_time])
+    pkg_path = os.path.join(get_package_share_directory('mobile_robot'))
+    xacro_file = os.path.join(pkg_path,'description',"robot.urdf.xacro")
+    #robot_description_config = xacro.process_file(xacro_file).toxml()
+    robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
 
     # Create robot_state_publisher node
     params1 = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
@@ -58,14 +58,14 @@ def generate_launch_description():
 	
 	# Create driver node
     driver = Node(
-        package = 'ecn_project',
+        package = 'mobile_robot',
         executable = 'driver',
         output = 'screen',
     )
     
     # Create transform_broadcaster node
     transform_broadcaster = Node(
-        package = 'ecn_project',
+        package = 'mobile_robot',
         executable = 'transform_broadcaster',
         output = 'screen',
     )
@@ -80,13 +80,13 @@ def generate_launch_description():
 			
 			
         DeclareLaunchArgument(
-            'use_sim_time',
-            default_value = 'false',
+            "use_sim_time",
+            default_value = "false",
             description = 'use sim time if true '),
             
         DeclareLaunchArgument(
-            'use_ros2_control',
-            default_value = 'true',
+            "use_ros2_control",
+            default_value = "true",
             description = 'use ros2 control if true'),
         
         #joint_state_publisher_gui,
