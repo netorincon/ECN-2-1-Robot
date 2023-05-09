@@ -1,0 +1,1 @@
+/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot/ament_cmake_core/mobile_robotConfig.cmake

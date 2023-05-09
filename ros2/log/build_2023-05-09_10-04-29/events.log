@@ -1,0 +1,174 @@
+[0.000000] (-) TimerEvent: {}
+[0.000614] (mobile_robot) JobQueued: {'identifier': 'mobile_robot', 'dependencies': OrderedDict()}
+[0.000662] (mobile_robot) JobStarted: {'identifier': 'mobile_robot'}
+[0.024503] (mobile_robot) JobProgress: {'identifier': 'mobile_robot', 'progress': 'cmake'}
+[0.025159] (mobile_robot) Command: {'cmd': ['/usr/bin/cmake', '/home/netorincon/ECN-1-2-Robot/ros2/src/1-2-robot', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot'], 'cwd': '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'netorincon'), ('LC_TIME', 'fr_FR.UTF-8'), ('SSH_AGENT_PID', '1631'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib::/usr/lib/x86_64-linux-gnu/gazebo-11/plugins'), ('ros1_workspaces', '/opt/ros/noetic /opt/ecn/ros1 /home/netorincon/ros /home/netorincon/ECN-1-2-Robot/ros'), ('PS1_ori', '\\e[1;34m\\w\\e[0m$'), ('HOME', '/home/netorincon'), ('ros2_workspaces', '/opt/ros/foxy /opt/ecn/ros2 /home/netorincon/ros2 /home/netorincon/ECN-1-2-Robot/ros2'), ('CYCLONEDDS_URI', '<General>\n            <NetworkInterfaceAddress>lo</NetworkInterfaceAddress>\n            <AllowMulticast>false</AllowMulticast>\n        </General>\n        <Discovery>\n            <ParticipantIndex>auto</ParticipantIndex>\n            <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>\n            <Peers>\n                <Peer address="localhost"/>\n            </Peers>\n        </Discovery>'), ('OLDPWD', '/home/netorincon/ECN-1-2-Robot/ros2/'), ('DESKTOP_SESSION', 'ubuntu'), ('GAZEBO_MASTER_URI', 'http://localhost:11345'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('PS1', '\\[\\e[38;5;166m\\][ROS2\\[\\e[38;5;166m\\]]\\[\\e[0m\\] \\e[1;34m\\w\\e[0m$'), ('LC_MONETARY', 'fr_FR.UTF-8'), ('MANAGERPID', '1202'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/netorincon/ros2/install'), ('ROS_DISTRO', 'foxy'), ('LOGNAME', 'netorincon'), ('JOURNAL_STREAM', '8:38812'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'netorincon'), ('TERM', 'xterm-256color'), ('GAZEBO_MODEL_PATH', '/usr/share/gazebo-11/models:'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '1'), ('WINDOWPATH', '2'), ('OGRE_RESOURCE_PATH', '/usr/lib/x86_64-linux-gnu/OGRE-1.9.0'), ('PATH', '/opt/ros/foxy/bin:/home/netorincon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/G14:@/tmp/.ICE-unix/1705,unix/G14:/tmp/.ICE-unix/1705'), ('INVOCATION_ID', '4381c719dd5e4abaa622f1441b40a4a9'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'fr_FR.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/b4307c75_4e03_4256_bf24_3399acb2cf7f'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'fr_FR.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.295'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/foxy'), ('SHELL', '/bin/bash'), ('LC_NAME', 'fr_FR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'fr_FR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GAZEBO_RESOURCE_PATH', '/usr/share/gazebo-11:'), ('LC_IDENTIFICATION', 'fr_FR.UTF-8'), ('GZ_VERSION', 'fortress'), ('GAZEBO_MODEL_DATABASE_URI', 'http://models.gazebosim.org'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('GAZEBO_PLUGIN_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/foxy/lib/python3.8/site-packages'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'fr_FR.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/opt/ros/foxy')]), 'shell': False}
+[0.095753] (mobile_robot) StdoutLine: {'line': b'-- The C compiler identification is GNU 9.4.0\n'}
+[0.099259] (-) TimerEvent: {}
+[0.167829] (mobile_robot) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 9.4.0\n'}
+[0.174622] (mobile_robot) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc\n'}
+[0.199391] (-) TimerEvent: {}
+[0.261064] (mobile_robot) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc -- works\n'}
+[0.262512] (mobile_robot) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.299490] (-) TimerEvent: {}
+[0.366865] (mobile_robot) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.375759] (mobile_robot) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.376030] (mobile_robot) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.377917] (mobile_robot) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++\n'}
+[0.399635] (-) TimerEvent: {}
+[0.461201] (mobile_robot) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ -- works\n'}
+[0.463193] (mobile_robot) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.499813] (-) TimerEvent: {}
+[0.573168] (mobile_robot) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.587852] (mobile_robot) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.588141] (mobile_robot) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.589580] (mobile_robot) StdoutLine: {'line': b'-- Found ament_cmake: 0.9.11 (/opt/ros/foxy/share/ament_cmake/cmake)\n'}
+[0.599950] (-) TimerEvent: {}
+[0.612170] (mobile_robot) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") \n'}
+[0.612411] (mobile_robot) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[0.700054] (-) TimerEvent: {}
+[0.740915] (mobile_robot) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.762681] (mobile_robot) StdoutLine: {'line': b'-- Found rclcpp: 2.4.2 (/opt/ros/foxy/share/rclcpp/cmake)\n'}
+[0.797463] (mobile_robot) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.800148] (-) TimerEvent: {}
+[0.802093] (mobile_robot) StdoutLine: {'line': b'-- Found rosidl_adapter: 1.3.0 (/opt/ros/foxy/share/rosidl_adapter/cmake)\n'}
+[0.878211] (mobile_robot) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  \n'}
+[0.900312] (-) TimerEvent: {}
+[0.901855] (mobile_robot) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/foxy/include  \n'}
+[0.983152] (mobile_robot) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.000436] (-) TimerEvent: {}
+[1.025726] (mobile_robot) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)\n'}
+[1.026725] (mobile_robot) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[1.027383] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[1.100569] (-) TimerEvent: {}
+[1.121556] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[1.122025] (mobile_robot) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.200755] (-) TimerEvent: {}
+[1.210161] (mobile_robot) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed\n'}
+[1.210407] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads\n'}
+[1.277172] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads - not found\n'}
+[1.277570] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread_create in pthread\n'}
+[1.300873] (-) TimerEvent: {}
+[1.358723] (mobile_robot) StdoutLine: {'line': b'-- Looking for pthread_create in pthread - found\n'}
+[1.360659] (mobile_robot) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.400980] (-) TimerEvent: {}
+[1.488093] (mobile_robot) StdoutLine: {'line': b'-- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)\n'}
+[1.501096] (-) TimerEvent: {}
+[1.591315] (mobile_robot) StdoutLine: {'line': b'-- Found tf2_ros: 0.13.14 (/opt/ros/foxy/share/tf2_ros/cmake)\n'}
+[1.601223] (-) TimerEvent: {}
+[1.701542] (-) TimerEvent: {}
+[1.801896] (-) TimerEvent: {}
+[1.873639] (mobile_robot) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.9.8 (/opt/ros/foxy/share/ament_lint_auto/cmake)\n'}
+[1.902027] (-) TimerEvent: {}
+[1.937693] (mobile_robot) StdoutLine: {'line': b"-- Added test 'copyright' to check source files copyright and LICENSE\n"}
+[1.938572] (mobile_robot) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[1.938819] (mobile_robot) StdoutLine: {'line': b'-- Configured cppcheck include dirs: \n'}
+[1.938936] (mobile_robot) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[1.939400] (mobile_robot) StdoutLine: {'line': b"-- Added test 'cpplint' to check C / C++ code against the Google style\n"}
+[1.939502] (mobile_robot) StdoutLine: {'line': b'-- Configured cpplint exclude dirs and/or files: \n'}
+[1.939813] (mobile_robot) StdoutLine: {'line': b"-- Added test 'flake8' to check Python code syntax and style conventions\n"}
+[1.940176] (mobile_robot) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[1.940548] (mobile_robot) StdoutLine: {'line': b"-- Added test 'pep257' to check Python code against some of the style conventions in PEP 257\n"}
+[1.941327] (mobile_robot) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[1.941494] (mobile_robot) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[1.941665] (mobile_robot) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[1.944463] (mobile_robot) StdoutLine: {'line': b'-- Configuring done\n'}
+[1.956313] (mobile_robot) StdoutLine: {'line': b'-- Generating done\n'}
+[1.957778] (mobile_robot) StdoutLine: {'line': b'-- Build files have been written to: /home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot\n'}
+[1.964649] (mobile_robot) CommandEnded: {'returncode': 0}
+[1.967575] (mobile_robot) JobProgress: {'identifier': 'mobile_robot', 'progress': 'build'}
+[1.967632] (mobile_robot) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot', '--', '-j16', '-l16'], 'cwd': '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'netorincon'), ('LC_TIME', 'fr_FR.UTF-8'), ('SSH_AGENT_PID', '1631'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib::/usr/lib/x86_64-linux-gnu/gazebo-11/plugins'), ('ros1_workspaces', '/opt/ros/noetic /opt/ecn/ros1 /home/netorincon/ros /home/netorincon/ECN-1-2-Robot/ros'), ('PS1_ori', '\\e[1;34m\\w\\e[0m$'), ('HOME', '/home/netorincon'), ('ros2_workspaces', '/opt/ros/foxy /opt/ecn/ros2 /home/netorincon/ros2 /home/netorincon/ECN-1-2-Robot/ros2'), ('CYCLONEDDS_URI', '<General>\n            <NetworkInterfaceAddress>lo</NetworkInterfaceAddress>\n            <AllowMulticast>false</AllowMulticast>\n        </General>\n        <Discovery>\n            <ParticipantIndex>auto</ParticipantIndex>\n            <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>\n            <Peers>\n                <Peer address="localhost"/>\n            </Peers>\n        </Discovery>'), ('OLDPWD', '/home/netorincon/ECN-1-2-Robot/ros2/'), ('DESKTOP_SESSION', 'ubuntu'), ('GAZEBO_MASTER_URI', 'http://localhost:11345'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('PS1', '\\[\\e[38;5;166m\\][ROS2\\[\\e[38;5;166m\\]]\\[\\e[0m\\] \\e[1;34m\\w\\e[0m$'), ('LC_MONETARY', 'fr_FR.UTF-8'), ('MANAGERPID', '1202'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/netorincon/ros2/install'), ('ROS_DISTRO', 'foxy'), ('LOGNAME', 'netorincon'), ('JOURNAL_STREAM', '8:38812'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'netorincon'), ('TERM', 'xterm-256color'), ('GAZEBO_MODEL_PATH', '/usr/share/gazebo-11/models:'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '1'), ('WINDOWPATH', '2'), ('OGRE_RESOURCE_PATH', '/usr/lib/x86_64-linux-gnu/OGRE-1.9.0'), ('PATH', '/opt/ros/foxy/bin:/home/netorincon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/G14:@/tmp/.ICE-unix/1705,unix/G14:/tmp/.ICE-unix/1705'), ('INVOCATION_ID', '4381c719dd5e4abaa622f1441b40a4a9'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'fr_FR.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/b4307c75_4e03_4256_bf24_3399acb2cf7f'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'fr_FR.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.295'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/foxy'), ('SHELL', '/bin/bash'), ('LC_NAME', 'fr_FR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'fr_FR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GAZEBO_RESOURCE_PATH', '/usr/share/gazebo-11:'), ('LC_IDENTIFICATION', 'fr_FR.UTF-8'), ('GZ_VERSION', 'fortress'), ('GAZEBO_MODEL_DATABASE_URI', 'http://models.gazebosim.org'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('GAZEBO_PLUGIN_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/foxy/lib/python3.8/site-packages'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'fr_FR.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/opt/ros/foxy')]), 'shell': False}
+[2.002179] (-) TimerEvent: {}
+[2.018111] (mobile_robot) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target transform_broadcaster\x1b[0m\n'}
+[2.020494] (mobile_robot) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target driver\x1b[0m\n'}
+[2.052161] (mobile_robot) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/transform_broadcaster.dir/src/transform_broadcaster.cpp.o\x1b[0m\n'}
+[2.060178] (mobile_robot) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/driver.dir/src/driver.cpp.o\x1b[0m\n'}
+[2.102297] (-) TimerEvent: {}
+[2.202631] (-) TimerEvent: {}
+[2.303008] (-) TimerEvent: {}
+[2.403346] (-) TimerEvent: {}
+[2.503686] (-) TimerEvent: {}
+[2.604025] (-) TimerEvent: {}
+[2.704367] (-) TimerEvent: {}
+[2.804751] (-) TimerEvent: {}
+[2.905070] (-) TimerEvent: {}
+[3.005383] (-) TimerEvent: {}
+[3.105727] (-) TimerEvent: {}
+[3.206072] (-) TimerEvent: {}
+[3.306426] (-) TimerEvent: {}
+[3.406779] (-) TimerEvent: {}
+[3.507134] (-) TimerEvent: {}
+[3.607480] (-) TimerEvent: {}
+[3.707828] (-) TimerEvent: {}
+[3.808193] (-) TimerEvent: {}
+[3.908539] (-) TimerEvent: {}
+[4.008890] (-) TimerEvent: {}
+[4.109205] (-) TimerEvent: {}
+[4.209525] (-) TimerEvent: {}
+[4.309888] (-) TimerEvent: {}
+[4.410245] (-) TimerEvent: {}
+[4.510586] (-) TimerEvent: {}
+[4.610899] (-) TimerEvent: {}
+[4.711233] (-) TimerEvent: {}
+[4.811566] (-) TimerEvent: {}
+[4.911911] (-) TimerEvent: {}
+[5.012253] (-) TimerEvent: {}
+[5.112560] (-) TimerEvent: {}
+[5.212910] (-) TimerEvent: {}
+[5.313224] (-) TimerEvent: {}
+[5.413533] (-) TimerEvent: {}
+[5.513843] (-) TimerEvent: {}
+[5.614153] (-) TimerEvent: {}
+[5.714478] (-) TimerEvent: {}
+[5.814803] (-) TimerEvent: {}
+[5.915165] (-) TimerEvent: {}
+[6.015487] (-) TimerEvent: {}
+[6.115810] (-) TimerEvent: {}
+[6.216168] (-) TimerEvent: {}
+[6.274926] (mobile_robot) StdoutLine: {'line': b'[ 75%] \x1b[32m\x1b[1mLinking CXX executable driver\x1b[0m\n'}
+[6.284817] (mobile_robot) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable transform_broadcaster\x1b[0m\n'}
+[6.316335] (-) TimerEvent: {}
+[6.416782] (-) TimerEvent: {}
+[6.513193] (mobile_robot) StdoutLine: {'line': b'[100%] Built target driver\n'}
+[6.516909] (-) TimerEvent: {}
+[6.559444] (mobile_robot) StdoutLine: {'line': b'[100%] Built target transform_broadcaster\n'}
+[6.574114] (mobile_robot) CommandEnded: {'returncode': 0}
+[6.614888] (mobile_robot) JobProgress: {'identifier': 'mobile_robot', 'progress': 'install'}
+[6.617237] (-) TimerEvent: {}
+[6.633041] (mobile_robot) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot'], 'cwd': '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'netorincon'), ('LC_TIME', 'fr_FR.UTF-8'), ('SSH_AGENT_PID', '1631'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib::/usr/lib/x86_64-linux-gnu/gazebo-11/plugins'), ('ros1_workspaces', '/opt/ros/noetic /opt/ecn/ros1 /home/netorincon/ros /home/netorincon/ECN-1-2-Robot/ros'), ('PS1_ori', '\\e[1;34m\\w\\e[0m$'), ('HOME', '/home/netorincon'), ('ros2_workspaces', '/opt/ros/foxy /opt/ecn/ros2 /home/netorincon/ros2 /home/netorincon/ECN-1-2-Robot/ros2'), ('CYCLONEDDS_URI', '<General>\n            <NetworkInterfaceAddress>lo</NetworkInterfaceAddress>\n            <AllowMulticast>false</AllowMulticast>\n        </General>\n        <Discovery>\n            <ParticipantIndex>auto</ParticipantIndex>\n            <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>\n            <Peers>\n                <Peer address="localhost"/>\n            </Peers>\n        </Discovery>'), ('OLDPWD', '/home/netorincon/ECN-1-2-Robot/ros2/'), ('DESKTOP_SESSION', 'ubuntu'), ('GAZEBO_MASTER_URI', 'http://localhost:11345'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('PS1', '\\[\\e[38;5;166m\\][ROS2\\[\\e[38;5;166m\\]]\\[\\e[0m\\] \\e[1;34m\\w\\e[0m$'), ('LC_MONETARY', 'fr_FR.UTF-8'), ('MANAGERPID', '1202'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/netorincon/ros2/install'), ('ROS_DISTRO', 'foxy'), ('LOGNAME', 'netorincon'), ('JOURNAL_STREAM', '8:38812'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'netorincon'), ('TERM', 'xterm-256color'), ('GAZEBO_MODEL_PATH', '/usr/share/gazebo-11/models:'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '1'), ('WINDOWPATH', '2'), ('OGRE_RESOURCE_PATH', '/usr/lib/x86_64-linux-gnu/OGRE-1.9.0'), ('PATH', '/opt/ros/foxy/bin:/home/netorincon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/G14:@/tmp/.ICE-unix/1705,unix/G14:/tmp/.ICE-unix/1705'), ('INVOCATION_ID', '4381c719dd5e4abaa622f1441b40a4a9'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'fr_FR.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/b4307c75_4e03_4256_bf24_3399acb2cf7f'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'fr_FR.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.295'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/foxy'), ('SHELL', '/bin/bash'), ('LC_NAME', 'fr_FR.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('LC_MEASUREMENT', 'fr_FR.UTF-8'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GAZEBO_RESOURCE_PATH', '/usr/share/gazebo-11:'), ('LC_IDENTIFICATION', 'fr_FR.UTF-8'), ('GZ_VERSION', 'fortress'), ('GAZEBO_MODEL_DATABASE_URI', 'http://models.gazebosim.org'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/netorincon/ECN-1-2-Robot/ros2/build/mobile_robot'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('GAZEBO_PLUGIN_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=b93983fcccbf471a603bf66d64590e7a'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/foxy/lib/python3.8/site-packages'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'fr_FR.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/opt/ros/foxy')]), 'shell': False}
+[6.639806] (mobile_robot) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[6.640076] (mobile_robot) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[6.640395] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/lib/mobile_robot/driver\n'}
+[6.648079] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/lib/mobile_robot/transform_broadcaster\n'}
+[6.663100] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/config/Twist.yaml\n'}
+[6.678242] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/config/my_controllers.yaml\n'}
+[6.693417] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/config/robot_core.urdf\n'}
+[6.704825] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/config/rviz_config.rviz\n'}
+[6.712591] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/description/gazebo_control.xacro\n'}
+[6.717291] (-) TimerEvent: {}
+[6.727334] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/description/inertial_macros.xacro\n'}
+[6.735262] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/description/robot.urdf.xacro\n'}
+[6.743161] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/description/robot_core.xacro\n'}
+[6.754976] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/description/ros2_control.xacro\n'}
+[6.769312] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/launch/Twist.yaml\n'}
+[6.779681] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/launch/display.launch.py\n'}
+[6.787852] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/ament_index/resource_index/package_run_dependencies/mobile_robot\n'}
+[6.795207] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/ament_index/resource_index/parent_prefix_path/mobile_robot\n'}
+[6.802704] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/environment/ament_prefix_path.sh\n'}
+[6.815939] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/environment/ament_prefix_path.dsv\n'}
+[6.817368] (-) TimerEvent: {}
+[6.825260] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/environment/path.sh\n'}
+[6.832664] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/environment/path.dsv\n'}
+[6.847674] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/local_setup.bash\n'}
+[6.855918] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/local_setup.sh\n'}
+[6.863216] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/local_setup.zsh\n'}
+[6.870597] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/local_setup.dsv\n'}
+[6.878496] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/package.dsv\n'}
+[6.886553] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/ament_index/resource_index/packages/mobile_robot\n'}
+[6.894564] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/cmake/mobile_robotConfig.cmake\n'}
+[6.902133] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/cmake/mobile_robotConfig-version.cmake\n'}
+[6.909943] (mobile_robot) StdoutLine: {'line': b'-- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/mobile_robot/share/mobile_robot/package.xml\n'}
+[6.917541] (-) TimerEvent: {}
+[6.925338] (mobile_robot) CommandEnded: {'returncode': 0}
+[6.989088] (mobile_robot) JobEnded: {'identifier': 'mobile_robot', 'rc': 0}
+[6.989613] (-) EventReactorShutdown: {}
