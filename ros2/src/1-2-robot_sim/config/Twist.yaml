@@ -1,0 +1,14 @@
+cmd_vel:
+    type: std_msgs/Float64MultiArray
+    Um:
+		min: 0
+		max: 100
+		to: data[0]
+	Beta1:
+		min: -3.14
+		max: 3.14
+		to: data[1]
+	Beta2:
+		min: -3.14
+		max: 3.14
+		to: data[2]

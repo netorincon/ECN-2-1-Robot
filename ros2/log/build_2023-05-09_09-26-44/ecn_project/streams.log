@@ -1,0 +1,97 @@
+[0.040s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake /home/netorincon/ECN-1-2-Robot/ros2/src/1-2-robot_sim -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project
+[0.213s] -- The C compiler identification is GNU 9.4.0
+[0.332s] -- The CXX compiler identification is GNU 9.4.0
+[0.342s] -- Check for working C compiler: /usr/bin/cc
+[0.454s] -- Check for working C compiler: /usr/bin/cc -- works
+[0.457s] -- Detecting C compiler ABI info
+[0.567s] -- Detecting C compiler ABI info - done
+[0.586s] -- Detecting C compile features
+[0.587s] -- Detecting C compile features - done
+[0.591s] -- Check for working CXX compiler: /usr/bin/c++
+[0.722s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[0.724s] -- Detecting CXX compiler ABI info
+[0.842s] -- Detecting CXX compiler ABI info - done
+[0.862s] -- Detecting CXX compile features
+[0.862s] -- Detecting CXX compile features - done
+[0.865s] -- Found ament_cmake: 0.9.11 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.898s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+[0.899s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[1.108s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.141s] -- Found rclcpp: 2.4.2 (/opt/ros/foxy/share/rclcpp/cmake)
+[1.196s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.204s] -- Found rosidl_adapter: 1.3.0 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[1.347s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  
+[1.390s] -- Found FastRTPS: /opt/ros/foxy/include  
+[1.498s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.570s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[1.571s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.574s] -- Looking for pthread.h
+[1.685s] -- Looking for pthread.h - found
+[1.685s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.797s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+[1.797s] -- Looking for pthread_create in pthreads
+[1.884s] -- Looking for pthread_create in pthreads - not found
+[1.884s] -- Looking for pthread_create in pthread
+[1.983s] -- Looking for pthread_create in pthread - found
+[1.985s] -- Found Threads: TRUE  
+[2.190s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[2.350s] -- Found tf2_ros: 0.13.14 (/opt/ros/foxy/share/tf2_ros/cmake)
+[2.824s] -- Found ament_lint_auto: 0.9.8 (/opt/ros/foxy/share/ament_lint_auto/cmake)
+[2.916s] -- Added test 'copyright' to check source files copyright and LICENSE
+[2.917s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[2.917s] -- Configured cppcheck include dirs: 
+[2.918s] -- Configured cppcheck exclude dirs and/or files: 
+[2.918s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[2.919s] -- Configured cpplint exclude dirs and/or files: 
+[2.919s] -- Added test 'flake8' to check Python code syntax and style conventions
+[2.920s] -- Added test 'lint_cmake' to check CMake code style
+[2.920s] -- Added test 'pep257' to check Python code against some of the style conventions in PEP 257
+[2.921s] -- Added test 'uncrustify' to check C / C++ code style
+[2.921s] -- Configured uncrustify additional arguments: 
+[2.922s] -- Added test 'xmllint' to check XML markup files
+[2.926s] -- Configuring done
+[2.945s] -- Generating done
+[2.947s] -- Build files have been written to: /home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project
+[2.956s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake /home/netorincon/ECN-1-2-Robot/ros2/src/1-2-robot_sim -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project
+[2.961s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --build /home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project -- -j16 -l16
+[3.019s] [35m[1mScanning dependencies of target transform_broadcaster[0m
+[3.020s] [35m[1mScanning dependencies of target driver[0m
+[3.074s] [ 25%] [32mBuilding CXX object CMakeFiles/driver.dir/src/driver.cpp.o[0m
+[3.074s] [ 50%] [32mBuilding CXX object CMakeFiles/transform_broadcaster.dir/src/transform_broadcaster.cpp.o[0m
+[9.205s] [ 75%] [32m[1mLinking CXX executable transform_broadcaster[0m
+[9.394s] [100%] [32m[1mLinking CXX executable driver[0m
+[9.555s] [100%] Built target transform_broadcaster
+[9.709s] [100%] Built target driver
+[9.723s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --build /home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project -- -j16 -l16
+[9.772s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --install /home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project
+[9.784s] -- Install configuration: ""
+[9.784s] -- Execute custom install script
+[9.785s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/lib/ecn_project/driver
+[9.800s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/lib/ecn_project/transform_broadcaster
+[9.811s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/config/Twist.yaml
+[9.822s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/config/my_controllers.yaml
+[9.835s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/config/robot_core.urdf
+[9.850s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/config/rviz_config.rviz
+[9.861s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/description/gazebo_control.xacro
+[9.876s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/description/inertial_macros.xacro
+[9.891s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/description/robot.urdf.xacro
+[9.901s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/description/robot_core.xacro
+[9.915s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/description/ros2_control.xacro
+[9.931s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/launch/Twist.yaml
+[9.942s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/launch/display.launch.py
+[9.956s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ament_index/resource_index/package_run_dependencies/ecn_project
+[9.971s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ament_index/resource_index/parent_prefix_path/ecn_project
+[9.982s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/environment/ament_prefix_path.sh
+[9.993s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/environment/ament_prefix_path.dsv
+[10.003s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/environment/path.sh
+[10.014s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/environment/path.dsv
+[10.025s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/local_setup.bash
+[10.041s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/local_setup.sh
+[10.055s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/local_setup.zsh
+[10.070s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/local_setup.dsv
+[10.081s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/package.dsv
+[10.091s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ament_index/resource_index/packages/ecn_project
+[10.102s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/cmake/ecn_projectConfig.cmake
+[10.117s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/cmake/ecn_projectConfig-version.cmake
+[10.132s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/ecn_project/share/ecn_project/package.xml
+[10.153s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --install /home/netorincon/ECN-1-2-Robot/ros2/build/ecn_project
