@@ -1,0 +1,98 @@
+[0.025s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake /home/netorincon/ECN-1-2-Robot/ros2/src/1-2-robot -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot
+[0.095s] -- The C compiler identification is GNU 9.4.0
+[0.159s] -- The CXX compiler identification is GNU 9.4.0
+[0.168s] -- Check for working C compiler: /usr/bin/cc
+[0.251s] -- Check for working C compiler: /usr/bin/cc -- works
+[0.252s] -- Detecting C compiler ABI info
+[0.336s] -- Detecting C compiler ABI info - done
+[0.345s] -- Detecting C compile features
+[0.345s] -- Detecting C compile features - done
+[0.347s] -- Check for working CXX compiler: /usr/bin/c++
+[0.443s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[0.445s] -- Detecting CXX compiler ABI info
+[0.535s] -- Detecting CXX compiler ABI info - done
+[0.550s] -- Detecting CXX compile features
+[0.551s] -- Detecting CXX compile features - done
+[0.552s] -- Found ament_cmake: 0.9.11 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.579s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+[0.579s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.714s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.737s] -- Found rclcpp: 2.4.2 (/opt/ros/foxy/share/rclcpp/cmake)
+[0.772s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.777s] -- Found rosidl_adapter: 1.3.0 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.887s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  
+[0.912s] -- Found FastRTPS: /opt/ros/foxy/include  
+[0.982s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.026s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[1.027s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.028s] -- Looking for pthread.h
+[1.108s] -- Looking for pthread.h - found
+[1.108s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.183s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+[1.183s] -- Looking for pthread_create in pthreads
+[1.269s] -- Looking for pthread_create in pthreads - not found
+[1.269s] -- Looking for pthread_create in pthread
+[1.365s] -- Looking for pthread_create in pthread - found
+[1.367s] -- Found Threads: TRUE  
+[1.501s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[1.598s] -- Found tf2_ros: 0.13.14 (/opt/ros/foxy/share/tf2_ros/cmake)
+[1.890s] -- Found ament_lint_auto: 0.9.8 (/opt/ros/foxy/share/ament_lint_auto/cmake)
+[1.939s] WARNING: Package name "1-2_robot" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+[1.964s] -- Added test 'copyright' to check source files copyright and LICENSE
+[1.965s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[1.965s] -- Configured cppcheck include dirs: 
+[1.965s] -- Configured cppcheck exclude dirs and/or files: 
+[1.966s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[1.966s] -- Configured cpplint exclude dirs and/or files: 
+[1.966s] -- Added test 'flake8' to check Python code syntax and style conventions
+[1.967s] -- Added test 'lint_cmake' to check CMake code style
+[1.967s] -- Added test 'pep257' to check Python code against some of the style conventions in PEP 257
+[1.968s] -- Added test 'uncrustify' to check C / C++ code style
+[1.968s] -- Configured uncrustify additional arguments: 
+[1.968s] -- Added test 'xmllint' to check XML markup files
+[1.971s] -- Configuring done
+[1.983s] -- Generating done
+[1.985s] -- Build files have been written to: /home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot
+[1.995s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake /home/netorincon/ECN-1-2-Robot/ros2/src/1-2-robot -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot
+[1.999s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --build /home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot -- -j16 -l16
+[2.056s] [35m[1mScanning dependencies of target transform_broadcaster[0m
+[2.056s] [35m[1mScanning dependencies of target driver[0m
+[2.085s] [ 25%] [32mBuilding CXX object CMakeFiles/driver.dir/src/driver.cpp.o[0m
+[2.087s] [ 50%] [32mBuilding CXX object CMakeFiles/transform_broadcaster.dir/src/transform_broadcaster.cpp.o[0m
+[6.189s] [ 75%] [32m[1mLinking CXX executable driver[0m
+[6.308s] [100%] [32m[1mLinking CXX executable transform_broadcaster[0m
+[6.445s] [100%] Built target driver
+[6.552s] [100%] Built target transform_broadcaster
+[6.567s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --build /home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot -- -j16 -l16
+[6.617s] Invoking command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --install /home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot
+[6.629s] -- Install configuration: ""
+[6.630s] -- Execute custom install script
+[6.630s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/lib/1-2_robot/driver
+[6.645s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/lib/1-2_robot/transform_broadcaster
+[6.653s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/config/Twist.yaml
+[6.660s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/config/my_controllers.yaml
+[6.667s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/config/robot_core.urdf
+[6.674s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/config/rviz_config.rviz
+[6.684s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/description/gazebo_control.xacro
+[6.691s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/description/inertial_macros.xacro
+[6.702s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/description/robot.urdf.xacro
+[6.709s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/description/robot_core.xacro
+[6.716s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/description/ros2_control.xacro
+[6.731s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/launch/Twist.yaml
+[6.743s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/launch/display.launch.py
+[6.754s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/ament_index/resource_index/package_run_dependencies/1-2_robot
+[6.762s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/ament_index/resource_index/parent_prefix_path/1-2_robot
+[6.769s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/environment/ament_prefix_path.sh
+[6.776s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/environment/ament_prefix_path.dsv
+[6.784s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/environment/path.sh
+[6.792s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/environment/path.dsv
+[6.799s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/local_setup.bash
+[6.809s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/local_setup.sh
+[6.817s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/local_setup.zsh
+[6.831s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/local_setup.dsv
+[6.846s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/package.dsv
+[6.861s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/ament_index/resource_index/packages/1-2_robot
+[6.874s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/cmake/1-2_robotConfig.cmake
+[6.883s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/cmake/1-2_robotConfig-version.cmake
+[6.890s] -- Symlinking: /home/netorincon/ECN-1-2-Robot/ros2/install/1-2_robot/share/1-2_robot/package.xml
+[6.900s] Invoked command in '/home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/foxy PS1=\[\e[38;5;166m\][ROS2\[\e[38;5;166m\]]\[\e[0m\] \e[1;34m\w\e[0m$ PS1_ori=\e[1;34m\w\e[0m$ /usr/bin/cmake --install /home/netorincon/ECN-1-2-Robot/ros2/build/1-2_robot
