@@ -29,6 +29,12 @@ ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found e
 add_executable(transform_broadcaster src/transform_broadcaster.cpp )
 ament_target_dependencies(transform_broadcaster tf2_ros rclcpp sensor_msgs std_msgs)
 
+add_executable(sim src/sim.cpp )
+ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs)
+
+add_executable(real_world src/real_world.cpp )
+ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
+
 install(TARGETS
     driver
     DESTINATION lib/${PROJECT_NAME}
@@ -38,7 +44,16 @@ install(TARGETS
     transform_broadcaster
     DESTINATION lib/${PROJECT_NAME}
     )
+    
+install(TARGETS
+    sim
+    DESTINATION lib/${PROJECT_NAME}
+    )
 
+install(TARGETS
+    real_world
+    DESTINATION lib/${PROJECT_NAME}
+    )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
