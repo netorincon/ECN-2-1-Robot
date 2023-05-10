@@ -10,27 +10,27 @@ Then it assembles a transform and published it to /tf2 to be able to see the rob
         The command input should include [um, deltaDot1 and deltaDot2]
     /joint_states topic
     
-
 ---Publishers
     /joint_cmd
-
 */
 
 #include <algorithm>
 #include <string>
 #include <math.h>
 #include <cstring>
+#include <chrono>
+#include <functional>
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <chrono>
-#include <functional>
 
 using namespace std::chrono_literals;
 
+
+//Structure for easy arranging of motor positions and speeds
 struct MotorState{
     std::string id;
     float position;
@@ -70,7 +70,7 @@ class real_world : public rclcpp::Node
                             "input_cmd", 10, std::bind(&real_world::calculateDesiredSpeeds, this, std::placeholders::_1));
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_cmd", 10);
-            timer_ = this->create_wall_timer(100ms, std::bind(&real_world::publishJointCommand, this));
+            timer_ = this->create_wall_timer(50ms, std::bind(&real_world::publishJointCommand, this));
             
         }
         //We initialize all variables of the state vector at 0
@@ -147,6 +147,8 @@ class real_world : public rclcpp::Node
 
         phi1d=2*cos(d2)*Um/R;
         phi2d=2*cos(d1)*Um/R;
+
+        //Arrange the speeds in an array for faster assignment during publishJointCommand 
         commandArray[0].id=1;
         commandArray[0].speed=phi1d;
 
@@ -164,6 +166,7 @@ class real_world : public rclcpp::Node
         
         joint_cmd.header.stamp=this->now();
         for(int i=0;i<4;i++){
+            //TODO Change the name parameter to the robot joint name instead of using just a number
             joint_cmd.name[i]=std::to_string(i);
             joint_cmd.velocity[i]=commandArray[i].speed;
             joint_cmd.position[i]=0;

@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(control_input REQUIRED)
 
 
 
@@ -30,7 +31,7 @@ add_executable(transform_broadcaster src/transform_broadcaster.cpp )
 ament_target_dependencies(transform_broadcaster tf2_ros rclcpp sensor_msgs std_msgs)
 
 add_executable(sim src/sim.cpp )
-ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs)
+ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
 add_executable(real_world src/real_world.cpp )
 ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
@@ -54,7 +55,7 @@ install(TARGETS
     real_world
     DESTINATION lib/${PROJECT_NAME}
     )
-
+    
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights

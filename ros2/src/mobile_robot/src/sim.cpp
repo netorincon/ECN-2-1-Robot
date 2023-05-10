@@ -12,11 +12,14 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <string>
 #include <math.h>
 #include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <control_input/msg/control_input.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
+
 #include <chrono>
 
 struct MotorState{
@@ -24,6 +27,12 @@ struct MotorState{
     float position;
     float speed;
 };
+
+double limit_angle(double a){
+    while( a >=  M_PI ) a -= 2*M_PI ;
+    while( a <  -M_PI ) a += 2*M_PI ;
+    return a ;
+}
 
 class transform_broadcaster : public rclcpp::Node
 {
@@ -43,65 +52,93 @@ class transform_broadcaster : public rclcpp::Node
             Then the values are integrated over time to obtain the current state vector.
             
             */
-            cmd_subscriber = this->create_subscription<std_msgs::msg::Float64MultiArray>(
+            cmd_subscriber = this->create_subscription<control_input::msg::ControlInput>(
                             "cmd_robot", 10, std::bind(&transform_broadcaster::calculatePose, this, std::placeholders::_1));
+
+            joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             
         }
         //We initialize all variables of the state vector at 0
-        float tt, x, y, phi1, phi2, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
+        float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
 
     private :
         geometry_msgs::msg::TransformStamped transform_stamped_;
-        rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr cmd_subscriber;
+        geometry_msgs::msg::TransformStamped icr;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr cmd_subscriber;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        sensor_msgs::msg::JointState joint_state;
+        tf2::Quaternion rotation;
         float frequency = 20; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.05;//Base distance
         float R=0.06; //Radius of the wheels
 
-void calculatePose(const std_msgs::msg::Float64MultiArray::SharedPtr msg){
+    void calculatePose(const control_input::msg::ControlInput::SharedPtr msg){
         
-        Um = msg->data[0];
-        dd1 = msg->data[1];
-        dd2 = msg->data[2];
-
+        Um = msg->um;
+        dd1 = msg->beta1dot;
+        dd2 = msg->beta2dot;
 
         //We calculate current robot speeds and orientation motor 
         tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
+        tt+=tt_dot*period;
+        tt=limit_angle(tt);
+
         x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
         y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
+        phi1d=2*cos(d2)*Um/R;
+        phi2d=2*cos(d1)*Um/R;
 
         //We integrate the speeds over time (add each time we get a new value)
         x+=x_dot*period;
         y+=y_dot*period;
-        tt+=tt_dot*period;
+        
         d1+=dd1*period; //Delta 1
         d2+=dd2*period; //Delta 2
+        phi1+=phi1d*period;
+        phi2+=phi2d*period;
         
+        //We limit the angles to +-Pi
+        phi1=limit_angle(phi1);
+        phi2=limit_angle(phi2);
+        
+        //We now publish the joint states
+        joint_state.header.stamp=this->now();
+        std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
+        joint_state.name=names;
+        std::vector<double> values={d2, d1, phi2, phi1};
+        joint_state.position = values;
+        joint_publisher->publish(joint_state);
 
+        //Publishing the chassis transform with respect to the world
         transform_stamped_.header.stamp = this->now();
         transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
         transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
         transform_stamped_.transform.translation.x = x;
         transform_stamped_.transform.translation.y = y;
         transform_stamped_.transform.translation.z = 0;
-        transform_stamped_.transform.rotation.x += 0;
-        transform_stamped_.transform.rotation.y += 0;
-        transform_stamped_.transform.rotation.z += tt;
-        transform_stamped_.transform.rotation.w = 1.0;
-
+        rotation.setRPY(0,0,tt);
+        transform_stamped_.transform.rotation.x = rotation.getX();
+        transform_stamped_.transform.rotation.y = rotation.getY();
+        transform_stamped_.transform.rotation.z = rotation.getZ();
+        transform_stamped_.transform.rotation.w = rotation.getW();
         tf_broadcaster_->sendTransform(transform_stamped_);
 
-}
-    // void getState(const sensor_msgs::msg::JointState::SharedPtr jointState){
-    //     for(int i=0;i<4;i++){
-    //         stateArray[i].id=jointState->name[i];
-    //         stateArray[i].position=jointState->position[i];
-    //         stateArray[i].speed=jointState->velocity[i];
-    //     }
-    // }
-};
+        //Publishing the position of the ICR with respect to the robot chassis
+        icr.header.stamp = this->now();
+        icr.header.frame_id = "chassis"; // Nom du repère fixe
+        icr.child_frame_id = "icr"; // Nom du repère du robot
+        icr.transform.translation.x = (a*cos(d1)*cos(d2+M_PI)/sin(d2+M_PI-d1));
+        icr.transform.translation.y = a/2 - (a*cos(d1)*sin(d2+M_PI)/sin(d2+M_PI-d1));
+        icr.transform.translation.z = 0;
 
+        tf_broadcaster_->sendTransform(icr);
+
+    }
+
+};
 
 int main(int argc, char** argv)
 {
