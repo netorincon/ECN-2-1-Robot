@@ -108,7 +108,7 @@ class transform_broadcaster : public rclcpp::Node
         joint_state.header.stamp=this->now();
         std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
         joint_state.name=names;
-        std::vector<double> values={d2, d1, phi2, phi1};
+        std::vector<double> values={d2+M_PI, d1, phi2, phi1};
         joint_state.position = values;
         joint_publisher->publish(joint_state);
 
@@ -130,8 +130,8 @@ class transform_broadcaster : public rclcpp::Node
         icr.header.stamp = this->now();
         icr.header.frame_id = "chassis"; // Nom du repère fixe
         icr.child_frame_id = "icr"; // Nom du repère du robot
-        icr.transform.translation.x = (a*cos(d1)*cos(d2+M_PI)/sin(d2+M_PI-d1));
-        icr.transform.translation.y = a/2 - (a*cos(d1)*sin(d2+M_PI)/sin(d2+M_PI-d1));
+        icr.transform.translation.x = (a*cos(d2+M_PI)*cos(d1)/sin(d1-(d2+M_PI)));
+        icr.transform.translation.y = a/2 - (a*cos(d2+M_PI)*sin(d1)/sin(d1-(d2+M_PI)));
         icr.transform.translation.z = 0;
 
         tf_broadcaster_->sendTransform(icr);

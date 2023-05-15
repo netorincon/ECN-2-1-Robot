@@ -99,7 +99,7 @@ def generate_launch_description():
             description = 'use ros2 control if true'),
         
         #joint_state_publisher_gui,
-        rqt,
+        #rqt,
         robot_state_publisher,
         sim,
         rviz

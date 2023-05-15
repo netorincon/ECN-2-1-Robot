@@ -125,26 +125,26 @@
             <geometry>
                 <box size="${thickness} ${thickness} ${l1}" />
             </geometry>
-            <origin xyz="${-a} 0 ${-l1/2+thickness/2}"/>
+            <origin xyz="${0} 0 ${-l1/2}"/>
             <material name="white"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l2} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-a-l2/2-thickness/2} 0 ${-l1+thickness}"/>
+            <origin xyz="${-l2/2-thickness/2} 0 ${-l1+thickness/2}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${thickness} ${thickness} ${l3}"/>
             </geometry>
-            <origin xyz="${-a-l2} ${0} ${-l3/2-l1+thickness/2}"/>
+            <origin xyz="${-l2} ${0} ${-l3/2-l1}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l4} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-a-wheel_thickness/2-l4/2} 0 ${-l_tot+2*thickness}"/>
+            <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
         <inertial>
@@ -160,8 +160,8 @@
     <joint name="left_wheel_base_joint" type="continuous">
         <parent link="chassis"/>
         <child link="left_wheel_base"/>
-        <origin xyz="${0} ${0} ${0}" rpy="0.0 0.0 0.0"/>
-        
+        <origin xyz="${-a} ${0} ${thickness/2}" rpy="0.0 0.0 ${pi/2}"/>
+        <axis xyz="0 0 1"/>
     </joint>
 
     
@@ -175,7 +175,7 @@
             <geometry>
                 <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
-            <origin xyz="${-a} 0 ${-l_tot+wheel_radius}" rpy="0 ${-pi/2} 0"/> 
+            <origin xyz="${0} 0 ${0}" rpy="${pi/2} 0 0"/> 
 			<material name="grey"/>      
         </visual>                    
     </link>
@@ -184,9 +184,8 @@
     <joint name="left_wheel_joint" type="continuous">
         <parent link="left_wheel_base"/>
         <child link="left_wheel"/>
-        <origin xyz="0 0 0"/>
-        <axis xyz="0 1 0"/>
-        
+        <origin xyz="${0} 0 ${-l_tot-thickness+wheel_radius}" rpy="0 0 ${pi/2}"/>
+        <axis xyz="0 1 0"/>    
     </joint>
 
 
@@ -195,30 +194,30 @@
     <!-- right_wheel_base-->
 
     <link name="right_wheel_base">
-        <visual>
+<visual>
             <geometry>
                 <box size="${thickness} ${thickness} ${l1}" />
             </geometry>
-            <origin xyz="${a} 0 ${-l1/2+thickness/2}"/>
+            <origin xyz="${0} 0 ${-l1/2}"/>
             <material name="white"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l2} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${a} 0 ${-l1-thickness/2}"/>
+            <origin xyz="${-l2/2-thickness/2} 0 ${-l1+thickness/2}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${thickness} ${thickness} ${l3}"/>
             </geometry>
-            <origin xyz="${a+l2+thickness/2} ${-l3/2} 0.0"/>
+            <origin xyz="${-l2} ${0} ${-l3/2-l1}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l4} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${l4/2} 0 ${-l_tot}"/>
+            <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
         <inertial>
@@ -234,8 +233,8 @@
     <joint name="right_wheel_base_joint" type="continuous">
         <parent link="chassis"/>
         <child link="right_wheel_base"/>
-        <origin xyz="${a} ${0} ${-thickness/2}" rpy="0.0 0.0 0.0"/>
-        
+        <origin xyz="${a} ${0} ${thickness/2}" rpy="0.0 0.0 ${-pi/2}"/>
+        <axis xyz="0 0 1"/>
     </joint>
 
 
@@ -247,7 +246,7 @@
             <geometry>
                 <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
             </geometry>
-            <origin xyz="0 0 0.0" rpy="0 0.0 ${pi/2}"/> 
+            <origin xyz="${0} 0 ${0}" rpy="${pi/2} 0 0"/> 
 			<material name="grey"/>      
         </visual>  
     </link>
@@ -260,7 +259,7 @@
     <joint name="right_wheel_joint" type="continuous">
         <parent link="right_wheel_base"/>
         <child link="right_wheel"/>
-        <origin xyz="0 0 ${-l1-l3-wheel_radius}"/>
+        <origin xyz="${0} 0 ${-l_tot-thickness+wheel_radius}" rpy="0 0 ${pi/2}"/>
         <axis xyz="0 1 0"/>
         
     </joint>
@@ -270,15 +269,16 @@
     <link name="castor_wheel">
 		<visual>
 			<geometry>
-				<box size="${thickness} ${thickness} ${l1+l3+thickness}"/>
+				<box size="${thickness} ${thickness} ${l1+l3}"/>
 			</geometry>
+            <origin xyz="0 0 ${-(l1+l3)/2}"/>
 			<material name="white"/>
 		</visual>
 		<visual>
 			<geometry>
 				<sphere radius="${wheel_radius}"/>
 			</geometry>
-			<origin xyz="0 0 ${-(l1+l3+wheel_radius)}"/>
+			<origin xyz="0 0 ${-(l1+l3)}"/>
 		</visual>
     </link>
 	
@@ -286,7 +286,7 @@
 	<joint name="castor_joint" type="fixed">
 		<parent link="chassis"></parent>
 		<child link="castor_wheel"></child>
-        <origin xyz="0 ${front_base_length} ${-(l1+l3+wheel_radius)}" />
+        <origin xyz="0 ${front_base_length} ${thickness/2}" />
 	</joint>
 
 
