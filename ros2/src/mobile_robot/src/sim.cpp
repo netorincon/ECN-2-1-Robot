@@ -79,7 +79,7 @@ class transform_broadcaster : public rclcpp::Node
         float frequency = 20; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.08;//Base distance
-        float R=0.06; //Radius of the wheels
+        float R=0.066; //Radius of the wheels
         Point ICRLocation;
 
         void calculateICR(){
@@ -107,6 +107,7 @@ class transform_broadcaster : public rclcpp::Node
             else if((diff<0) && (diffAbs>=M_PI)){
                 alpha1+=M_PI;
             }
+            //See PDF for detailed calculations
             ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(alpha1-alpha2));
             ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(alpha1-alpha2));
             return;
