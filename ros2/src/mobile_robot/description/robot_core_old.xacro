@@ -36,10 +36,9 @@
     <!-- Chassis -->
 
 
-    <xacro:property name="chassis_length" value="0.33"/>
-    <xacro:property name="chassis_width" value="0.3"/>
-    <xacro:property name="big_bar_length" value="0.3"/>
-    <xacro:property name="chassis_thickness" value="0.015"/>
+    <xacro:property name="chassis_length" value="0.2"/>
+    <xacro:property name="chassis_width" value="0.1"/>
+    <xacro:property name="chassis_thickness" value="0.01"/>
     <xacro:property name="front_base_length" value="0.05"/>
     <xacro:property name="back_base_length" value="0.05"/>
     <xacro:property name="a" value="0.02"/>
@@ -67,34 +66,34 @@
     <link name="chassis">
 		<visual>
             <geometry>
-                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+                <box size="${chassis_length} ${chassis_thickness} ${chassis_thickness}"/>
             </geometry>
             <material name="orange"/>
-            <origin xyz="0 ${-big_bar_length/2 +chassis_thickness/2} 0"/>
+            <origin xyz="0 ${-chassis_width/2 +chassis_thickness/2} 0"/>
         </visual>
         <visual>
             <geometry>
-                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+                <box size="${chassis_length} ${chassis_thickness} ${chassis_thickness}"/>
             </geometry>
-            <origin xyz="0 ${big_bar_length/2 -chassis_thickness/2} 0"/>
+            <origin xyz="0 ${chassis_width/2 -chassis_thickness/2} 0"/>
         </visual>
         <visual>
             <geometry>
-                <box size="${chassis_thickness} ${big_bar_length} ${chassis_thickness}"/>
-            </geometry>
-            <material name="grey"/>
-            <origin xyz="${-big_bar_length/2 - chassis_thickness/2} 0 0"/>
-        </visual>
-        <visual>
-            <geometry>
-                <box size="${chassis_thickness} ${big_bar_length} ${chassis_thickness}"/>
+                <box size="${chassis_thickness} ${chassis_width} ${chassis_thickness}"/>
             </geometry>
             <material name="grey"/>
-            <origin xyz="${big_bar_length/2 + chassis_thickness/2} 0 0"/>
+            <origin xyz="${-chassis_length/2} 0 0"/>
         </visual>
         <visual>
             <geometry>
-                <box size="${chassis_thickness} ${big_bar_length} ${chassis_thickness}"/>
+                <box size="${chassis_thickness} ${chassis_width} ${chassis_thickness}"/>
+            </geometry>
+            <material name="grey"/>
+            <origin xyz="${chassis_length/2} 0 0"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${chassis_thickness} ${chassis_width} ${chassis_thickness}"/>
             </geometry>
             <origin xyz="${front_base_length} 0 ${chassis_thickness}"/>
         </visual>
@@ -124,10 +123,10 @@
     
 
 
-    <xacro:property name="l1" value="0.1"/>
-    <xacro:property name="l2" value="0.04"/>
-    <xacro:property name="l3" value="0.033"/>
-    <xacro:property name="thickness" value="0.015"/>
+    <xacro:property name="l1" value="0.04"/>
+    <xacro:property name="l2" value="0.01"/>
+    <xacro:property name="l3" value="0.025"/>
+    <xacro:property name="thickness" value="0.01"/>
     <xacro:property name="motor_side" value="0.02"/>
 
 
@@ -184,8 +183,8 @@
 
     <!-- Left_wheel-->
 
-    <xacro:property name="wheel_radius" value="0.033"/>
-    <xacro:property name="wheel_length" value="0.02"/>
+    <xacro:property name="wheel_radius" value="0.025"/>
+    <xacro:property name="wheel_length" value="0.01"/>
 
     <link name="left_wheel">
         <visual>
@@ -310,7 +309,7 @@
     <link name="castor_wheel">
 		<visual>
 			<geometry>
-				<box size="${thickness} ${thickness} ${l1+l3+2*thickness}"/>
+				<box size="${thickness} ${thickness} ${l1+l3}"/>
 			</geometry>
 			<material name="white"/>
 		</visual>
@@ -318,7 +317,7 @@
 			<geometry>
 				<sphere radius="${wheel_radius}"/>
 			</geometry>
-			<origin xyz="0 0 ${-(l1+l3)/2}"/>
+			<origin xyz="0 0 ${-(l1+l3)/2-wheel_radius+motor_side/4}"/>
 		</visual>
     </link>
 	
@@ -326,7 +325,7 @@
 	<joint name="castor_joint" type="fixed">
 		<parent link="chassis"></parent>
 		<child link="castor_wheel"></child>
-        <origin xyz="${-front_base_length} 0 ${-(l1+l3)/2}" />
+        <origin xyz="${-front_base_length} 0 ${-2*chassis_thickness}" />
 	</joint>
 
 

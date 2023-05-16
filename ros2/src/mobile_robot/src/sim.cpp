@@ -28,11 +28,17 @@ struct MotorState{
     float speed;
 };
 
+struct Point{
+    float x;
+    float y;
+};
+
 double limit_angle(double a){
-    while( a >=  M_PI ) a -= 2*M_PI ;
-    while( a <  -M_PI ) a += 2*M_PI ;
+    while( a >=  2*M_PI ) a -= 2*M_PI ;
+    while( a <  0 ) a += 2*M_PI ;
     return a ;
 }
+
 
 class transform_broadcaster : public rclcpp::Node
 {
@@ -72,72 +78,103 @@ class transform_broadcaster : public rclcpp::Node
         tf2::Quaternion rotation;
         float frequency = 20; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
-        float a=0.05;//Base distance
+        float a=0.08;//Base distance
         float R=0.06; //Radius of the wheels
+        Point ICRLocation;
 
-    void calculatePose(const control_input::msg::ControlInput::SharedPtr msg){
-        
-        Um = msg->um;
-        dd1 = msg->beta1dot;
-        dd2 = msg->beta2dot;
+        void calculateICR(){
+            //We define alpha1 and alpha2 as temporary angles for ICR calculation
+            float alpha1=d1+M_PI/2;
+            float alpha2=d2+M_PI/2;
+            alpha1=limit_angle(alpha1);
+            alpha2=limit_angle(alpha2);
 
-        //We calculate current robot speeds and orientation motor 
-        tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
-        tt+=tt_dot*period;
-        tt=limit_angle(tt);
+            float diff=alpha1-alpha2;
+            float diffAbs=abs(diff);
+            if((diff>=0) && (diffAbs<M_PI) && alpha1>=M_PI){
+                alpha2+=M_PI;
+            }
+            else if((diff>=0) && (diffAbs>=M_PI) && alpha1>=M_PI){
+                alpha1-=M_PI;
+            }
+            else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
+                alpha1+=M_PI;
+                alpha2+=M_PI;
+            }
+            else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
+                alpha2-=M_PI;
+            }
+            else if((diff<0) && (diffAbs>=M_PI)){
+                alpha1+=M_PI;
+            }
+            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(alpha1-alpha2));
+            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(alpha1-alpha2));
+            return;
+        }
 
-        x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
-        y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
-        phi1d=2*cos(d2)*Um/R;
-        phi2d=2*cos(d1)*Um/R;
+        void calculatePose(const control_input::msg::ControlInput::SharedPtr msg){
+            
+            Um = msg->um;
+            dd1 = msg->beta1dot;
+            dd2 = msg->beta2dot;
 
-        //We integrate the speeds over time (add each time we get a new value)
-        x+=x_dot*period;
-        y+=y_dot*period;
-        
-        d1+=dd1*period; //Delta 1
-        d2+=dd2*period; //Delta 2
-        phi1+=phi1d*period;
-        phi2+=phi2d*period;
-        
-        //We limit the angles to +-Pi
-        phi1=limit_angle(phi1);
-        phi2=limit_angle(phi2);
-        
-        //We now publish the joint states
-        joint_state.header.stamp=this->now();
-        std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
-        joint_state.name=names;
-        std::vector<double> values={d2+M_PI, d1, phi2, phi1};
-        joint_state.position = values;
-        joint_publisher->publish(joint_state);
+            //We calculate current robot speeds and orientation motor 
+            tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
+            tt+=tt_dot*period;
+            tt=limit_angle(tt);
 
-        //Publishing the chassis transform with respect to the world
-        transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
-        transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
-        transform_stamped_.transform.translation.x = x;
-        transform_stamped_.transform.translation.y = y;
-        transform_stamped_.transform.translation.z = 0;
-        rotation.setRPY(0,0,tt);
-        transform_stamped_.transform.rotation.x = rotation.getX();
-        transform_stamped_.transform.rotation.y = rotation.getY();
-        transform_stamped_.transform.rotation.z = rotation.getZ();
-        transform_stamped_.transform.rotation.w = rotation.getW();
-        tf_broadcaster_->sendTransform(transform_stamped_);
+            x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
+            y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
+            phi1d=2*cos(d2)*Um/R;
+            phi2d=2*cos(d1)*Um/R;
 
-        //Publishing the position of the ICR with respect to the robot chassis
-        icr.header.stamp = this->now();
-        icr.header.frame_id = "chassis"; // Nom du repère fixe
-        icr.child_frame_id = "icr"; // Nom du repère du robot
-        icr.transform.translation.x = (a*cos(d2+M_PI)*cos(d1)/sin(d1-(d2+M_PI)));
-        icr.transform.translation.y = a/2 - (a*cos(d2+M_PI)*sin(d1)/sin(d1-(d2+M_PI)));
-        icr.transform.translation.z = 0;
+            //We integrate the speeds over time (add each time we get a new value)
+            x+=x_dot*period;
+            y+=y_dot*period;
+            
+            d1+=dd1*period; //Delta 1
+            d2+=dd2*period; //Delta 2
+            phi1+=phi1d*period;
+            phi2+=phi2d*period;
+            
+            //We limit the angles to 2pi
+            phi1=limit_angle(phi1);
+            phi2=limit_angle(phi2);
+            
+            //We now publish the joint states
+            joint_state.header.stamp=this->now();
+            std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
+            joint_state.name=names;
+            std::vector<double> values={d2+M_PI, d1, phi2, phi1};
+            joint_state.position = values;
+            joint_publisher->publish(joint_state);
 
-        tf_broadcaster_->sendTransform(icr);
+            //Publishing the chassis transform with respect to the world
+            transform_stamped_.header.stamp = this->now();
+            transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
+            transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
+            transform_stamped_.transform.translation.x = x;
+            transform_stamped_.transform.translation.y = y;
+            transform_stamped_.transform.translation.z = 0;
+            rotation.setRPY(0,0,tt);
+            transform_stamped_.transform.rotation.x = rotation.getX();
+            transform_stamped_.transform.rotation.y = rotation.getY();
+            transform_stamped_.transform.rotation.z = rotation.getZ();
+            transform_stamped_.transform.rotation.w = rotation.getW();
+            tf_broadcaster_->sendTransform(transform_stamped_);
 
-    }
+            //Publishing the position of the ICR with respect to the robot chassis
+            calculateICR();
+            icr.header.stamp = this->now();
+            icr.header.frame_id = "chassis"; // Nom du repère fixe
+            icr.child_frame_id = "icr"; // Nom du repère du robot
+            icr.transform.translation.x = ICRLocation.x;
+            icr.transform.translation.y = ICRLocation.y;
+            icr.transform.translation.z = 0;
 
+            tf_broadcaster_->sendTransform(icr);
+
+        }
 };
 
 int main(int argc, char** argv)
