@@ -17,7 +17,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
@@ -36,6 +38,8 @@ ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 add_executable(real_world src/real_world.cpp )
 ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
 
+ament_python_install_package(${PROJECT_NAME})
+
 install(TARGETS
     driver
     DESTINATION lib/${PROJECT_NAME}
@@ -53,6 +57,10 @@ install(TARGETS
 
 install(TARGETS
     real_world
+    DESTINATION lib/${PROJECT_NAME}
+    )
+install(PROGRAMS
+    scripts/gui.py
     DESTINATION lib/${PROJECT_NAME}
     )
     
