@@ -22,8 +22,7 @@ def main(args=None):
     # Start the ROS2 node on a separate thread
     thread = Thread(target=executor.spin)
     thread.start()
-    #print(type(thread.start()))
-    pub_node.get_logger().info("Spinned ROS2 Node . . .")
+    pub_node.get_logger().info("Started slider publisher node . . .")
 
     # Let the app running on the main thread
     try:
@@ -31,7 +30,7 @@ def main(args=None):
         sys.exit(app.exec_())
     finally:
         
-        pub_node.get_logger().info("Shutting down ROS2 Node . . .")
+        pub_node.get_logger().info("Shutting slider publisher node . . .")
         pub_node.destroy_node()
         executor.shutdown()
 

@@ -14,15 +14,12 @@ class publisherNode(Node):
         self.ui = ui
         self.publisher_ = self.create_publisher(ControlInput, 'cmd_robot', 10)
         timer_period = 0.05  # seconds
-        self.i = 0
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        
 
     def timer_callback(self):
         msg = ControlInput()
         msg.um=float(self.ui.umSlider.value()/100)
         msg.beta1dot=float(self.ui.b1d_slider.value()/500)
         msg.beta2dot=float(self.ui.b2d_slider.value()/500)
-        if(self.ui.manual_mode_radio.isChecked()):
+        if(self.ui.manual_speed_mode_radio.isChecked()):
             self.publisher_.publish(msg)
-            self.i += 1
