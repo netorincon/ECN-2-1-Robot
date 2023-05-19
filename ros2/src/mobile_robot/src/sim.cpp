@@ -91,10 +91,10 @@ class transform_broadcaster : public rclcpp::Node
 
             float diff=alpha1-alpha2;
             float diffAbs=abs(diff);
-            if((diff>=0) && (diffAbs<M_PI) && alpha1>=M_PI){
+            if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
                 alpha2+=M_PI;
             }
-            else if((diff>=0) && (diffAbs>=M_PI) && alpha1>=M_PI){
+            else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
                 alpha1-=M_PI;
             }
             else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
@@ -107,9 +107,15 @@ class transform_broadcaster : public rclcpp::Node
             else if((diff<0) && (diffAbs>=M_PI)){
                 alpha1+=M_PI;
             }
+            if(diff==0){
+                diff=0.00001;
+            }
+            else{
+                diff=alpha1-alpha2;
+            }
             //See PDF for detailed calculations
-            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(alpha1-alpha2));
-            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(alpha1-alpha2));
+            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
+            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
             return;
         }
 
@@ -146,8 +152,10 @@ class transform_broadcaster : public rclcpp::Node
             joint_state.header.stamp=this->now();
             std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
             joint_state.name=names;
-            std::vector<double> values={d2+M_PI, d1, phi2, phi1};
-            joint_state.position = values;
+            std::vector<double> posValues={d2+M_PI, d1, phi2, phi1};
+            std::vector<double> velValues={dd2, dd1, phi2d, phi1d};
+            joint_state.position = posValues;
+            //joint_state.velocity = velValues;
             joint_publisher->publish(joint_state);
 
             //Publishing the chassis transform with respect to the world

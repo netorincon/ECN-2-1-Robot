@@ -95,10 +95,6 @@
             </geometry>
             <origin xyz="0 ${front_base_length} ${chassis_thickness}"/>
         </visual>
-        <inertial>
-			<mass value="1"/>
-			<inertia ixx="1e-3" ixy="0.0" ixz="0.0" iyy="1e-3" iyz="0.0" izz="1e-3"/>
-		</inertial>
     </link>
     
     <gazebo reference="chassis">
@@ -147,10 +143,6 @@
             <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
-        <inertial>
-			<mass value="1"/>
-			<inertia ixx="1e-3" ixy="0.0" ixz="0.0" iyy="1e-3" iyz="0.0" izz="1e-3"/>
-		</inertial>
     </link>
     
     <gazebo reference="left_wheel_base_joint">
@@ -220,10 +212,6 @@
             <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
-        <inertial>
-			<mass value="1"/>
-			<inertia ixx="1e-3" ixy="0.0" ixz="0.0" iyy="1e-3" iyz="0.0" izz="1e-3"/>
-		</inertial>
     </link>
     
     <gazebo reference="right_wheel_base_joint">

@@ -18,8 +18,8 @@ class publisherNode(Node):
 
     def timer_callback(self):
         msg = ControlInput()
-        msg.um=float(self.ui.umSlider.value()/100)
-        msg.beta1dot=float(self.ui.b1d_slider.value()/500)
-        msg.beta2dot=float(self.ui.b2d_slider.value()/500)
+        msg.um=float(self.ui.um_sb.value())
+        msg.beta1dot=float(self.ui.b1d_sb.value())
+        msg.beta2dot=float(self.ui.b2d_sb.value())
         if(self.ui.manual_speed_mode_radio.isChecked()):
             self.publisher_.publish(msg)
