@@ -9,7 +9,6 @@ from launch.actions import DeclareLaunchArgument
 
 import xacro
 
-
 def generate_launch_description():
 
     # Check if we are told to use sim time
@@ -50,44 +49,9 @@ def generate_launch_description():
         output = 'screen',
         arguments=['-d', [os.path.join(pkg_path, 'config', 'robot_sim.rviz')]]
     )
-
-    # # Create joint_state_publisher_gui node
-    # joint_state_publisher_gui = Node(
-    #     package = 'joint_state_publisher_gui',
-    #     executable = 'joint_state_publisher_gui',
-    # )
-    
-
-			
-    # # Create slider_publisher node
-    # yaml_file = os.path.join(pkg_path,'launch','Twist.yaml')
-    # slider_publisher = Node(
-	# 	package = 'slider_publisher',
-	# 	executable = 'slider_publisher',
-	# 	name = 'slider_publisher',
-	# 	output = 'screen',
-	# 	arguments = [yaml_file],
-	# )
-	
-	# # Create driver node
-    # driver = Node(
-    #     package = 'mobile_robot',
-    #     executable = 'driver',
-    #     output = 'screen',
-    # )
-    
-    # # Create transform_broadcaster node
-    # transform_broadcaster = Node(
-    #     package = 'mobile_robot',
-    #     executable = 'transform_broadcaster',
-    #     output = 'screen',
-    # )
-
     # Launch
     return LaunchDescription([
-    
-			
-			
+		
         DeclareLaunchArgument(
             "use_sim_time",
             default_value = "false",
@@ -97,14 +61,10 @@ def generate_launch_description():
             "use_ros2_control",
             default_value = "true",
             description = 'use ros2 control if true'),
-        
-        #joint_state_publisher_gui,
-        #rqt,
+
         robot_state_publisher,
         sim,
         rviz
-        
-        
-        
+   
     ])
 
