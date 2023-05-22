@@ -26,12 +26,9 @@
 #include "DynamixelSDK.h"
 
 // Control table address
-//#define ADDR_PRO_TORQUE_ENABLE          562                 // Control table address is different in Dynamixel model
-//#define ADDR_PRO_GOAL_POSITION          596
-//#define ADDR_PRO_PRESENT_POSITION       611
 
 // EEPROM Area
-// Data in EEPROM area can only be written when torque value (64) is 0
+// Data in EEPROM area can only be written when torque value (ADDR_TORQUE_ENABLE) is 0
 #define ADDR_OPERATING_MODE				11
 
 // RAM Area
@@ -40,26 +37,21 @@
 #define ADDR_GOAL_CURRENT				102 // Does NOT exist in Rot motors
 #define ADDR_GOAL_VELOCITY				104
 #define ADDR_GOAL_POSITION				116
-#define ADDR_PRESENT_CURRENT			126 // Represents Present Load in Rot motors
+#define ADDR_PRESENT_CURRENT			126 // Represents "Present Load" in Rot motors
 #define ADDR_PRESENT_VELOCITY			128
 #define ADDR_PRESENT_POSITION			132
 
 // Data Byte Length
-//#define LEN_PRO_GOAL_POSITION           4
-//#define LEN_PRO_PRESENT_POSITION        4
-
-#define LEN_GOAL_CURRENT				2
-#define LEN_GOAL_PV						4
-#define LEN_PRESENT_CURRENT				2
-#define LEN_PRESENT_PV					4
+#define LEN_CURRENT						2
+#define LEN_PV							4 //Position and Velocity
 
 // Protocol version
 #define PROTOCOL_VERSION                2.0                 // See which protocol version is used in the Dynamixel
 
 // Default setting
 // Spinning motors
-#define DXL1_ID                         1                   // Dynamixel#1 ID: 1
-#define DXL2_ID                         2                   // Dynamixel#2 ID: 2
+#define DXL1_ID                         1
+#define DXL2_ID                         2
 // Rotation motors
 #define DXL3_ID                         3
 #define DXL4_ID                         4
@@ -82,74 +74,85 @@
 //ESC key
 #define ESC_ASCII_VALUE                 0x1b
 
+struct MotorState{
+	std::string id;
+	float position;
+	float speed;
+	float torque;
+};
 
 class motor_state : public rclcpp::Node
 {
     public :
-        motor_state(rclcpp::NodeOptions options) : Node("motor_state", options)
-        {
-
-
-            //init transform broadcastor
-            //tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-
-            //init subscriber
-            //subscriber_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
-                            //"cmd_robot", 10, std::bind(&transform_broadcaster::make_transforms, this, std::placeholders::_1));
-
-
-
-
+        //motor_state(rclcpp::NodeOptions options) : Node("motor_state", options){
+        motor_state() : Node("motor_state"){
+			//Subscriber for getting control mode
+			control_mode_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+						"mode",10,std::bind(&motor_state::commandMode,this,std::placeholders::_1));
+			
+			//Subscriber for desired joint states		
+			joint_command_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+						"joint_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
+			
+			//Publisher for present joint states
+			joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
+			timer_ = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&motor_state::publishJointState,this));
+			
         }
-        float tt = 0, x = 0, y = 0;
-        float a=0.05;
+        
+        MotorState commandArray[4]; //Goal
+        MotorState stateArray[4]; //Present
 
     private :
+		rclcpp::TimerBase::SharedPtr timer_;
+		sensor_msgs::msg::JointState jointState;
         geometry_msgs::msg::TransformStamped transform_stamped_;
-        rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscriber_;
+        //rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscriber_;
         //std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-
-
-
-
-
-
-
-
-	void make_transforms(const std_msgs::msg::Float64MultiArray::SharedPtr msg){
-
-        float Um = msg->data[0];
-        float bt1 = msg->data[1];
-        float bt2 = msg->data[2];
-
-
-
-        float tt_dot=(tan(bt2)-tan(bt1))*Um;
-        float x_dot=(a*cos(tt)*(tan(bt1)+tan(bt2))+2*a*sin(tt))*Um;
-        float y_dot=(a*sin(tt)*(tan(bt1)+tan(bt2))-2*a*sin(tt))*Um;
-
-        float frequency = 20; // fréquence de publication des transformations sur le topic /tf
-        float period = 1/frequency;
-
-        tt += tt_dot*period;
-        x += x_dot*period;
-        y += y_dot*period;
-
-
-        transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
-        transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
-        transform_stamped_.transform.translation.x += x_dot;
-        transform_stamped_.transform.translation.y += y_dot;
-        transform_stamped_.transform.translation.z += 0;
-        transform_stamped_.transform.rotation.x += 0;
-        transform_stamped_.transform.rotation.y += 0;
-        transform_stamped_.transform.rotation.z += tt;
-        transform_stamped_.transform.rotation.w = 1.0;
-
-        //tf_broadcaster_->sendTransform(transform_stamped_);
-    }
-
+        
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_command_subscriber;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr control_mode_subscriber;
+        
+	// Method to define the kind of control mode the robot is going to have
+	void commandMode(sensor_msgs::msg::JointState::SharedPtr mode){
+		//Decide what kind of variable its going to be
+	}
+	
+	// Method to obtain desired joint states
+	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
+		for(int i=0;i<4;i++){
+			//Dynamixel ID
+			commandArray[i].id = cmd->name[i];
+			
+			//Goal Position
+			commandArray[i].position = cmd->position[i];
+			
+			//Goal Velocity
+			commandArray[i].speed = cmd->velocity[i];
+			
+			//Goal Torque
+			//As previously mentioned, rot motors do not have torque control
+			//There's no point in obtaining such values
+			if(cmd->name[i] != "3" && cmd->name[i] != "4"){
+				commandArray[i].torque = cmd->effort[i];
+			}	
+		}
+	}
+	
+	// Method to publish present values of the motors
+	void publishJointState(){
+		jointState.header.stamp = this->now();
+		for(int i=0;i<4;i++){
+			jointState.name[i] = stateArray[i].id;
+			jointState.position[i] = stateArray[i].position;
+			jointState.velocity[i] = stateArray[i].speed;
+			if(stateArray[i].id != "3" && stateArray[i].id != "4"){
+				jointState.effort[i] = stateArray[i].torque;
+			}
+		}
+		joint_state_publisher->publish(jointState);
+	}
 };
 
 // Functions to read keyboard
@@ -236,11 +239,11 @@ void disableTorque(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler
 }
 
 // Add parameter storage for all dynamixels
-void paramStorage(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, bool &exitParamStor){
+void paramStorageRead(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, bool &exitParamStor){
 	bool dxl_addparam_result = false;
 	
 	// Add parameter storage for Dynamixel#id present position
-	dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
+	dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_POSITION, LEN_PV);
 	if (dxl_addparam_result != true){
 		fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (position)", id);
 		exitParamStor = true;
@@ -248,23 +251,47 @@ void paramStorage(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, bool &exi
 	}
 	
 	// Add parameter storage for Dynamixel#id present velocity
-	dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_VELOCITY, LEN_PRESENT_PV);
+	dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_VELOCITY, LEN_PV);
 	if (dxl_addparam_result != true){
 		fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (velocity)", id);
 		exitParamStor = true;
 		return;
 	}
 	
+	//Motors 3 and 4 (rotational) do not have torque control, there's no need to read the value
+	//However, we could technically read present load in the motors
+	//In said case, remove the if condition which skips id 3 and 4
 	if(id != 3 && id != 4){
 		// Add parameter storage for Dynamixel#id present torque
-		dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT);
+		dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
 			exitParamStor = true;
 			return;
 		}
 	}
+}
+
+void paramStorageWrite(dynamixel::GroupBulkWrite &groupBulkWrite, uint8_t id, int address, int len, uint8_t param_goal_position[4], bool &exitParamStor){
+	bool dxl_addparam_result = false;
 	
+	dxl_addparam_result = groupBulkWrite.addParam(id, address, len, param_goal_position);
+	if (dxl_addparam_result != true){
+		fprintf(stderr, "[ID:%03d] groupBulkWrite addparam failed", id);
+		exitParamStor = true;
+		return;
+	}
+}
+
+void readAvailable(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, int address, int len, bool &exitParamStor){
+	bool dxl_getdata_result = false;
+	
+	dxl_getdata_result = groupBulkRead.isAvailable(id, address, len);
+	if (dxl_getdata_result != true){
+		fprintf(stderr, "[ID:%03d] groupBulkRead getdata failed", id);
+		exitParamStor = true;
+		return;
+	}
 }
 
 int main(int argc, char** argv)
@@ -285,21 +312,32 @@ int main(int argc, char** argv)
 	// Initialize GroupBulkRead instance
 	dynamixel::GroupBulkRead groupBulkRead(portHandler, packetHandler);
 	
-	int index = 0;
 	int dxl_comm_result = COMM_TX_FAIL;             // Communication result
-	bool dxl_addparam_result = false;               // addParam result
-	bool dxl_getdata_result = false;                // GetParam result
-	int dxl_goal_position[2] = {DXL_MINIMUM_POSITION_VALUE, DXL_MAXIMUM_POSITION_VALUE};         // Goal position
+	//bool dxl_addparam_result = false;               // addParam result
+	//bool dxl_getdata_result = false;                // GetParam result
+	int dxl1_goal = 0;         						// Goal joint values
+	int dxl2_goal = 0;
+	int dxl3_goal = 0;
+	int dxl4_goal = 0;
 	bool exitParamStor = false;
+	
+	// Mode selector for control type
+	// 0 for torque (current)
+	// 1 velocity
+	// 3 position (default
+	int addressGoal = ADDR_GOAL_POSITION;
+	int addressPres = ADDR_PRESENT_POSITION;
+	int lenSize = LEN_PV;
 
 	uint8_t dxl_error = 0;                          // Dynamixel error
-	//uint8_t dxl_led_value[2] = {0x00, 0xFF};        // Dynamixel LED value for write
-	uint8_t param_goal_position[4];
-	int32_t dxl1_present_position = 0;              // Present position
-	int32_t dxl2_present_position = 0;
-	int32_t dxl3_present_position = 0;
-	int32_t dxl4_present_position = 0;
-	//uint8_t dxl2_led_value_read;                    // Dynamixel LED value for read
+	uint8_t param1_goal_state[4];
+	uint8_t param2_goal_state[4];
+	uint8_t param3_goal_state[4];
+	uint8_t param4_goal_state[4];
+	int32_t dxl1_present_state = 0;              // Present position
+	int32_t dxl2_present_state = 0;
+	int32_t dxl3_present_state = 0;
+	int32_t dxl4_present_state = 0;
 	
 	// Open port
 	if (portHandler->openPort()){
@@ -345,53 +383,160 @@ int main(int argc, char** argv)
 // Check if its possible to do it in function instead
 
 	// Add parameter storage for Dynamixel#1 present values
-	paramStorage(groupBulkRead, DXL1_ID, exitParamStor);
+	paramStorageRead(groupBulkRead, DXL1_ID, exitParamStor);
 	if(exitParamStor){
 		return 0;
 	}
 	
 	// Add parameter storage for Dynamixel#2 present values
-	paramStorage(groupBulkRead, DXL2_ID, exitParamStor);
+	paramStorageRead(groupBulkRead, DXL2_ID, exitParamStor);
 	if(exitParamStor){
 		return 0;
 	}
 	
 	// Add parameter storage for Dynamixel#3 present values
-	paramStorage(groupBulkRead, DXL3_ID, exitParamStor);
+	paramStorageRead(groupBulkRead, DXL3_ID, exitParamStor);
 	if(exitParamStor){
 		return 0;
 	}
 	
 	// Add parameter storage for Dynamixel#4 present values
-	paramStorage(groupBulkRead, DXL4_ID, exitParamStor);
+	paramStorageRead(groupBulkRead, DXL4_ID, exitParamStor);
 	if(exitParamStor){
 		return 0;
 	}
-
-
-	//// Add parameter storage for Dynamixel#1 present position
-	//dxl_addparam_result = groupBulkRead.addParam(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
-	//if (dxl_addparam_result != true){
-		//fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (position)", DXL1_ID);
-		//return 0;
-	//}
 	
-	//// Add parameter storage for Dynamixel#1 present velocity
-	//dxl_addparam_result = groupBulkRead.addParam(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PRESENT_PV);
-	//if (dxl_addparam_result != true){
-		//fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (velocity)", DXL1_ID);
-		//return 0;
-	//}
+	rclcpp::init(argc, argv);
+	auto node = std::make_shared<motor_state>();
 	
-	//// Add parameter storage for Dynamixel#1 present torque
-	//dxl_addparam_result = groupBulkRead.addParam(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT);
-	//if (dxl_addparam_result != true){
-		//fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", DXL1_ID);
-		//return 0;
-	//}
-	
-	while(1){
+	while(rclcpp::ok()){
+		//printf("Press any key to continue! (or press ESC to quit!)\n");
+		//if (getch() == ESC_ASCII_VALUE)
+			//break;
 		
+		//Verify is similar to spin_once in ROS1
+		rclcpp::spin_some(node);
+		
+		//Obtain goal joints
+		dxl1_goal = (int)node->commandArray[0].position;
+		dxl2_goal = (int)node->commandArray[1].position;
+		dxl3_goal = (int)node->commandArray[2].position;
+		dxl4_goal = (int)node->commandArray[3].position;
+
+		// Allocate goal position value into byte array
+		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl1_goal));
+		param1_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl1_goal));
+		param1_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl1_goal));
+		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl1_goal));
+		
+		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl2_goal));
+		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl2_goal));
+		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl2_goal));
+		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl2_goal));
+		
+		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl3_goal));
+		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl3_goal));
+		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl3_goal));
+		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl3_goal));
+		
+		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl4_goal));
+		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl4_goal));
+		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl4_goal));
+		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl4_goal));
+
+		// Add parameter storage for Dynamixels goal
+		paramStorageWrite(groupBulkWrite, DXL1_ID, addressGoal, lenSize, param1_goal_state, exitParamStor);
+		if(exitParamStor){
+			return 0;
+		}
+		
+		paramStorageWrite(groupBulkWrite, DXL2_ID, addressGoal, lenSize, param2_goal_state, exitParamStor);
+		if(exitParamStor){
+			return 0;
+		}
+		
+		paramStorageWrite(groupBulkWrite, DXL3_ID, addressGoal, lenSize, param3_goal_state, exitParamStor);
+		if(exitParamStor){
+			return 0;
+		}
+		
+		paramStorageWrite(groupBulkWrite, DXL4_ID, addressGoal, lenSize, param4_goal_state, exitParamStor);
+		if(exitParamStor){
+			return 0;
+		}
+
+		// Bulkwrite goal joint states
+		dxl_comm_result = groupBulkWrite.txPacket();
+		if (dxl_comm_result != COMM_SUCCESS){
+			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+		}
+
+		// Clear bulkwrite parameter storage
+		groupBulkWrite.clearParam();
+
+		do{
+			// Bulkread present state
+			dxl_comm_result = groupBulkRead.txRxPacket();
+			if (dxl_comm_result != COMM_SUCCESS){
+				printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+			}
+			else if (groupBulkRead.getError(DXL1_ID, &dxl_error)){
+				printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
+			}
+			else if (groupBulkRead.getError(DXL2_ID, &dxl_error)){
+				printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
+			}
+			else if (groupBulkRead.getError(DXL3_ID, &dxl_error)){
+				printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+			}
+			else if (groupBulkRead.getError(DXL4_ID, &dxl_error)){
+				printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+			}
+
+			// Check if groupbulkread data of Dynamixel#1 is available
+			readAvailable(groupBulkRead, DXL1_ID, addressPres, lenSize, exitParamStor);
+			if(exitParamStor){
+				return 0;
+			}
+			
+			// Check if groupbulkread data of Dynamixel#2 is available
+			readAvailable(groupBulkRead, DXL2_ID, addressPres, lenSize, exitParamStor);
+			if(exitParamStor){
+				return 0;
+			}
+			
+			// Check if groupbulkread data of Dynamixel#3 is available
+			readAvailable(groupBulkRead, DXL3_ID, addressPres, lenSize, exitParamStor);
+			if(exitParamStor){
+				return 0;
+			}
+			
+			// Check if groupbulkread data of Dynamixel#4 is available
+			readAvailable(groupBulkRead, DXL4_ID, addressPres, lenSize, exitParamStor);
+			if(exitParamStor){
+				return 0;
+			}
+
+			// Get present position value
+			dxl1_present_state = groupBulkRead.getData(DXL1_ID, addressPres, lenSize);
+			dxl2_present_state = groupBulkRead.getData(DXL2_ID, addressPres, lenSize);
+			dxl3_present_state = groupBulkRead.getData(DXL3_ID, addressPres, lenSize);
+			dxl4_present_state = groupBulkRead.getData(DXL4_ID, addressPres, lenSize);
+
+			printf("[ID:%03d] Present Position : %d \t [ID:%03d] Present Position : %d \t [ID:%03d] Present Position : %d \t [ID:%03d] Present Position: %d\n", DXL1_ID, dxl1_present_state, DXL2_ID, dxl2_present_state, DXL3_ID, dxl3_present_state, DXL4_ID, dxl4_present_state);
+			
+			node->stateArray[0].id = "1";
+			node->stateArray[0].position = dxl1_present_state;
+			
+			node->stateArray[1].id = "2";
+			node->stateArray[1].position = dxl2_present_state;
+			
+			node->stateArray[2].id = "3";
+			node->stateArray[2].position = dxl3_present_state;
+			
+			node->stateArray[3].id = "4";
+			node->stateArray[3].position = dxl4_present_state;
+		}while(abs(dxl1_goal - dxl1_present_state) > DXL_MOVING_STATUS_THRESHOLD || abs(dxl2_goal - dxl2_present_state) > DXL_MOVING_STATUS_THRESHOLD || abs(dxl3_goal - dxl3_present_state) > DXL_MOVING_STATUS_THRESHOLD || abs(dxl4_goal - dxl4_present_state) > DXL_MOVING_STATUS_THRESHOLD);
 	}
 	
 /*
@@ -414,121 +559,13 @@ int main(int argc, char** argv)
 //
 	
 	// Close port
-	portHandler->closePort();
+	portHandler->closePort();	
 	
-	
-	
-	// Below is for reference
-	// Copy as needed
-	// Delete when finished
-	
-
-	//while(1){
-		//printf("Press any key to continue! (or press ESC to quit!)\n");
-		//if (getch() == ESC_ASCII_VALUE)
-			//break;
-
-		//// Allocate goal position value into byte array
-		//param_goal_position[0] = DXL_LOBYTE(DXL_LOWORD(dxl_goal_position[index]));
-		//param_goal_position[1] = DXL_HIBYTE(DXL_LOWORD(dxl_goal_position[index]));
-		//param_goal_position[2] = DXL_LOBYTE(DXL_HIWORD(dxl_goal_position[index]));
-		//param_goal_position[3] = DXL_HIBYTE(DXL_HIWORD(dxl_goal_position[index]));
-
-		//// Add Dynamixel#1 goal position value to the Syncwrite storage
-		//dxl_addparam_result = groupSyncWrite.addParam(DXL1_ID, param_goal_position);
-		//if (dxl_addparam_result != true){
-			//fprintf(stderr, "[ID:%03d] groupSyncWrite addparam failed", DXL1_ID);
-			//return 0;
-		//}
-
-		//// Add Dynamixel#2 goal position value to the Syncwrite parameter storage
-		//dxl_addparam_result = groupSyncWrite.addParam(DXL2_ID, param_goal_position);
-		//if (dxl_addparam_result != true){
-			//fprintf(stderr, "[ID:%03d] groupSyncWrite addparam failed", DXL2_ID);
-			//return 0;
-		//}
-
-		//// Syncwrite goal position
-		//dxl_comm_result = groupSyncWrite.txPacket();
-		//if (dxl_comm_result != COMM_SUCCESS){
-			//printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-		//}
-
-		//// Clear syncwrite parameter storage
-		//groupSyncWrite.clearParam();
-
-		//do{
-			//// Syncread present position
-			//dxl_comm_result = groupSyncRead.txRxPacket();
-			//if (dxl_comm_result != COMM_SUCCESS){
-				//printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-			//}
-			//else if (groupSyncRead.getError(DXL1_ID, &dxl_error)){
-				//printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
-			//}
-			//else if (groupSyncRead.getError(DXL2_ID, &dxl_error)){
-				//printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-			//}
-
-			//// Check if groupsyncread data of Dynamixel#1 is available
-			//dxl_getdata_result = groupSyncRead.isAvailable(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
-			//if (dxl_getdata_result != true){
-				//fprintf(stderr, "[ID:%03d] groupSyncRead getdata failed", DXL1_ID);
-				//return 0;
-			//}
-
-			//// Check if groupsyncread data of Dynamixel#2 is available
-			//dxl_getdata_result = groupSyncRead.isAvailable(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
-			//if (dxl_getdata_result != true){
-				//fprintf(stderr, "[ID:%03d] groupSyncRead getdata failed", DXL2_ID);
-				//return 0;
-			//}
-
-			//// Get Dynamixel#1 present position value
-			//dxl1_present_position = groupSyncRead.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
-
-			//// Get Dynamixel#2 present position value
-			//dxl2_present_position = groupSyncRead.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PRESENT_PV);
-
-			//printf("[ID:%03d] GoalPos:%03d  PresPos:%03d\t[ID:%03d] GoalPos:%03d  PresPos:%03d\n", DXL1_ID, dxl_goal_position[index], dxl1_present_position, DXL2_ID, dxl_goal_position[index], dxl2_present_position);
-
-		//}while((abs(dxl_goal_position[index] - dxl1_present_position) > DXL_MOVING_STATUS_THRESHOLD) || (abs(dxl_goal_position[index] - dxl2_present_position) > DXL_MOVING_STATUS_THRESHOLD));
-
-		//// Change goal position
-		//if (index == 0){
-			//index = 1;
-		//}
-		//else{
-			//index = 0;
-		//}
-	//}
-
-	//// Disable Dynamixel#1 Torque
-	//dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL1_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
-	//if (dxl_comm_result != COMM_SUCCESS){
-		//printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-	//}
-	//else if (dxl_error != 0){
-		//printf("%s\n", packetHandler->getRxPacketError(dxl_error));
-	//}
-
-	//// Disable Dynamixel#2 Torque
-	//dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL2_ID, ADDR_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
-	//if (dxl_comm_result != COMM_SUCCESS){
-		//printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-	//}
-	//else if (dxl_error != 0){
-		//printf("%s\n", packetHandler->getRxPacketError(dxl_error));
-	//}
-
-	//// Close port
-	//portHandler->closePort();
-	
-	
-	rclcpp::init(argc, argv);
+	//rclcpp::init(argc, argv);
+	//auto node = std::make_shared<motor_state>();
+	//rclcpp::spin(node);
 	//rclcpp::spin(std::make_shared<transform_broadcaster>(rclcpp::NodeOptions{}));
+	
 	rclcpp::shutdown();
 	return 0;
 }
-
-
