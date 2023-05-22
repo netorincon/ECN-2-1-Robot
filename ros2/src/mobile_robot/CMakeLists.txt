@@ -23,21 +23,15 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
-<<<<<<< HEAD
+
 find_package(control_input REQUIRED)
-
-
-=======
 find_package(dynamixel_sdk REQUIRED)
->>>>>>> merge_test
-
 add_executable(driver src/driver.cpp)
 ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found error
 
 add_executable(transform_broadcaster src/transform_broadcaster.cpp)
 ament_target_dependencies(transform_broadcaster tf2_ros rclcpp sensor_msgs std_msgs)
 
-<<<<<<< HEAD
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
@@ -45,75 +39,9 @@ add_executable(real_world src/real_world.cpp )
 ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
 
 ament_python_install_package(${PROJECT_NAME})
-=======
+
 add_executable(motor_state src/motor_state.cpp)
 ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk)
-
-# Made for Dynamixel libraries
-#include_directories(include/dynamixel_sdk)
-
-#set(DYNAMIXEL_SDK_SOURCES
-	#src/dynamixel_sdk/packet_handler.cpp
-	#src/dynamixel_sdk/protocol1_packet_handler.cpp
-	#src/dynamixel_sdk/protocol2_packet_handler.cpp
-	#src/dynamixel_sdk/group_sync_read.cpp
-	#src/dynamixel_sdk/group_sync_write.cpp
-	#src/dynamixel_sdk/group_bulk_read.cpp
-	#src/dynamixel_sdk/group_bulk_write.cpp
-	#src/dynamixel_sdk/port_handler.cpp
-	#src/dynamixel_sdk/port_handler_arduino.cpp
-	#include/dynamixel_sdk/dynamixel_sdk.h
-	#include/dynamixel_sdk/port_handler.h
-	#include/dynamixel_sdk/group_bulk_read.h
-	#include/dynamixel_sdk/group_bulk_write.h
-	#include/dynamixel_sdk/group_sync_read.h
-	#include/dynamixel_sdk/group_sync_write.h
-	#include/dynamixel_sdk/packet_handler.h
-	#include/dynamixel_sdk/port_handler.h
-	#include/dynamixel_sdk/protocol1_packet_handler.h
-	#include/dynamixel_sdk/protocol2_packet_handler.h
-	#include/dynamixel_sdk/port_handler_arduino.h
-#)
-
-#if(APPLE)
-  #add_library(dynamixel_sdk SHARED
-    #${DYNAMIXEL_SDK_SOURCES}
-    #src/dynamixel_sdk/port_handler_mac.cpp
-    #include/dynamixel_sdk/port_handler_mac.h
-  #)
-#elseif(WIN32)
-  #add_library(dynamixel_sdk SHARED
-    #${DYNAMIXEL_SDK_SOURCES}
-    #src/dynamixel_sdk/port_handler_windows.cpp
-    #include/dynamixel_sdk/port_handler_windows.h
-  #)
-#else()
-  #add_library(dynamixel SHARED
-    #${DYNAMIXEL_SDK_SOURCES}
-    #src/dynamixel_sdk/port_handler_linux.cpp
-    #include/dynamixel_sdk/port_handler_linux.h
-  #)
-#endif()
-
-#install(
-  #DIRECTORY include/
-  #DESTINATION include/
-#)
-
-#install(
-  #TARGETS ${PROJECT_NAME}
-  #ARCHIVE DESTINATION lib
-  #LIBRARY DESTINATION lib
-  #RUNTIME DESTINATION bin
-#)
-
-#install(TARGETS
-	#LIBRARY ${DYNAMIXEL_SDK_SOURCES}
-    #DESTINATION lib/${PROJECT_NAME}/dynamixel_sdk
-    #)
-#
-
->>>>>>> merge_test
 
 install(TARGETS
     driver
@@ -131,7 +59,6 @@ install(TARGETS
     )
 
 install(TARGETS
-<<<<<<< HEAD
     real_world
     DESTINATION lib/${PROJECT_NAME}
     )
@@ -139,21 +66,13 @@ install(PROGRAMS
     scripts/gui.py
     DESTINATION lib/${PROJECT_NAME}
     )
-    
-=======
+
     motor_state
     DESTINATION lib/${PROJECT_NAME}
     )
 
->>>>>>> merge_test
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
 
@@ -162,6 +81,4 @@ install(
     DESTINATION share/${PROJECT_NAME}
     )
 
-#ament_export_include_directories(include)
-#ament_export_libraries(${PROJECT_NAME})
 ament_package()
