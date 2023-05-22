@@ -19,8 +19,8 @@ def generate_launch_description():
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('mobile_robot'))
     xacro_file = os.path.join(pkg_path,'description',"robot.urdf.xacro")
-    robot_description_config = xacro.process_file(xacro_file).toxml()
-    #robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
+    #robot_description_config = xacro.process_file(xacro_file).toxml()
+    robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
 
     # Create robot_state_publisher node
     params1 = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
@@ -31,44 +31,57 @@ def generate_launch_description():
         parameters = [params1]
     )
 
+    sim = Node(
+        package = 'mobile_robot',
+        executable = 'sim',
+        output = 'screen',
+    )
+
+    rqt = Node(
+        package = 'rqt_gui',
+        executable = 'rqt_gui',
+        output = 'screen',
+    )
+
     # Create Rviz node
     rviz = Node(
         package = 'rviz2',
         executable = 'rviz2',
         output = 'screen',
+        arguments=['-d', [os.path.join(pkg_path, 'config', 'robot_sim.rviz')]]
     )
 
-    # Create joint_state_publisher_gui node
-    joint_state_publisher_gui = Node(
-        package = 'joint_state_publisher_gui',
-        executable = 'joint_state_publisher_gui',
-    )
+    # # Create joint_state_publisher_gui node
+    # joint_state_publisher_gui = Node(
+    #     package = 'joint_state_publisher_gui',
+    #     executable = 'joint_state_publisher_gui',
+    # )
     
 
 			
-    # Create slider_publisher node
-    yaml_file = os.path.join(pkg_path,'launch','Twist.yaml')
-    slider_publisher = Node(
-		package = 'slider_publisher',
-		executable = 'slider_publisher',
-		name = 'slider_publisher',
-		output = 'screen',
-		arguments = [yaml_file],
-	)
+    # # Create slider_publisher node
+    # yaml_file = os.path.join(pkg_path,'launch','Twist.yaml')
+    # slider_publisher = Node(
+	# 	package = 'slider_publisher',
+	# 	executable = 'slider_publisher',
+	# 	name = 'slider_publisher',
+	# 	output = 'screen',
+	# 	arguments = [yaml_file],
+	# )
 	
-	# Create driver node
-    driver = Node(
-        package = 'mobile_robot',
-        executable = 'driver',
-        output = 'screen',
-    )
+	# # Create driver node
+    # driver = Node(
+    #     package = 'mobile_robot',
+    #     executable = 'driver',
+    #     output = 'screen',
+    # )
     
-    # Create transform_broadcaster node
-    transform_broadcaster = Node(
-        package = 'mobile_robot',
-        executable = 'transform_broadcaster',
-        output = 'screen',
-    )
+    # # Create transform_broadcaster node
+    # transform_broadcaster = Node(
+    #     package = 'mobile_robot',
+    #     executable = 'transform_broadcaster',
+    #     output = 'screen',
+    # )
 
     # Launch
     return LaunchDescription([
@@ -86,10 +99,9 @@ def generate_launch_description():
             description = 'use ros2 control if true'),
         
         #joint_state_publisher_gui,
+        #rqt,
         robot_state_publisher,
-        slider_publisher,
-        driver,
-        transform_broadcaster,
+        sim,
         rviz
         
         
