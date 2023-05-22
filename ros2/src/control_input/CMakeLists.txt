@@ -22,10 +22,12 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ControlInput.msg"
   "msg/PositionCommand.msg"
+  "msg/MotorCommand.msg"
 )
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

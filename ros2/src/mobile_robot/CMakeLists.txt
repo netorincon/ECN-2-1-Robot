@@ -67,7 +67,8 @@ install(PROGRAMS
     DESTINATION lib/${PROJECT_NAME}
     )
 
-    motor_state
+install (TARGETS
+motor_state
     DESTINATION lib/${PROJECT_NAME}
     )
 

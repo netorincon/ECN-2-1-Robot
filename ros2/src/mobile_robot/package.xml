@@ -16,6 +16,7 @@
   <depend>slider_publisher</depend>
   <depend>std_msgs</depend>
   <depend>control_input</depend>
+  <depend>dynamixel_sdk</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
