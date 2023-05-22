@@ -21,6 +21,7 @@
 
 // Used to publish current state to topic
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <control_input/msg/motor_command.hpp>
 
 // Uses Dynamixel SDK library
 #include "DynamixelSDK.h"
@@ -74,6 +75,12 @@
 //ESC key
 #define ESC_ASCII_VALUE                 0x1b
 
+struct MotorGoal{
+	std::string id;
+	int mode;
+	float value;
+};
+
 struct MotorState{
 	std::string id;
 	float position;
@@ -87,12 +94,12 @@ class motor_state : public rclcpp::Node
         //motor_state(rclcpp::NodeOptions options) : Node("motor_state", options){
         motor_state() : Node("motor_state"){
 			//Subscriber for getting control mode
-			control_mode_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-						"mode",10,std::bind(&motor_state::commandMode,this,std::placeholders::_1));
+			//control_mode_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+						//"mode",10,std::bind(&motor_state::commandMode,this,std::placeholders::_1));
 			
 			//Subscriber for desired joint states		
-			joint_command_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-						"joint_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
+			joint_command_subscriber = this->create_subscription<control_input::msg::MotorCommand>(
+						"motor_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
 			
 			//Publisher for present joint states
 			joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
@@ -100,43 +107,53 @@ class motor_state : public rclcpp::Node
 			
         }
         
-        MotorState commandArray[4]; //Goal
+        MotorGoal command[4]; //Goal
         MotorState stateArray[4]; //Present
+        //std::string currentMode[4]; //Current control mode of motors
 
     private :
 		rclcpp::TimerBase::SharedPtr timer_;
 		sensor_msgs::msg::JointState jointState;
-        geometry_msgs::msg::TransformStamped transform_stamped_;
+        //geometry_msgs::msg::TransformStamped transform_stamped_;
         //rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscriber_;
         //std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
-        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_command_subscriber;
-        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr control_mode_subscriber;
+        rclcpp::Subscription<control_input::msg::MotorCommand>::SharedPtr joint_command_subscriber;
+        //rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr control_mode_subscriber;
         
-	// Method to define the kind of control mode the robot is going to have
-	void commandMode(sensor_msgs::msg::JointState::SharedPtr mode){
-		//Decide what kind of variable its going to be
-	}
+	//// Method to define the kind of control mode the robot is going to have
+	//void commandMode(sensor_msgs::msg::JointState::SharedPtr mode){
+		////Decide what kind of variable its going to be
+	//}
 	
 	// Method to obtain desired joint states
-	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
+	void goalJoints(const control_input::msg::MotorCommand::SharedPtr cmd){
+		int controlMode;
+		
 		for(int i=0;i<4;i++){
 			//Dynamixel ID
-			commandArray[i].id = cmd->name[i];
+			command[i].id = cmd->cmd.name[i];
 			
-			//Goal Position
-			commandArray[i].position = cmd->position[i];
+			if(cmd->mode[i] == "position"){
+				controlMode = 3;
+				command[i].value = cmd->cmd.position[i];
+			}
+			else if(cmd->mode[i] == "velocity"){
+				controlMode = 1;
+				command[i].value = cmd->cmd.velocity[i];
+			}
+			else if(cmd->mode[i] == "torque"){
+				controlMode = 0;
+				if(cmd->cmd.name[i] != "3" && cmd->cmd.name[i] != "4"){
+					command[i].value = cmd->cmd.effort[i];
+				}
+			}
 			
-			//Goal Velocity
-			commandArray[i].speed = cmd->velocity[i];
-			
-			//Goal Torque
-			//As previously mentioned, rot motors do not have torque control
-			//There's no point in obtaining such values
-			if(cmd->name[i] != "3" && cmd->name[i] != "4"){
-				commandArray[i].torque = cmd->effort[i];
-			}	
+			//Check for mode change
+			if(!command[i].mode || command[i].mode != controlMode){
+				command[i].mode = controlMode;
+			}
 		}
 	}
 	
@@ -238,6 +255,26 @@ void disableTorque(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler
 	}
 }
 
+//OPERATING MODE
+void changeMode(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, uint8_t id, uint8_t mode, uint8_t &dxl_error){
+	int dxl_comm_result = COMM_TX_FAIL;
+	
+	disableTorque(portHandler,packetHandler,id,dxl_error);
+	
+	dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_OPERATING_MODE, mode, &dxl_error);
+	if (dxl_comm_result != COMM_SUCCESS){
+		printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+	}
+	else if (dxl_error != 0){
+		printf("%s\n", packetHandler->getRxPacketError(dxl_error));
+	}
+	//else{
+		//printf("Dynamixel#%d has been successfully disconnected \n", id);
+	//}
+	
+	enableTorque(portHandler,packetHandler,id,dxl_error);
+}
+
 // Add parameter storage for all dynamixels
 void paramStorageRead(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, bool &exitParamStor){
 	bool dxl_addparam_result = false;
@@ -294,6 +331,52 @@ void readAvailable(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, int addr
 	}
 }
 
+void getPresentValue(dynamixel::PacketHandler *packetHandler, dynamixel::GroupBulkRead &groupBulkRead, int address, int len, uint8_t &dxl_error, bool &exitParamStor){
+	// Bulkread present state
+	int dxl_comm_result;
+	
+	dxl_comm_result = groupBulkRead.txRxPacket();
+	if (dxl_comm_result != COMM_SUCCESS){
+		printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+	}
+	else if (groupBulkRead.getError(DXL1_ID, &dxl_error)){
+		printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
+	}
+	else if (groupBulkRead.getError(DXL2_ID, &dxl_error)){
+		printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
+	}
+	else if (groupBulkRead.getError(DXL3_ID, &dxl_error)){
+		printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+	}
+	else if (groupBulkRead.getError(DXL4_ID, &dxl_error)){
+		printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+	}
+
+	// Check if groupbulkread data of Dynamixel#1 is available
+	readAvailable(groupBulkRead, DXL1_ID, address, len, exitParamStor);
+	if(exitParamStor){
+		return;
+	}
+	
+	// Check if groupbulkread data of Dynamixel#2 is available
+	readAvailable(groupBulkRead, DXL2_ID, address, len, exitParamStor);
+	if(exitParamStor){
+		return;
+	}
+	
+	// Check if groupbulkread data of Dynamixel#3 is available
+	readAvailable(groupBulkRead, DXL3_ID, address, len, exitParamStor);
+	if(exitParamStor){
+		return;
+	}
+	
+	// Check if groupbulkread data of Dynamixel#4 is available
+	readAvailable(groupBulkRead, DXL4_ID, address, len, exitParamStor);
+	if(exitParamStor){
+		return;
+	}
+}
+
 int main(int argc, char** argv)
 {
 	// Initialize PortHandler instance
@@ -315,10 +398,10 @@ int main(int argc, char** argv)
 	int dxl_comm_result = COMM_TX_FAIL;             // Communication result
 	//bool dxl_addparam_result = false;               // addParam result
 	//bool dxl_getdata_result = false;                // GetParam result
-	int dxl1_goal = 0;         						// Goal joint values
-	int dxl2_goal = 0;
-	int dxl3_goal = 0;
-	int dxl4_goal = 0;
+	int dxl1_goal;         							// Goal joint values
+	int dxl2_goal;
+	int dxl3_goal;
+	int dxl4_goal;
 	bool exitParamStor = false;
 	
 	// Mode selector for control type
@@ -418,10 +501,10 @@ int main(int argc, char** argv)
 		rclcpp::spin_some(node);
 		
 		//Obtain goal joints
-		dxl1_goal = (int)node->commandArray[0].position;
-		dxl2_goal = (int)node->commandArray[1].position;
-		dxl3_goal = (int)node->commandArray[2].position;
-		dxl4_goal = (int)node->commandArray[3].position;
+		dxl1_goal = (int)node->command[0].value;
+		dxl2_goal = (int)node->command[1].value;
+		dxl3_goal = (int)node->command[2].value;
+		dxl4_goal = (int)node->command[3].value;
 
 		// Allocate goal position value into byte array
 		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl1_goal));
@@ -475,47 +558,7 @@ int main(int argc, char** argv)
 		groupBulkWrite.clearParam();
 
 		do{
-			// Bulkread present state
-			dxl_comm_result = groupBulkRead.txRxPacket();
-			if (dxl_comm_result != COMM_SUCCESS){
-				printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-			}
-			else if (groupBulkRead.getError(DXL1_ID, &dxl_error)){
-				printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
-			}
-			else if (groupBulkRead.getError(DXL2_ID, &dxl_error)){
-				printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-			}
-			else if (groupBulkRead.getError(DXL3_ID, &dxl_error)){
-				printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
-			}
-			else if (groupBulkRead.getError(DXL4_ID, &dxl_error)){
-				printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
-			}
-
-			// Check if groupbulkread data of Dynamixel#1 is available
-			readAvailable(groupBulkRead, DXL1_ID, addressPres, lenSize, exitParamStor);
-			if(exitParamStor){
-				return 0;
-			}
 			
-			// Check if groupbulkread data of Dynamixel#2 is available
-			readAvailable(groupBulkRead, DXL2_ID, addressPres, lenSize, exitParamStor);
-			if(exitParamStor){
-				return 0;
-			}
-			
-			// Check if groupbulkread data of Dynamixel#3 is available
-			readAvailable(groupBulkRead, DXL3_ID, addressPres, lenSize, exitParamStor);
-			if(exitParamStor){
-				return 0;
-			}
-			
-			// Check if groupbulkread data of Dynamixel#4 is available
-			readAvailable(groupBulkRead, DXL4_ID, addressPres, lenSize, exitParamStor);
-			if(exitParamStor){
-				return 0;
-			}
 
 			// Get present position value
 			dxl1_present_state = groupBulkRead.getData(DXL1_ID, addressPres, lenSize);

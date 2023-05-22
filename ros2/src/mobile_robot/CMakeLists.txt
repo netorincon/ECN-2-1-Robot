@@ -41,7 +41,7 @@ ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
 ament_python_install_package(${PROJECT_NAME})
 
 add_executable(motor_state src/motor_state.cpp)
-ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk)
+ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input)
 
 install(TARGETS
     driver
