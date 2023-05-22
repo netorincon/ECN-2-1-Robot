@@ -4,7 +4,6 @@ import os, signal
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from widget import Ui_Form
 from control_input.msg import ControlInput
 from control_input.msg import PositionCommand
 import math 
