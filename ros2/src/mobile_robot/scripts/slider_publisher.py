@@ -4,6 +4,7 @@ import os, signal
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from sensor_msgs.msg import JointState
 from control_input.msg import ControlInput
 from control_input.msg import PositionCommand
 import math 

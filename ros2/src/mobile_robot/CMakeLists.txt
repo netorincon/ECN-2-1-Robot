@@ -23,9 +23,9 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
-
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
+
 add_executable(driver src/driver.cpp)
 ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found error
 
