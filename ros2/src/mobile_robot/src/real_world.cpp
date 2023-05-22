@@ -26,6 +26,9 @@ Then it assembles a transform and published it to /tf2 to be able to see the rob
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <control_input/msg/slider_command.hpp>
+#include <control_input/msg/motor_command.hpp>
+#include <control_input/msg/control_input.hpp>
 
 using namespace std::chrono_literals;
 
@@ -35,6 +38,7 @@ struct MotorState{
     std::string id;
     float position;
     float speed;
+    float torque;
 };
 
 class real_world : public rclcpp::Node
@@ -63,13 +67,16 @@ class real_world : public rclcpp::Node
 
             */
 
-            state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-                            "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
+            // state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+            //                 "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
 
-            control_input_subscriber = this->create_subscription<std_msgs::msg::Float64MultiArray>(
-                            "input_cmd", 10, std::bind(&real_world::calculateDesiredSpeeds, this, std::placeholders::_1));
+            control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
+                            "input_cmd", 10, std::bind(&real_world::jointCommandFromController, this, std::placeholders::_1));
 
-            joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_cmd", 10);
+            slider_subscriber = this->create_subscription<control_input::msg::SliderCommand>(
+                            "slider_cmd", 10, std::bind(&real_world::jointCommandFromSliders, this, std::placeholders::_1));
+
+            joint_command_publisher = this->create_publisher<control_input::msg::MotorCommand>("motor_cmd", 10);
             timer_ = this->create_wall_timer(50ms, std::bind(&real_world::publishJointCommand, this));
             
         }
@@ -80,11 +87,12 @@ class real_world : public rclcpp::Node
     private :
         rclcpp::TimerBase::SharedPtr timer_;
         geometry_msgs::msg::TransformStamped transform_stamped_;
-        sensor_msgs::msg::JointState joint_cmd;
+        control_input::msg::MotorCommand joint_cmd;
 
-        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_command_publisher;
-        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
-        rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr control_input_subscriber;
+        rclcpp::Publisher<control_input::msg::MotorCommand>::SharedPtr joint_command_publisher;
+        // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+        rclcpp::Subscription<control_input::msg::SliderCommand>::SharedPtr slider_subscriber;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         float frequency = 20; // fréquence de publication des transformations sur le topic /tf
@@ -140,37 +148,109 @@ class real_world : public rclcpp::Node
         tf_broadcaster_->sendTransform(transform_stamped_);
         return;
     }
-    void calculateDesiredSpeeds(const std_msgs::msg::Float64MultiArray::SharedPtr inputCommand){
-        Um = inputCommand->data[0];
-        dd1 = inputCommand->data[1];
-        dd2 = inputCommand->data[2];
+    void jointCommandFromSliders(const control_input::msg::SliderCommand::SharedPtr msg){
+        if(msg->mode=="velocity"){
+            Um = msg->um;
+            dd1=msg->cmd.velocity[0];
+            dd2=msg->cmd.velocity[1];
 
-        phi1d=2*cos(d2)*Um/R;
-        phi2d=2*cos(d1)*Um/R;
+            phi1d=2*cos(d2)*Um/R;
+            phi2d=2*cos(d1)*Um/R;
 
-        //Arrange the speeds in an array for faster assignment during publishJointCommand 
-        commandArray[0].id=1;
-        commandArray[0].speed=phi1d;
+            //Arrange the speeds in an array for faster assignment during publishJointCommand 
+            commandArray[0].id=1;
+            commandArray[0].speed=phi1d;
 
-        commandArray[1].id=2;
-        commandArray[1].speed=phi2d;
+            commandArray[1].id=2;
+            commandArray[1].speed=phi2d;
 
-        commandArray[2].id=3;
-        commandArray[2].speed=dd1;
+            commandArray[2].id=3;
+            commandArray[2].speed=dd1;
 
-        commandArray[3].id=4;
-        commandArray[4].speed=dd2;
-        
+            commandArray[3].id=4;
+            commandArray[4].speed=dd2;   
+
+            for(int i=0;i<4;i++){
+                commandArray[i].position=0;
+                commandArray[i].torque=0;
+            }
+            joint_cmd.mode={"velocity", "velocity", "velocity", "velocity"};
+        }
+        else if(msg->mode=="position"){
+            Um=0;
+            d1=msg->cmd.position[0];
+            d2=msg->cmd.position[1];
+
+            phi1d=0;
+            phi2d=0;
+
+            //Arrange the speeds in an array for faster assignment during publishJointCommand 
+            commandArray[0].id=1;
+            commandArray[0].position=0;
+
+            commandArray[1].id=2;
+            commandArray[1].position=0;
+
+            commandArray[2].id=3;
+            commandArray[2].position=d1;
+
+            commandArray[3].id=4;
+            commandArray[4].position=d2;   
+
+            for(int i=0;i<4;i++){
+                commandArray[i].speed=0;
+                commandArray[i].torque=0;
+            }
+            joint_cmd.mode={"position", "position", "position", "position"};
+        }
+        //publishJointCommand();
+
+    }
+
+        void jointCommandFromController(const control_input::msg::ControlInput::SharedPtr msg){
+            Um = msg->um;
+            dd1=msg->beta1dot;
+            dd2=msg->beta2dot;
+
+            phi1d=2*cos(d2)*Um/R;
+            phi2d=2*cos(d1)*Um/R;
+
+            //Arrange the speeds in an array for faster assignment during publishJointCommand 
+            commandArray[0].id=1;
+            commandArray[0].speed=phi1d;
+
+            commandArray[1].id=2;
+            commandArray[1].speed=phi2d;
+
+            commandArray[2].id=3;
+            commandArray[2].speed=dd1;
+
+            commandArray[3].id=4;
+            commandArray[4].speed=dd2;   
+
+            for(int i=0;i<4;i++){
+                commandArray[i].position=0;
+                commandArray[i].torque=0;
+            }
+            joint_cmd.mode={"velocity", "velocity", "velocity", "velocity"};
+
+        //publishJointCommand();
+
     }
     void publishJointCommand(){
         
-        joint_cmd.header.stamp=this->now();
+        joint_cmd.cmd.header.stamp=this->now();
+        joint_cmd.cmd.name.clear();
+        joint_cmd.cmd.velocity.clear();
+        joint_cmd.cmd.position.clear();
+        joint_cmd.cmd.effort.clear();
+
         for(int i=0;i<4;i++){
             //TODO Change the name parameter to the robot joint name instead of using just a number
-            joint_cmd.name[i]=std::to_string(i);
-            joint_cmd.velocity[i]=commandArray[i].speed;
-            joint_cmd.position[i]=0;
-            joint_cmd.effort[i]=0;
+            joint_cmd.cmd.name.push_back(std::to_string(i+1));
+            joint_cmd.cmd.velocity.push_back(commandArray[i].speed);
+            joint_cmd.cmd.position.push_back(commandArray[i].position);
+            joint_cmd.cmd.effort.push_back(commandArray[i].torque);
         }
         joint_command_publisher->publish(joint_cmd);
     }
