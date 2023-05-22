@@ -17,10 +17,19 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
+<<<<<<< HEAD
+find_package(control_input REQUIRED)
+
+
+=======
 find_package(dynamixel_sdk REQUIRED)
+>>>>>>> merge_test
 
 add_executable(driver src/driver.cpp)
 ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found error
@@ -28,6 +37,15 @@ ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found e
 add_executable(transform_broadcaster src/transform_broadcaster.cpp)
 ament_target_dependencies(transform_broadcaster tf2_ros rclcpp sensor_msgs std_msgs)
 
+<<<<<<< HEAD
+add_executable(sim src/sim.cpp )
+ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
+
+add_executable(real_world src/real_world.cpp )
+ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
+
+ament_python_install_package(${PROJECT_NAME})
+=======
 add_executable(motor_state src/motor_state.cpp)
 ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk)
 
@@ -95,6 +113,7 @@ ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk)
     #)
 #
 
+>>>>>>> merge_test
 
 install(TARGETS
     driver
@@ -105,12 +124,28 @@ install(TARGETS
     transform_broadcaster
     DESTINATION lib/${PROJECT_NAME}
     )
+    
+install(TARGETS
+    sim
+    DESTINATION lib/${PROJECT_NAME}
+    )
 
 install(TARGETS
+<<<<<<< HEAD
+    real_world
+    DESTINATION lib/${PROJECT_NAME}
+    )
+install(PROGRAMS
+    scripts/gui.py
+    DESTINATION lib/${PROJECT_NAME}
+    )
+    
+=======
     motor_state
     DESTINATION lib/${PROJECT_NAME}
     )
 
+>>>>>>> merge_test
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
