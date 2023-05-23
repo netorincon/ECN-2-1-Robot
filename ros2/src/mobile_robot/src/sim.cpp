@@ -17,6 +17,7 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <control_input/msg/slider_command.hpp>
+#include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -42,12 +43,14 @@ double limit_angle(double a){
 }
 
 
-class transform_broadcaster : public rclcpp::Node
+class sim : public rclcpp::Node
 {
     public :
-        transform_broadcaster(rclcpp::NodeOptions options) : Node("transform_broadcaster", options)
+        
+        sim(rclcpp::NodeOptions options) : Node("sim", options)
         {
-
+            declare_parameter("mode", "velocity");
+            get_parameter("mode", mode);
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -60,9 +63,15 @@ class transform_broadcaster : public rclcpp::Node
             Then the values are integrated over time to obtain the current state vector.
             
             */  
+            if(mode=="velocity" || mode=="position"){
+                slider_subscriber = this->create_subscription<control_input::msg::SliderCommand>(
+                    "slider_cmd", 10, std::bind(&sim::calculatePoseFromSliders, this, std::placeholders::_1));
+            }
+            if(mode=="controller"){
+                controller_subscriber = this->create_subscription<control_input::msg::ControlInput>(
+                    "slider_cmd", 10, std::bind(&sim::calculatePoseFromController, this, std::placeholders::_1));
+            }
 
-            slider_subscriber = this->create_subscription<control_input::msg::SliderCommand>(
-                            "slider_cmd", 10, std::bind(&transform_broadcaster::calculatePoseFromSliders, this, std::placeholders::_1));
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             
@@ -74,26 +83,30 @@ class transform_broadcaster : public rclcpp::Node
         geometry_msgs::msg::TransformStamped transform_stamped_;
         geometry_msgs::msg::TransformStamped icr;
         rclcpp::Subscription<control_input::msg::SliderCommand>::SharedPtr slider_subscriber;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr controller_subscriber;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
         tf2::Quaternion rotation;
-        float frequency = 20; // fréquence de publication des transformations sur le topic /tf
+        float frequency = 100; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.08;//Base distance
-        float R=0.066; //Radius of the wheels
+        float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)
         Point ICRLocation;
 
         void calculatePoseFromSliders(const control_input::msg::SliderCommand::SharedPtr msg){
             
-            if(msg->mode=="velocity"){
+            if(mode=="velocity"){ //We read the mode that was passed as argument when launching the node
                 Um = msg->um;
                 dd1 = msg->cmd.velocity[0];
                 dd2 = msg->cmd.velocity[1];
 
                 //We calculate current robot speeds and orientation motor speeds
+                d1+=dd1*period; //Delta 1
+                d2+=dd2*period; //Delta 2
+
                 tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
                 tt+=tt_dot*period;
                 tt=limit_angle(tt);
@@ -107,8 +120,7 @@ class transform_broadcaster : public rclcpp::Node
                 x+=x_dot*period;
                 y+=y_dot*period;
                 
-                d1+=dd1*period; //Delta 1
-                d2+=dd2*period; //Delta 2
+                
 
                 beta1=d1;
                 beta2=d2+M_PI;
@@ -120,7 +132,7 @@ class transform_broadcaster : public rclcpp::Node
                 phi1=limit_angle(phi1);
                 phi2=limit_angle(phi2);
             }
-            else if(msg->mode=="position"){
+            else if(mode=="position"){
                 beta1=msg->cmd.position[0];
                 beta2=msg->cmd.position[1]+M_PI;
                 d1=msg->cmd.position[0];
@@ -128,8 +140,43 @@ class transform_broadcaster : public rclcpp::Node
                 phi1=0;
                 phi2=0;
             }
-
             publishTransforms();              
+        }
+
+        void calculatePoseFromController(const control_input::msg::ControlInput::SharedPtr msg){
+                Um = msg->um;
+                dd1 = msg->beta1dot;
+                dd2 = msg->beta2dot;
+
+                //We calculate current robot speeds and orientation motor speeds
+                d1+=dd1*period; //Delta 1
+                d2+=dd2*period; //Delta 2
+
+                tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
+                tt+=tt_dot*period;
+                tt=limit_angle(tt);
+
+                x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
+                y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
+                phi1d=2*cos(d2)*Um/R;
+                phi2d=2*cos(d1)*Um/R;
+
+                //We integrate the speeds over time (add each time we get a new value)
+                x+=x_dot*period;
+                y+=y_dot*period;
+                
+                
+
+                beta1=d1;
+                beta2=d2+M_PI;
+
+                phi1+=phi1d*period;
+                phi2+=phi2d*period;
+                
+                //We limit the angles to 2pi
+                phi1=limit_angle(phi1);
+                phi2=limit_angle(phi2);
+                publishTransforms(); 
         }
 
         void calculateICR(){
@@ -160,7 +207,7 @@ class transform_broadcaster : public rclcpp::Node
 
             diff=alpha1-alpha2;
             //See PDF for detailed calculations
-            RCLCPP_INFO(this->get_logger(), "Difference: '%f'", sin(diff));
+            //RCLCPP_INFO(this->get_logger(), "Difference: '%f'", sin(diff));
             if(sin(diff)!=0){
                 ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
                 ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
@@ -170,7 +217,6 @@ class transform_broadcaster : public rclcpp::Node
 
 
         void publishTransforms(){
-            RCLCPP_INFO(this->get_logger(), "Hola" );
             //We now publish the joint states
             std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
             std::vector<double> posValues={beta2, beta1, phi2, phi1};
@@ -211,7 +257,7 @@ class transform_broadcaster : public rclcpp::Node
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<transform_broadcaster>(rclcpp::NodeOptions{}));
+  rclcpp::spin(std::make_shared<sim>(rclcpp::NodeOptions{}));
   rclcpp::shutdown();
   return 0;
 }

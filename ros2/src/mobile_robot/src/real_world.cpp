@@ -203,8 +203,6 @@ class real_world : public rclcpp::Node
             }
             joint_cmd.mode={"position", "position", "position", "position"};
         }
-        //publishJointCommand();
-
     }
 
         void jointCommandFromController(const control_input::msg::ControlInput::SharedPtr msg){
@@ -233,8 +231,6 @@ class real_world : public rclcpp::Node
                 commandArray[i].torque=0;
             }
             joint_cmd.mode={"velocity", "velocity", "velocity", "velocity"};
-
-        //publishJointCommand();
 
     }
     void publishJointCommand(){

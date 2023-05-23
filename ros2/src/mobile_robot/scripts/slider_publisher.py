@@ -13,7 +13,7 @@ class publisherNode(Node):
         super().__init__('slider_publisher')
         self.ui = ui
         self.slider_publisher = self.create_publisher(SliderCommand, 'slider_cmd', 10)
-        timer_period = 0.05  # seconds
+        timer_period = 0.01  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
@@ -30,4 +30,7 @@ class publisherNode(Node):
             msg.cmd.position.append(self.ui.beta1_sb.value()*math.pi/180)
             msg.cmd.position.append(self.ui.beta2_sb.value()*math.pi/180)  
 
+        elif(self.ui.control_mode_radio.isChecked()):
+            msg.mode="controller"
+        
         self.slider_publisher.publish(msg)
