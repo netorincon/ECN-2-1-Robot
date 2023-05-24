@@ -26,12 +26,6 @@ find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
 
-add_executable(driver src/driver.cpp)
-ament_target_dependencies(driver rclcpp sensor_msgs std_msgs) # File not found error
-
-add_executable(transform_broadcaster src/transform_broadcaster.cpp)
-ament_target_dependencies(transform_broadcaster tf2_ros rclcpp sensor_msgs std_msgs)
-
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
@@ -43,16 +37,9 @@ ament_python_install_package(${PROJECT_NAME})
 add_executable(motor_state src/motor_state.cpp)
 ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input)
 
-install(TARGETS
-    driver
-    DESTINATION lib/${PROJECT_NAME}
-    )
+add_executable(controller src/controller.cpp)
+ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input)
 
-install(TARGETS
-    transform_broadcaster
-    DESTINATION lib/${PROJECT_NAME}
-    )
-    
 install(TARGETS
     sim
     DESTINATION lib/${PROJECT_NAME}
@@ -71,6 +58,10 @@ install (TARGETS
 motor_state
     DESTINATION lib/${PROJECT_NAME}
     )
+install(TARGETS
+	controller
+	DESTINATION lib/${PROJECT_NAME}
+	)		
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
