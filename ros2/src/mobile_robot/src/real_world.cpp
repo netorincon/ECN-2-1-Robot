@@ -29,6 +29,7 @@ Then it assembles a transform and published it to /tf2 to be able to see the rob
 #include <control_input/msg/slider_command.hpp>
 #include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
+#include <control_input/msg/position_command.hpp>
 
 using namespace std::chrono_literals;
 
@@ -46,7 +47,8 @@ class real_world : public rclcpp::Node
     public :
         real_world(rclcpp::NodeOptions options) : Node("real_world", options)
         {
-
+            declare_parameter("mode", "velocity");
+            get_parameter("mode", mode);
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -67,17 +69,23 @@ class real_world : public rclcpp::Node
 
             */
 
-            // state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-            //                 "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
+            state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+                             "motor_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
 
+            if(mode=="position"){
+                position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
+                            "position_cmd", 10, std::bind(&real_world::jointCommandFromPositionCmd, this, std::placeholders::_1));
+
+            }
+            if(mode=="velocity" || mode=="controller"){
             control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
-                            "input_cmd", 10, std::bind(&real_world::jointCommandFromController, this, std::placeholders::_1));
-
-            slider_subscriber = this->create_subscription<control_input::msg::SliderCommand>(
-                            "slider_cmd", 10, std::bind(&real_world::jointCommandFromSliders, this, std::placeholders::_1));
+                            "control_cmd", 10, std::bind(&real_world::jointCommandFromControlCmd, this, std::placeholders::_1));
+            }
+            
 
             joint_command_publisher = this->create_publisher<control_input::msg::MotorCommand>("motor_cmd", 10);
-            timer_ = this->create_wall_timer(50ms, std::bind(&real_world::publishJointCommand, this));
+            joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+            timer_ = this->create_wall_timer(20ms, std::bind(&real_world::publishJointCommand, this));
             
         }
         //We initialize all variables of the state vector at 0
@@ -90,18 +98,20 @@ class real_world : public rclcpp::Node
         control_input::msg::MotorCommand joint_cmd;
 
         rclcpp::Publisher<control_input::msg::MotorCommand>::SharedPtr joint_command_publisher;
-        // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
-        rclcpp::Subscription<control_input::msg::SliderCommand>::SharedPtr slider_subscriber;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-        float frequency = 20; // fréquence de publication des transformations sur le topic /tf
+        float frequency = 50; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.05;//Base distance in meters
-        float R=0.06; //Radius of the wheels in meters
-
+        float R=0.033; //Radius of the wheels in meters
+        std::string mode;
         MotorState stateArray[4];
         MotorState commandArray[4];
+        sensor_msgs::msg::JointState joint_state;
 
     void calculatePose(const sensor_msgs::msg::JointState::SharedPtr jointState){
 
@@ -110,6 +120,7 @@ class real_world : public rclcpp::Node
             stateArray[i].id=jointState->name[i];
             stateArray[i].position=jointState->position[i];
             stateArray[i].speed=jointState->velocity[i];
+            stateArray[i].torque=jointState->effort[i];
         }
                
         //Get the current speed of the spin actuators
@@ -121,7 +132,12 @@ class real_world : public rclcpp::Node
 
         d1+=dd1*period; //delta 1
         d2+=dd2*period; //delta 2
-        
+
+        beta1=d1;
+        beta2=d2+M_PI;
+        phi1+=phi1d*period;
+        phi2+=phi2d*period;
+
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
         float U=phi1d*R/(2*cos(d2));
 
@@ -148,38 +164,10 @@ class real_world : public rclcpp::Node
         tf_broadcaster_->sendTransform(transform_stamped_);
         return;
     }
-    void jointCommandFromSliders(const control_input::msg::SliderCommand::SharedPtr msg){
-        if(msg->mode=="velocity"){
-            Um = msg->um;
-            dd1=msg->cmd.velocity[0];
-            dd2=msg->cmd.velocity[1];
-
-            phi1d=2*cos(d2)*Um/R;
-            phi2d=2*cos(d1)*Um/R;
-
-            //Arrange the speeds in an array for faster assignment during publishJointCommand 
-            commandArray[0].id=1;
-            commandArray[0].speed=phi1d;
-
-            commandArray[1].id=2;
-            commandArray[1].speed=phi2d;
-
-            commandArray[2].id=3;
-            commandArray[2].speed=dd1;
-
-            commandArray[3].id=4;
-            commandArray[4].speed=dd2;   
-
-            for(int i=0;i<4;i++){
-                commandArray[i].position=0;
-                commandArray[i].torque=0;
-            }
-            joint_cmd.mode={"velocity", "velocity", "velocity", "velocity"};
-        }
-        else if(msg->mode=="position"){
+    void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
             Um=0;
-            d1=msg->cmd.position[0];
-            d2=msg->cmd.position[1];
+            d1=msg->d1;
+            d2=msg->d2;
 
             phi1d=0;
             phi2d=0;
@@ -195,20 +183,19 @@ class real_world : public rclcpp::Node
             commandArray[2].position=d1;
 
             commandArray[3].id=4;
-            commandArray[4].position=d2;   
+            commandArray[3].position=d2;   
 
             for(int i=0;i<4;i++){
                 commandArray[i].speed=0;
                 commandArray[i].torque=0;
             }
             joint_cmd.mode={"position", "position", "position", "position"};
-        }
     }
 
-        void jointCommandFromController(const control_input::msg::ControlInput::SharedPtr msg){
-            Um = msg->um;
-            dd1=msg->beta1dot;
-            dd2=msg->beta2dot;
+        void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
+            Um=msg->um;
+            dd1=msg->delta1dot;
+            dd2=msg->delta2dot;
 
             phi1d=2*cos(d2)*Um/R;
             phi2d=2*cos(d1)*Um/R;
@@ -224,7 +211,7 @@ class real_world : public rclcpp::Node
             commandArray[2].speed=dd1;
 
             commandArray[3].id=4;
-            commandArray[4].speed=dd2;   
+            commandArray[3].speed=dd2;   
 
             for(int i=0;i<4;i++){
                 commandArray[i].position=0;
@@ -248,6 +235,13 @@ class real_world : public rclcpp::Node
             joint_cmd.cmd.position.push_back(commandArray[i].position);
             joint_cmd.cmd.effort.push_back(commandArray[i].torque);
         }
+        std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
+        std::vector<double> posValues={beta2, beta1, phi2, phi1};
+        std::vector<double> velValues={dd2, dd1, phi2d, phi1d};
+        joint_state.name=names;
+        joint_state.position = posValues;
+        joint_state.header.stamp=this->now();
+        joint_publisher->publish(joint_state);
         joint_command_publisher->publish(joint_cmd);
     }
 

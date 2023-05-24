@@ -22,8 +22,8 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-
 #include <chrono>
+#include <control_input/msg/position_command.hpp>
 
 struct MotorState{
     std::string id;
@@ -56,22 +56,21 @@ class sim : public rclcpp::Node
 
             /*
             We subscribe to the topic cmd_robot via cmd_susbscriber 
-            It receives the input vector which includes [um, beta1dot and beta2dot].
+            It receives the input vector which includes [um, delta1dot and delta2dot].
             qDot (derivative of the configuration vector) is estimated using the S matrix obtained in the Kinematic model calculations
             times the um input. 
 
             Then the values are integrated over time to obtain the current state vector.
             
             */  
-            if(mode=="velocity" || mode=="position"){
-                slider_subscriber = this->create_subscription<control_input::msg::SliderCommand>(
-                    "slider_cmd", 10, std::bind(&sim::calculatePoseFromSliders, this, std::placeholders::_1));
+            if(mode=="position"){
+                position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
+                    "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
             }
-            if(mode=="controller"){
-                controller_subscriber = this->create_subscription<control_input::msg::ControlInput>(
-                    "slider_cmd", 10, std::bind(&sim::calculatePoseFromController, this, std::placeholders::_1));
+            if(mode=="velocity" || mode=="controller"){
+                control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
+                    "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
             }
-
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             
@@ -82,71 +81,34 @@ class sim : public rclcpp::Node
     private :
         geometry_msgs::msg::TransformStamped transform_stamped_;
         geometry_msgs::msg::TransformStamped icr;
-        rclcpp::Subscription<control_input::msg::SliderCommand>::SharedPtr slider_subscriber;
-        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr controller_subscriber;
+        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
         tf2::Quaternion rotation;
-        float frequency = 100; // fréquence de publication des transformations sur le topic /tf
+        float frequency = 50; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.08;//Base distance
         float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)
         Point ICRLocation;
 
-        void calculatePoseFromSliders(const control_input::msg::SliderCommand::SharedPtr msg){
-            
-            if(mode=="velocity"){ //We read the mode that was passed as argument when launching the node
-                Um = msg->um;
-                dd1 = msg->cmd.velocity[0];
-                dd2 = msg->cmd.velocity[1];
-
-                //We calculate current robot speeds and orientation motor speeds
-                d1+=dd1*period; //Delta 1
-                d2+=dd2*period; //Delta 2
-
-                tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
-                tt+=tt_dot*period;
-                tt=limit_angle(tt);
-
-                x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
-                y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
-                phi1d=2*cos(d2)*Um/R;
-                phi2d=2*cos(d1)*Um/R;
-
-                //We integrate the speeds over time (add each time we get a new value)
-                x+=x_dot*period;
-                y+=y_dot*period;
-                
-                
-
-                beta1=d1;
-                beta2=d2+M_PI;
-
-                phi1+=phi1d*period;
-                phi2+=phi2d*period;
-                
-                //We limit the angles to 2pi
-                phi1=limit_angle(phi1);
-                phi2=limit_angle(phi2);
-            }
-            else if(mode=="position"){
-                beta1=msg->cmd.position[0];
-                beta2=msg->cmd.position[1]+M_PI;
-                d1=msg->cmd.position[0];
-                d2=msg->cmd.position[1];
+        void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
+                beta1=msg->d1;
+                beta2=msg->d2+M_PI;
+                d1=msg->d1;
+                d2=msg->d2;
                 phi1=0;
                 phi2=0;
+                publishTransforms(); 
             }
-            publishTransforms();              
-        }
 
-        void calculatePoseFromController(const control_input::msg::ControlInput::SharedPtr msg){
+        void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
-                dd1 = msg->beta1dot;
-                dd2 = msg->beta2dot;
+                dd1 = msg->delta1dot;
+                dd2 = msg->delta2dot;
 
                 //We calculate current robot speeds and orientation motor speeds
                 d1+=dd1*period; //Delta 1
@@ -164,8 +126,6 @@ class sim : public rclcpp::Node
                 //We integrate the speeds over time (add each time we get a new value)
                 x+=x_dot*period;
                 y+=y_dot*period;
-                
-                
 
                 beta1=d1;
                 beta2=d2+M_PI;
