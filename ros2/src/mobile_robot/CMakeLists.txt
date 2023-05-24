@@ -36,7 +36,7 @@ add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
 add_executable(real_world src/real_world.cpp )
-ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs)
+ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
 ament_python_install_package(${PROJECT_NAME})
 

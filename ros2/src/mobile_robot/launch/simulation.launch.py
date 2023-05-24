@@ -14,6 +14,7 @@ def generate_launch_description():
     # Check if we are told to use sim time
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_ros2_control = LaunchConfiguration('use_ros2_control')
+    mode=LaunchConfiguration('mode')
 
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('mobile_robot'))
@@ -30,10 +31,12 @@ def generate_launch_description():
         parameters = [params1]
     )
 
+    simParams={"mode": mode}
     sim = Node(
         package = 'mobile_robot',
         executable = 'sim',
         output = 'screen',
+        parameters=[simParams]
     )
 
     rqt = Node(
@@ -61,6 +64,10 @@ def generate_launch_description():
             "use_ros2_control",
             default_value = "true",
             description = 'use ros2 control if true'),
+        DeclareLaunchArgument(
+            "mode",
+            default_value = "velocity",
+            description = 'Use manual velocity sliders as default'),
 
         robot_state_publisher,
         sim,

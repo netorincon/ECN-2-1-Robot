@@ -36,8 +36,8 @@
     <!-- Chassis -->
     <xacro:property name="big_bar_length" value="0.3"/>
     <xacro:property name="chassis_thickness" value="0.015"/>
-    <xacro:property name="front_base_length" value="0.2"/>
-    <xacro:property name="base_to_back_distance" value="0.05"/>
+    <xacro:property name="front_base_length" value="0.18"/>
+    <xacro:property name="base_to_back_distance" value="0.065"/>
     <xacro:property name="a" value="0.08"/>
 
 

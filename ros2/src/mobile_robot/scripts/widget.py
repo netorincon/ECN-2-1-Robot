@@ -12,21 +12,29 @@ class Ui_Form(object):
         #Check radio button state
         manual_speed_mode=self.manual_speed_mode_radio.isChecked()
         manual_pos_mode=self.manual_pos_mode_radio.isChecked()
+        controller_mode=self.control_mode_radio.isChecked()
+        self.mode=""
+        if(manual_speed_mode):
+            self.mode="mode:="+"velocity"
+        elif(manual_pos_mode):
+            self.mode="mode:="+"position"
+        elif(controller_mode):
+            self.mode="mode:="+"controller"
 
         if(self.launchP.processId()!=0):
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
 
         if(self.simulation_radio.isChecked()):
-            self.launchP.start("ros2", ["launch", "mobile_robot", "simulation.launch.py"])
+            self.launchP.start("ros2", ["launch", "mobile_robot", "simulation.launch.py", self.mode])
         else:
-            self.launchP.start("ros2", ["launch", "mobile_robot", "real_world.launch.py"])
+            self.launchP.start("ros2", ["launch", "mobile_robot", "real_world.launch.py", self.mode])
 
         self.umSlider.setEnabled(manual_speed_mode)
         self.b1d_slider.setEnabled(manual_speed_mode)
         self.b2d_slider.setEnabled(manual_speed_mode)
         self.reset_speed_button.setEnabled(manual_speed_mode)
-
+        
         self.b1_slider.setEnabled(manual_pos_mode)
         self.b2_slider.setEnabled(manual_pos_mode)
         self.reset_pos_button.setEnabled(manual_pos_mode)
@@ -35,9 +43,9 @@ class Ui_Form(object):
         self.real_world_radio.setDisabled(True)
         self.launch_button.setDisabled(True)
         self.control_mode_radio.setDisabled(True)
+        self.manual_speed_mode_radio.setDisabled(True)
+        self.manual_pos_mode_radio.setDisabled(True)
         self.end_button.setEnabled(True)
-        #self.manual_speed_mode_radio.setDisabled(True)
-        #self.manual_pos_mode_radio.setDisabled(True)
         return
     
     def endLaunch(self):
@@ -142,6 +150,24 @@ class Ui_Form(object):
         self.um_sb.setEnabled(True)
         self.b1d_sb.setEnabled(True)
         self.b2d_sb.setEnabled(True)
+        if(not self.launch_button.isEnabled() and not self.end_button.isEnabled()):          
+            self.simulation_radio.setEnabled(True)
+            self.real_world_radio.setEnabled(True)
+        return
+
+    def switchToControllerMode(self):
+        self.b1_slider.setDisabled(True)
+        self.b2_slider.setDisabled(True)
+        self.reset_pos_button.setDisabled(True)
+        self.umSlider.setDisabled(True)
+        self.b1d_slider.setDisabled(True)
+        self.b2d_slider.setDisabled(True)
+        self.reset_speed_button.setDisabled(True)
+        self.beta1_sb.setDisabled(True)
+        self.beta2_sb.setDisabled(True)
+        self.um_sb.setDisabled(True)
+        self.b1d_sb.setDisabled(True)
+        self.b2d_sb.setDisabled(True)
         if(not self.launch_button.isEnabled() and not self.end_button.isEnabled()):          
             self.simulation_radio.setEnabled(True)
             self.real_world_radio.setEnabled(True)
@@ -358,53 +384,9 @@ class Ui_Form(object):
         self.close_button.setObjectName("close_button")
 
         self.retranslateUi(Form)
-        self.control_mode_radio.clicked['bool'].connect(self.simulation_radio.setEnabled)
-        self.control_mode_radio.clicked['bool'].connect(self.real_world_radio.setEnabled)
-        self.control_mode_radio.clicked['bool'].connect(self.umSlider.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b1d_slider.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b2d_slider.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.reset_speed_button.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b1_slider.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b2_slider.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.reset_pos_button.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.beta1_sb.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.beta2_sb.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.um_sb.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b1d_sb.setDisabled)
-        self.control_mode_radio.clicked['bool'].connect(self.b2d_sb.setDisabled)
-
         self.manual_pos_mode_radio.clicked['bool'].connect(self.switchToPositionMode)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b1_slider.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b2_slider.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.reset_pos_button.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.umSlider.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b1d_slider.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b2d_slider.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.reset_speed_button.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.beta1_sb.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.beta2_sb.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.um_sb.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b1d_sb.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.b2d_sb.setDisabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.simulation_radio.setEnabled)
-        # self.manual_pos_mode_radio.clicked['bool'].connect(self.real_world_radio.setEnabled)
-        
         self.manual_speed_mode_radio.clicked['bool'].connect(self.switchToSpeedMode)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.simulation_radio.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.umSlider.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.um_sb.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b1d_slider.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b2d_slider.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.reset_speed_button.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.real_world_radio.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b1_slider.setDisabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b2_slider.setDisabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.reset_pos_button.setDisabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.beta1_sb.setDisabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.beta2_sb.setDisabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.um_sb.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b1d_sb.setEnabled)
-        # self.manual_speed_mode_radio.clicked['bool'].connect(self.b2d_sb.setEnabled)
+        self.control_mode_radio.clicked['bool'].connect(self.switchToControllerMode)
 
         self.simulation_radio.clicked['bool'].connect(self.launch_button.setEnabled)
         self.real_world_radio.clicked['bool'].connect(self.launch_button.setEnabled)
@@ -445,14 +427,14 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "1-2 robot control GUI"))
         self.manual_speed_mode_radio.setText(_translate("Form", "Manual speed mode"))
         self.manual_pos_mode_radio.setText(_translate("Form", "Manual position mode"))
-        self.Runtime.setPlainText(_translate("Form", "Runtime"))
+        self.Runtime.setPlainText(_translate("Form", "Environment: "))
         self.simulation_radio.setText(_translate("Form", "Simulation"))
         self.real_world_radio.setText(_translate("Form", "Real world"))
         self.TextLabel.setPlainText(_translate("Form", "Um control input"))
-        self.beta1dot.setPlainText(_translate("Form", "Beta dot 1"))
-        self.beta2dot.setPlainText(_translate("Form", "Beta 2 dot"))
-        self.beta1text.setPlainText(_translate("Form", "Beta 1"))
-        self.beta2text.setPlainText(_translate("Form", "Beta 2"))
+        self.beta1dot.setPlainText(_translate("Form", "Delta dot 1"))
+        self.beta2dot.setPlainText(_translate("Form", "Delta 2 dot"))
+        self.beta1text.setPlainText(_translate("Form", "Delta 1"))
+        self.beta2text.setPlainText(_translate("Form", "Delta 2"))
         self.reset_speed_button.setText(_translate("Form", "Reset sliders"))
         self.reset_pos_button.setText(_translate("Form", "Reset sliders"))
         self.control_mode_radio.setText(_translate("Form", "Controller mode"))
