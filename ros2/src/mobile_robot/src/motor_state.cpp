@@ -547,6 +547,12 @@ int main(int argc, char** argv)
 	node->stateArray[3].position = dxl4_present_state.position;
 	node->stateArray[3].velocity = dxl4_present_state.velocity;
 	
+	for(int i = 0; i < 4; i++){
+		node->command[i].id = std::to_string(i+1);
+		node->command[i].mode = 3;
+		node->command[i].value = node->stateArray[i].position;
+	}
+	
 	while(rclcpp::ok()){
 		//printf("Press any key to continue! (or press ESC to quit!)\n");
 		//if (getch() == ESC_ASCII_VALUE)
