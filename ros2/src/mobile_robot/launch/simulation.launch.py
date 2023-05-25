@@ -6,6 +6,7 @@ from launch import LaunchDescription
 from launch.substitutions  import LaunchConfiguration, Command
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import LaunchConfigurationEquals
 
 import xacro
 
@@ -44,6 +45,13 @@ def generate_launch_description():
         executable = 'rqt_gui',
         output = 'screen',
     )
+    
+    controller =Node(
+        package='mobile_robot',
+        executable='controller',
+        output='screen',
+        condition=LaunchConfigurationEquals('mode', 'controller'),
+    )
 
     # Create Rviz node
     rviz = Node(
@@ -71,7 +79,8 @@ def generate_launch_description():
 
         robot_state_publisher,
         sim,
-        rviz
+        rviz,
+        controller
    
     ])
 
