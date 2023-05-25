@@ -127,7 +127,7 @@ int kbhit(void)
 struct MotorGoal{
 	std::string id;
 	int mode;
-	float value;
+	int value;
 };
 
 struct MotorState{
@@ -157,7 +157,7 @@ class motor_state : public rclcpp::Node
 				printf("Failed to open the port!\n");
 				printf("Press any key to terminate...\n");
 				getch();
-				return 0;
+				//return 0;
 			}
 			
 			// Set port baudrate
@@ -168,96 +168,63 @@ class motor_state : public rclcpp::Node
 				printf("Failed to change the baudrate!\n");
 				printf("Press any key to terminate...\n");
 				getch();
-				return 0;
+				//return 0;
 			}
 			
 			// Enable Dynamixel#1 Torque
-			enableTorque(portHandler,packetHandler,DXL1_ID,dxl_error);
+			enableTorque(DXL1_ID);
 			
 			// Enable Dynamixel#2 Torque
-			enableTorque(portHandler,packetHandler,DXL2_ID,dxl_error);
+			enableTorque(DXL2_ID);
 			
 			// Enable Dynamixel#3 Torque
-			enableTorque(portHandler,packetHandler,DXL3_ID,dxl_error);
+			enableTorque(DXL3_ID);
 			
 			// Enable Dynamixel#4 Torque
-			enableTorque(portHandler,packetHandler,DXL4_ID,dxl_error);
+			enableTorque(DXL4_ID);
 
 			// Add parameter storage for Dynamixel#1 present values
-			paramStorageRead(groupBulkRead, DXL1_ID, exitParam);
+			paramStorageRead(DXL1_ID);
 			if(exitParam){
-				return 0;
+				printf("\nParameter storage for DXL1 (return 0)");
+				//return 0;
 			}
 			
 			// Add parameter storage for Dynamixel#2 present values
-			paramStorageRead(groupBulkRead, DXL2_ID, exitParam);
+			paramStorageRead(DXL2_ID);
 			if(exitParam){
-				return 0;
+				printf("\nParameter storage for DXL2 (return 0)");
+				//return 0;
 			}
 			
 			// Add parameter storage for Dynamixel#3 present values
-			paramStorageRead(groupBulkRead, DXL3_ID, exitParam);
+			paramStorageRead(DXL3_ID);
 			if(exitParam){
-				return 0;
+				printf("\nParameter storage for DXL3 (return 0)");
+				//return 0;
 			}
 			
 			// Add parameter storage for Dynamixel#4 present values
-			paramStorageRead(groupBulkRead, DXL4_ID, exitParam);
+			paramStorageRead(DXL4_ID);
 			if(exitParam){
-				return 0;
+				printf("\nParameter storage for DXL4 (return 0)");
+				//return 0;
 			}
 			
 			// Get initial values
-			getPresentValue(packetHandler, groupBulkRead, dxl_error, exitParam);
+			getPresentValue();
 			if(exitParam){
-				return 0;
+				printf("\nError in getting present values (return 0)");
+				//return 0;
 			}
 			
-			dxl1_present_state.position = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-			dxl1_present_state.velocity = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-			dxl1_present_state.torque = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-			
-			dxl2_present_state.position = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-			dxl2_present_state.velocity = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-			dxl2_present_state.torque = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-			
-			dxl3_present_state.position = groupBulkRead.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-			dxl3_present_state.velocity = groupBulkRead.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-			
-			dxl4_present_state.position = groupBulkRead.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
-			dxl4_present_state.velocity = groupBulkRead.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-
-			printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL1_ID, dxl1_present_state.position, dxl1_present_state.velocity, dxl1_present_state.torque, DXL2_ID, dxl2_present_state.position, dxl2_present_state.velocity, dxl2_present_state.torque, DXL3_ID, dxl3_present_state.position, dxl3_present_state.velocity, DXL4_ID, dxl4_present_state.position, dxl4_present_state.velocity);
-			
-			// Store initial values
-			node->stateArray[0].id = "1";
-			node->stateArray[0].position = dxl1_present_state.position;
-			node->stateArray[0].velocity = dxl1_present_state.velocity;
-			node->stateArray[0].torque = dxl1_present_state.torque;
-			
-			node->stateArray[1].id = "2";
-			node->stateArray[1].position = dxl2_present_state.position;
-			node->stateArray[1].velocity = dxl2_present_state.velocity;
-			node->stateArray[1].torque = dxl2_present_state.torque;
-			
-			node->stateArray[2].id = "3";
-			node->stateArray[2].position = dxl3_present_state.position;
-			node->stateArray[2].velocity = dxl3_present_state.velocity;
-			
-			node->stateArray[3].id = "4";
-			node->stateArray[3].position = dxl4_present_state.position;
-			node->stateArray[3].velocity = dxl4_present_state.velocity;
-			
+			// Initialize in mode 3 (Position Control) with current values
 			for(int i = 0; i < 4; i++){
-				node->command[i].id = std::to_string(i+1);
-				node->command[i].mode = 3;
-				node->command[i].value = node->stateArray[i].position;
+				command[i].id = std::to_string(i+1);
+				command[i].mode = 3;
+				command[i].value = stateArray[i].position;
 			}
-			
-			
-			
-			
-						
+				
 			//Subscriber for desired joint states		
 			motor_command_subscriber = this->create_subscription<control_input::msg::MotorCommand>(
 						"motor_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
@@ -265,11 +232,29 @@ class motor_state : public rclcpp::Node
 			//Publisher for present joint states
 			motor_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_states",10);
 			timer_ = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&motor_state::publishJointState,this));
-			
         }
         
         MotorGoal command[4]; //Goal
         MotorState stateArray[4]; //Present
+        
+        // Initialize PortHandler instance
+		// Set the port path
+		// Get methods and members of PortHandlerLinux or PortHandlerWindows
+		dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
+        
+        //DISABLE TORQUE
+		void disableTorque(uint8_t id){
+			dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
+			if (dxl_comm_result != COMM_SUCCESS){
+				printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+			}
+			else if (dxl_error != 0){
+				printf("%s\n", packetHandler->getRxPacketError(dxl_error));
+			}
+			else{
+				printf("Dynamixel#%d has been successfully disconnected \n", id);
+			}
+		}
 
     private :
 		rclcpp::TimerBase::SharedPtr timer_;
@@ -277,11 +262,6 @@ class motor_state : public rclcpp::Node
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr motor_state_publisher;
         rclcpp::Subscription<control_input::msg::MotorCommand>::SharedPtr motor_command_subscriber;
-        
-        // Initialize PortHandler instance
-		// Set the port path
-		// Get methods and members of PortHandlerLinux or PortHandlerWindows
-		dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
@@ -289,12 +269,12 @@ class motor_state : public rclcpp::Node
 		dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
 		
 		// Initialize GroupBulkWrite instance
-		dynamixel::GroupBulkWrite groupBulkWrite(portHandler, packetHandler);
+		dynamixel::GroupBulkWrite commandPacket = dynamixel::GroupBulkWrite(portHandler, packetHandler);
 
 		// Initialize GroupBulkRead instance
-		dynamixel::GroupBulkRead groupBulkReadPosition(portHandler, packetHandler);
-		dynamixel::GroupBulkRead groupBulkReadVelocity(portHandler, packetHandler);
-		dynamixel::GroupBulkRead groupBulkReadTorque(portHandler, packetHandler);
+		dynamixel::GroupBulkRead positionPacket = dynamixel::GroupBulkRead(portHandler, packetHandler);
+		dynamixel::GroupBulkRead velocityPacket = dynamixel::GroupBulkRead(portHandler, packetHandler);
+		dynamixel::GroupBulkRead torquePacket = dynamixel::GroupBulkRead(portHandler, packetHandler);
 		
 		int dxl_comm_result = COMM_TX_FAIL;             // Communication result
 		bool dxl_addparam_result = false;               // addParam result
@@ -322,10 +302,38 @@ class motor_state : public rclcpp::Node
 		DxlState dxl2_present_state;
 		DxlState dxl3_present_state;
 		DxlState dxl4_present_state;
-        
-        
-        
-        
+		
+	// Position conversion for dynamixel
+	int posToPulse(float value){
+		return (value*(360/(2*M_PI)))/0.088;
+	}
+	
+	// Velocity conversion for dynamixel
+	int velToPulse(float value){
+		return (value/(2*M_PI))*60;
+	}
+	
+	// TODO
+	// Current (torque) conversion for dynamixel
+	int torToPulse(float value){
+		return value;
+	}
+	
+	// Position conversion for topic
+	float pulseToPos(float value){
+		return value*0.088*((2*M_PI)/360);
+	}
+	
+	// Velocity conversion for topic
+	float pulseToVel(float value){
+		return (value*(2*M_PI))/60;
+	}
+	
+	// TODO
+	//Current (torque) conversion for topic
+	float pulseToTor(float value){
+		return value;
+	}
 	
 	// Method to obtain desired joint states
 	void goalJoints(const control_input::msg::MotorCommand::SharedPtr cmd){
@@ -337,16 +345,16 @@ class motor_state : public rclcpp::Node
 			
 			if(cmd->mode[i] == "position"){
 				controlMode = 3;
-				command[i].value = cmd->cmd.position[i];
+				command[i].value = posToPulse(cmd->cmd.position[i]);
 			}
 			else if(cmd->mode[i] == "velocity"){
 				controlMode = 1;
-				command[i].value = cmd->cmd.velocity[i];
+				command[i].value = velToPulse(cmd->cmd.velocity[i]);
 			}
 			else if(cmd->mode[i] == "torque"){
 				controlMode = 0;
 				if(cmd->cmd.name[i] != "3" && cmd->cmd.name[i] != "4"){
-					command[i].value = cmd->cmd.effort[i];
+					command[i].value = torToPulse(cmd->cmd.effort[i]);
 				}
 			}
 			
@@ -356,147 +364,104 @@ class motor_state : public rclcpp::Node
 			}
 		}
 		
-		
-		
 		//Check operating mode for every motor and change accordingly
 		for(int i=0; i<4; i++){
-			if(dxl_mode[i] != node->command[i].mode){
-				changeMode(portHandler, packetHandler, stoi(node->command[i].id), node->command[i].mode, dxl_error);
-				if(node->command[i].mode == 3){
+			if(dxl_mode[i] != command[i].mode){
+				changeMode(stoi(command[i].id), command[i].mode);
+				if(command[i].mode == 3){
 					addressGoal[i] = ADDR_GOAL_POSITION;
 					lenSize[i] = LEN_PV;
 				}
-				else if(node->command[i].mode == 1){
+				else if(command[i].mode == 1){
 					addressGoal[i] = ADDR_GOAL_VELOCITY;
 					lenSize[i] = LEN_PV;
 				}
-				else if(node->command[i].mode == 0){
+				else if(command[i].mode == 0){
 					addressGoal[i] = ADDR_GOAL_CURRENT;
 					lenSize[i] = LEN_CURRENT;
 				}
 			}
 		}
-		
-		//Obtain goal joints
-		dxl1_goal = (int)node->command[0].value;
-		dxl2_goal = (int)node->command[1].value;
-		dxl3_goal = (int)node->command[2].value;
-		dxl4_goal = (int)node->command[3].value;
 
 		// Allocate goal position value into byte array
-		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl1_goal));
-		param1_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl1_goal));
-		param1_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl1_goal));
-		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl1_goal));
+		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[0].value));
+		param1_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[0].value));
+		param1_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[0].value));
+		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[0].value));
 		
-		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl2_goal));
-		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl2_goal));
-		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl2_goal));
-		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl2_goal));
+		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[1].value));
+		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[1].value));
+		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[1].value));
+		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[1].value));
 		
-		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl3_goal));
-		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl3_goal));
-		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl3_goal));
-		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl3_goal));
+		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[2].value));
+		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[2].value));
+		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[2].value));
+		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[2].value));
 		
-		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(dxl4_goal));
-		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(dxl4_goal));
-		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(dxl4_goal));
-		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(dxl4_goal));
+		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[3].value));
+		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[3].value));
+		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[3].value));
+		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[3].value));
 
 		// Add parameter storage for Dynamixels goal
-		paramStorageWrite(groupBulkWrite, DXL1_ID, addressGoal[0], lenSize[0], param1_goal_state, exitParam);
+		paramStorageWrite(DXL1_ID, addressGoal[0], lenSize[0], param1_goal_state);
 		if(exitParam){
-			return 0;
+			printf("Param write 1 (return 0) failed");
+			//return 0;
 		}
 		
-		paramStorageWrite(groupBulkWrite, DXL2_ID, addressGoal[1], lenSize[1], param2_goal_state, exitParam);
+		paramStorageWrite(DXL2_ID, addressGoal[1], lenSize[1], param2_goal_state);
 		if(exitParam){
-			return 0;
+			printf("Param write 2 (return 0) failed");
+			//return 0;
 		}
 		
-		paramStorageWrite(groupBulkWrite, DXL3_ID, addressGoal[2], lenSize[2], param3_goal_state, exitParam);
+		paramStorageWrite(DXL3_ID, addressGoal[2], lenSize[2], param3_goal_state);
 		if(exitParam){
-			return 0;
+			printf("Param write 3 (return 0) failed");
+			//return 0;
 		}
 		
-		paramStorageWrite(groupBulkWrite, DXL4_ID, addressGoal[3], lenSize[3], param4_goal_state, exitParam);
+		paramStorageWrite(DXL4_ID, addressGoal[3], lenSize[3], param4_goal_state);
 		if(exitParam){
-			return 0;
+			printf("Param write 4 (return 0) failed");
+			//return 0;
 		}
 
 		// Bulkwrite goal joint states
-		dxl_comm_result = groupBulkWrite.txPacket();
+		dxl_comm_result = commandPacket.txPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
 
 		// Clear bulkwrite parameter storage
-		groupBulkWrite.clearParam();
+		commandPacket.clearParam();
 	}
 	
 	// Method to publish present values of the motors
 	void publishJointState(){
 		// Check present states
-		getPresentValue(packetHandler, groupBulkRead, dxl_error, exitParam);
+		getPresentValue();
 		if(exitParam){
-			return 0;
+			printf("Could not obtain present value for publisher (return 0)");
+			//return 0;
 		}
-		
-		// Get present values
-		dxl1_present_state.position = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		dxl1_present_state.velocity = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		dxl1_present_state.torque = groupBulkRead.getData(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		
-		dxl2_present_state.position = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		dxl2_present_state.velocity = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		dxl2_present_state.torque = groupBulkRead.getData(DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		
-		dxl3_present_state.position = groupBulkRead.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		dxl3_present_state.velocity = groupBulkRead.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		
-		dxl4_present_state.position = groupBulkRead.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		dxl4_present_state.velocity = groupBulkRead.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		
-		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \n [ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL1_ID, dxl1_present_state.position, dxl1_present_state.velocity, dxl1_present_state.torque, DXL2_ID, dxl2_present_state.position, dxl2_present_state.velocity, dxl2_present_state.torque, DXL3_ID, dxl3_present_state.position, dxl3_present_state.velocity, DXL4_ID, dxl4_present_state.position, dxl4_present_state.velocity);
-		
-		node->stateArray[0].id = "1";
-		node->stateArray[0].position = dxl1_present_state.position;
-		node->stateArray[0].velocity = dxl1_present_state.velocity;
-		node->stateArray[0].torque = dxl1_present_state.torque;
-		
-		node->stateArray[1].id = "2";
-		node->stateArray[1].position = dxl2_present_state.position;
-		node->stateArray[1].velocity = dxl2_present_state.velocity;
-		node->stateArray[1].torque = dxl2_present_state.torque;
-		
-		node->stateArray[2].id = "3";
-		node->stateArray[2].position = dxl3_present_state.position;
-		node->stateArray[2].velocity = dxl3_present_state.velocity;
-		
-		node->stateArray[3].id = "4";
-		node->stateArray[3].position = dxl4_present_state.position;
-		node->stateArray[3].velocity = dxl4_present_state.velocity;
-		
-		
-		
 		
 		jointState.header.stamp = this->now();
 		for(int i=0;i<4;i++){
 			jointState.name[i] = stateArray[i].id;
-			jointState.position[i] = stateArray[i].position;
-			jointState.velocity[i] = stateArray[i].velocity;
+			jointState.position[i] = pulseToPos(stateArray[i].position);
+			jointState.velocity[i] = pulseToVel(stateArray[i].velocity);
 			if(stateArray[i].id != "3" && stateArray[i].id != "4"){
-				jointState.effort[i] = stateArray[i].torque;
+				jointState.effort[i] = pulseToTor(stateArray[i].torque);
 			}
 		}
 		motor_state_publisher->publish(jointState);
 	}
 	
 	//ENABLE TORQUE TO MOTORS
-	void enableTorque(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, uint8_t id, uint8_t &dxl_error){
-		int dxl_comm_result = COMM_TX_FAIL;
-		
+	void enableTorque(uint8_t id){
 		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
@@ -509,27 +474,9 @@ class motor_state : public rclcpp::Node
 		}
 	}
 
-	//DISABLE TORQUE
-	void disableTorque(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, uint8_t id, uint8_t &dxl_error){
-		int dxl_comm_result = COMM_TX_FAIL;
-		
-		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, TORQUE_DISABLE, &dxl_error);
-		if (dxl_comm_result != COMM_SUCCESS){
-			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-		}
-		else if (dxl_error != 0){
-			printf("%s\n", packetHandler->getRxPacketError(dxl_error));
-		}
-		else{
-			printf("Dynamixel#%d has been successfully disconnected \n", id);
-		}
-	}
-
 	//DEFINE OR CHANGE OPERATING MODE OF MOTORS
-	void changeMode(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, uint8_t id, uint8_t mode, uint8_t &dxl_error){
-		int dxl_comm_result = COMM_TX_FAIL;
-		
-		disableTorque(portHandler,packetHandler,id,dxl_error);
+	void changeMode(uint8_t id, uint8_t mode){
+		disableTorque(id);
 		
 		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_OPERATING_MODE, mode, &dxl_error);
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -542,15 +489,15 @@ class motor_state : public rclcpp::Node
 			//printf("Dynamixel#%d has been successfully disconnected \n", id);
 		//}
 		
-		enableTorque(portHandler,packetHandler,id,dxl_error);
+		enableTorque(id);
 	}
 
 	// Add parameter storage for all dynamixels
-	void paramStorageRead(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, bool &exitParam){
+	void paramStorageRead(uint8_t id){
 		bool dxl_addparam_result = false;
 		
 		// Add parameter storage for Dynamixel#id present position
-		dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_POSITION, LEN_PV);
+		dxl_addparam_result = positionPacket.addParam(id, ADDR_PRESENT_POSITION, LEN_PV);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (position)", id);
 			exitParam = true;
@@ -558,7 +505,7 @@ class motor_state : public rclcpp::Node
 		}
 		
 		// Add parameter storage for Dynamixel#id present velocity
-		dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_VELOCITY, LEN_PV);
+		dxl_addparam_result = velocityPacket.addParam(id, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (velocity)", id);
 			exitParam = true;
@@ -570,7 +517,7 @@ class motor_state : public rclcpp::Node
 		//In said case, remove the if condition which skips id 3 and 4
 		if(id != 3 && id != 4){
 			// Add parameter storage for Dynamixel#id present torque
-			dxl_addparam_result = groupBulkRead.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			dxl_addparam_result = torquePacket.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			if (dxl_addparam_result != true){
 				fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
 				exitParam = true;
@@ -579,9 +526,7 @@ class motor_state : public rclcpp::Node
 		}
 	}
 
-	void readAvailable(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, int address, int len, bool &exitParam){
-		bool dxl_getdata_result = false;
-		
+	void readAvailable(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, int address, int len){
 		dxl_getdata_result = groupBulkRead.isAvailable(id, address, len);
 		if (dxl_getdata_result != true){
 			fprintf(stderr, "[ID:%03d] groupBulkRead getdata failed", id);
@@ -590,90 +535,129 @@ class motor_state : public rclcpp::Node
 		}
 	}
 
-	void getPresentValue(dynamixel::PacketHandler *packetHandler, dynamixel::GroupBulkRead &groupBulkRead, uint8_t &dxl_error, bool &exitParam){
+	void getPresentValue(){
 		// Bulkread present state
-		int dxl_comm_result;
-		
-		dxl_comm_result = groupBulkRead.txRxPacket();
+		dxl_comm_result = positionPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
-		else if (groupBulkRead.getError(DXL1_ID, &dxl_error)){
+		else if (positionPacket.getError(DXL1_ID, &dxl_error)){
 			printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
 		}
-		else if (groupBulkRead.getError(DXL2_ID, &dxl_error)){
+		else if (positionPacket.getError(DXL2_ID, &dxl_error)){
 			printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
 		}
-		else if (groupBulkRead.getError(DXL3_ID, &dxl_error)){
+		else if (positionPacket.getError(DXL3_ID, &dxl_error)){
 			printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
 		}
-		else if (groupBulkRead.getError(DXL4_ID, &dxl_error)){
+		else if (positionPacket.getError(DXL4_ID, &dxl_error)){
 			printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
 		}
+		
+		readAvailable(positionPacket, DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(positionPacket, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(positionPacket, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(positionPacket, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		dxl_comm_result = velocityPacket.txRxPacket();
+		if (dxl_comm_result != COMM_SUCCESS){
+			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+		}
+		else if (velocityPacket.getError(DXL1_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (velocityPacket.getError(DXL2_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (velocityPacket.getError(DXL3_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (velocityPacket.getError(DXL4_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		
+		readAvailable(velocityPacket, DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(velocityPacket, DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(velocityPacket, DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(velocityPacket, DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		if(exitParam){
+			return;
+		}
+		
+		dxl_comm_result = torquePacket.txRxPacket();
+		if (dxl_comm_result != COMM_SUCCESS){
+			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+		}
+		else if (torquePacket.getError(DXL1_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (torquePacket.getError(DXL2_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		
+		readAvailable(torquePacket, DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+		if(exitParam){
+			return;
+		}
+		
+		readAvailable(torquePacket, DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+		if(exitParam){
+			return;
+		}
+		
+		// Store initial values
+		stateArray[0].id = "1";
+		stateArray[0].position = positionPacket.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[0].velocity = velocityPacket.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[0].torque = torquePacket.getData(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+		
+		stateArray[1].id = "2";
+		stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[1].velocity = velocityPacket.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[1].torque = torquePacket.getData(DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+		
+		stateArray[2].id = "3";
+		stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[2].velocity = velocityPacket.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		
+		stateArray[3].id = "4";
+		stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[3].velocity = velocityPacket.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 
-		// Check if groupbulkread data of Dynamixel#1 is available
-		readAvailable(groupBulkRead, DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT, exitParam);
-		if(exitParam){
-			return;
-		}
-		
-		// Check if groupbulkread data of Dynamixel#2 is available
-		readAvailable(groupBulkRead, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT, exitParam);
-		if(exitParam){
-			return;
-		}
-		
-		// Check if groupbulkread data of Dynamixel#3 is available
-		readAvailable(groupBulkRead, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL3_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT, exitParam);
-		if(exitParam){
-			return;
-		}
-		
-		// Check if groupbulkread data of Dynamixel#4 is available
-		readAvailable(groupBulkRead, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV, exitParam);
-		if(exitParam){
-			return;
-		}
-		readAvailable(groupBulkRead, DXL4_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT, exitParam);
-		if(exitParam){
-			return;
-		}
+		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque, DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque, DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 
-	void paramStorageWrite(dynamixel::GroupBulkWrite &groupBulkWrite, uint8_t id, int address, int len, uint8_t param_goal_position[4], bool &exitParam){
-		bool dxl_addparam_result = false;
-		
-		dxl_addparam_result = groupBulkWrite.addParam(id, address, len, param_goal_position);
+	void paramStorageWrite(uint8_t id, int address, int len, uint8_t param_goal_position[4]){
+		dxl_addparam_result = commandPacket.addParam(id, address, len, param_goal_position);
 		if (dxl_addparam_result != true){
-			fprintf(stderr, "[ID:%03d] groupBulkWrite addparam failed", id);
+			fprintf(stderr, "[ID:%03d] commandPacket addparam failed", id);
 			exitParam = true;
 			return;
 		}
@@ -683,15 +667,16 @@ class motor_state : public rclcpp::Node
 int main(int argc, char** argv)
 {	
 	rclcpp::init(argc, argv);
-	node = std::make_shared<motor_state>(rclcpp::NodeOptions{});
+	auto node = std::make_shared<motor_state>();
+	//node = std::make_shared<motor_state>(rclcpp::NodeOptions{});
 	rclcpp::spin(node);
 	
 	// Make sure to disable torque and close port
-	disableTorque(portHandler,packetHandler,DXL1_ID,dxl_error);
-	disableTorque(portHandler,packetHandler,DXL2_ID,dxl_error);
-	disableTorque(portHandler,packetHandler,DXL3_ID,dxl_error);
-	disableTorque(portHandler,packetHandler,DXL4_ID,dxl_error);
-	portHandler->closePort();
+	node->disableTorque(DXL1_ID);
+	node->disableTorque(DXL2_ID);
+	node->disableTorque(DXL3_ID);
+	node->disableTorque(DXL4_ID);
+	node->portHandler->closePort();
 	
 	rclcpp::shutdown();
 	return 0;
