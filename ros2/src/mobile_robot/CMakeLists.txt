@@ -25,6 +25,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
+find_package(Eigen3 3.4.0 REQUIRED)
 
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
@@ -38,7 +39,8 @@ add_executable(motor_state src/motor_state.cpp)
 ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input)
 
 add_executable(controller src/controller.cpp)
-ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input)
+ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input Eigen3)
+target_link_libraries(controller Eigen3::Eigen)
 
 install(TARGETS
     sim

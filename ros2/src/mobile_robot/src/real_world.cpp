@@ -30,6 +30,7 @@ Then it assembles a transform and published it to /tf2 to be able to see the rob
 #include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
+#include <control_input/msg/state_vector.hpp>
 
 using namespace std::chrono_literals;
 
@@ -84,26 +85,18 @@ class real_world : public rclcpp::Node
             
 
             joint_command_publisher = this->create_publisher<control_input::msg::MotorCommand>("motor_cmd", 10);
+            state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+
             timer_ = this->create_wall_timer(20ms, std::bind(&real_world::publishJointCommand, this));
             
         }
-        //We initialize all variables of the state vector at 0
-        float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
+
         
 
     private :
-        rclcpp::TimerBase::SharedPtr timer_;
-        geometry_msgs::msg::TransformStamped transform_stamped_;
-        control_input::msg::MotorCommand joint_cmd;
-
-        rclcpp::Publisher<control_input::msg::MotorCommand>::SharedPtr joint_command_publisher;
-        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
-        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
-        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
-        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
-
-        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        //We initialize all variables of the state vector at 0
+        float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
         float frequency = 50; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
         float a=0.05;//Base distance in meters
@@ -112,6 +105,19 @@ class real_world : public rclcpp::Node
         MotorState stateArray[4];
         MotorState commandArray[4];
         sensor_msgs::msg::JointState joint_state;
+        control_input::msg::StateVector robot_state;
+
+        rclcpp::TimerBase::SharedPtr timer_;
+        geometry_msgs::msg::TransformStamped transform_stamped_;
+        control_input::msg::MotorCommand joint_cmd;
+        rclcpp::Publisher<control_input::msg::MotorCommand>::SharedPtr joint_command_publisher;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
 
     void calculatePose(const sensor_msgs::msg::JointState::SharedPtr jointState){
 
@@ -162,6 +168,17 @@ class real_world : public rclcpp::Node
         transform_stamped_.transform.rotation.z += tt;
         transform_stamped_.transform.rotation.w = 1.0;
         tf_broadcaster_->sendTransform(transform_stamped_);
+
+        //We publish the current state vector to be read by the controller
+        robot_state.x=x;
+        robot_state.y=y;
+        robot_state.theta=tt;
+        robot_state.delta1=d1;
+        robot_state.delta2=d2;
+        robot_state.phi1=phi1;
+        robot_state.phi2=phi2;
+        state_vector_publisher->publish(robot_state);
+
         return;
     }
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){

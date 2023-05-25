@@ -24,6 +24,7 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <chrono>
 #include <control_input/msg/position_command.hpp>
+#include <control_input/msg/state_vector.hpp>
 
 struct MotorState{
     std::string id;
@@ -73,6 +74,7 @@ class sim : public rclcpp::Node
             }
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+            state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             
         }
         //We initialize all variables of the state vector at 0
@@ -84,9 +86,11 @@ class sim : public rclcpp::Node
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
+        control_input::msg::StateVector robot_state;
         tf2::Quaternion rotation;
         float frequency = 50; // fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;
@@ -211,6 +215,15 @@ class sim : public rclcpp::Node
             tf_broadcaster_->sendTransform(transform_stamped_);
             icr.header.stamp = this->now();
             tf_broadcaster_->sendTransform(icr);
+
+            robot_state.x=x;
+            robot_state.y=y;
+            robot_state.theta=tt;
+            robot_state.delta1=d1;
+            robot_state.delta2=d2;
+            robot_state.phi1=phi1;
+            robot_state.phi2=phi2;
+            state_vector_publisher->publish(robot_state);
         }
 };
 
