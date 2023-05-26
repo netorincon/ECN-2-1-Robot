@@ -49,7 +49,7 @@ class controller : public rclcpp::Node
         float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2;
         float a=0.08;
         float e=0.1;
-        float kp=0.5;
+        float kp=0.1;
         float period=0.02;
         float time=0;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
@@ -60,7 +60,7 @@ class controller : public rclcpp::Node
         Eigen::Matrix2f K;
         Eigen::Matrix2f K_inv;
         Eigen::Vector2f u;
-        Eigen::Vector2f xr{0,0};
+        Eigen::Vector2f xr{1,1};
         Eigen::Vector2f xrprev;
         Eigen::Vector2f xrdot;
         Eigen::Vector2f xp;

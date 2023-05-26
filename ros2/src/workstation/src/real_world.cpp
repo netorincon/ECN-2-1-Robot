@@ -43,6 +43,19 @@ struct MotorState{
     float torque;
 };
 
+float limit_phiSpeed(float a){
+    float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
+
+float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+    float max=(55.0/60.0)*(2*M_PI);
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
 class real_world : public rclcpp::Node
 {
     public :
@@ -53,7 +66,7 @@ class real_world : public rclcpp::Node
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-            /*
+            /*s
             ---To convert joint states into tf2 transform:---
             We subscribe to the topic joint_states via state_susbscriber 
             This subscriber will receive a JointState type message, which will include a list of the states of each of the four motors. 
@@ -143,6 +156,7 @@ class real_world : public rclcpp::Node
         beta2=d2+M_PI;
         phi1+=phi1d*period;
         phi2+=phi2d*period;
+       
 
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
         float U=phi1d*R/(2*cos(d2));
@@ -214,15 +228,18 @@ class real_world : public rclcpp::Node
             dd1=msg->delta1dot;
             dd2=msg->delta2dot;
 
-            phi1d=2*cos(d2)*Um/R;
-            phi2d=2*cos(d1)*Um/R;
+            dd1=limit_deltaSpeed(dd1);
+            dd2=limit_deltaSpeed(dd2);
+
+            phi1d=limit_phiSpeed(2*cos(d2)*Um/R);
+            phi2d=limit_phiSpeed(2*cos(d1)*Um/R);
 
             //Arrange the speeds in an array for faster assignment during publishJointCommand 
             commandArray[0].id=1;
-            commandArray[0].speed=phi1d;
+            commandArray[0].speed=phi2d;
 
             commandArray[1].id=2;
-            commandArray[1].speed=phi2d;
+            commandArray[1].speed=phi1d;
 
             commandArray[2].id=3;
             commandArray[2].speed=dd1;

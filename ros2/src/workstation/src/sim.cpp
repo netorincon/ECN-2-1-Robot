@@ -42,7 +42,19 @@ double limit_angle(double a){
     while( a <  0 ) a += 2*M_PI ;
     return a ;
 }
+float limit_phiSpeed(float a){
+    float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
 
+float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+    float max=(55.0/60.0)*(2*M_PI);
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
 
 class sim : public rclcpp::Node
 {
@@ -111,8 +123,9 @@ class sim : public rclcpp::Node
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
-                dd1 = msg->delta1dot;
-                dd2 = msg->delta2dot;
+                dd1 = limit_deltaSpeed(msg->delta1dot);
+
+                dd2 = limit_deltaSpeed(msg->delta2dot);
 
                 //We calculate current robot speeds and orientation motor speeds
                 d1+=dd1*period; //Delta 1
@@ -124,8 +137,8 @@ class sim : public rclcpp::Node
 
                 x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
                 y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
-                phi1d=2*cos(d2)*Um/R;
-                phi2d=2*cos(d1)*Um/R;
+                phi1d=limit_phiSpeed(2*cos(d2)*Um/R);
+                phi2d=limit_phiSpeed(2*cos(d1)*Um/R);
 
                 //We integrate the speeds over time (add each time we get a new value)
                 x+=x_dot*period;
