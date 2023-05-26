@@ -273,7 +273,7 @@ class motor_state : public rclcpp::Node
 	// + PI we need to substract 1024
 	// - PI we need to add 1024
 	int posToPulse(float value){
-		return 2048 - ((value * 1024) / M_PI);
+		return 2048 + ((value * 2048) / M_PI);
 	}
 	
 	// Velocity conversion for spinning motors
@@ -291,13 +291,13 @@ class motor_state : public rclcpp::Node
 	// Position conversion for topic
 	// Change orientation motors position to radians
 	float pulseToPos(float value){
-		return (2048 - value)*(M_PI / 1024);
+		return (2048 - (value % 4095))*(M_PI / 2048);
 	}
 	
 	// Velocity conversion for topic
 	// Change motor value to rad/s
 	float pulseToVel(float value){
-		return (value * 0.229 * 2 * M_PI) / 60;
+		return ((value % 1023) * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
