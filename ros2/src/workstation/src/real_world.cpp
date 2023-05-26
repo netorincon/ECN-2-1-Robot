@@ -130,11 +130,11 @@ class real_world : public rclcpp::Node
         }
                
         //Get the current speed of the spin actuators
-        phi1d=stateArray[2].speed; 
-        phi2d=stateArray[3].speed;
+        phi1d=stateArray[1].speed; 
+        phi2d=stateArray[0].speed;
 
-        dd1=stateArray[0].speed;
-        dd2=stateArray[1].speed;
+        dd1=stateArray[2].speed;
+        dd2=stateArray[3].speed;
 
         d1+=dd1*period; //delta 1
         d2+=dd2*period; //delta 2
