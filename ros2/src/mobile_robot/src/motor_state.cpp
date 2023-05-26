@@ -279,7 +279,7 @@ class motor_state : public rclcpp::Node
 	// Velocity conversion for spinning motors
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
-		return ((value * 60) / 2 * M_PI) / 0.229;
+		return ((value * 60) / (2 * M_PI)) / 0.229;
 	}
 	
 	// TODO
