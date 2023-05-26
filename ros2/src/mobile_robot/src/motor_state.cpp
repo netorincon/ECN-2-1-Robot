@@ -268,34 +268,40 @@ class motor_state : public rclcpp::Node
 		DxlState dxl3_present_state;
 		DxlState dxl4_present_state;
 		
-	// Position conversion for dynamixel
+	// Position conversion for orientation motors
+	// 2048 is the wheel's 0
+	// + PI we need to substract 1024
+	// - PI we need to add 1024
 	int posToPulse(float value){
-		return (value*(360/(2*M_PI)))/0.088;
+		return 2048 - ((value * 1024) / M_PI);
 	}
 	
-	// Velocity conversion for dynamixel
+	// Velocity conversion for spinning motors
+	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
-		return (value/(2*M_PI))*60;
+		return ((value * 60) / 2 * M_PI) / 0.229;
 	}
 	
 	// TODO
-	// Current (torque) conversion for dynamixel
+	// Torque conversion for dynamixel
 	int torToPulse(float value){
 		return value;
 	}
 	
 	// Position conversion for topic
+	// Change orientation motors position to radians
 	float pulseToPos(float value){
-		return value*0.088*((2*M_PI)/360);
+		return (2048 - value)*(M_PI / 1024);
 	}
 	
 	// Velocity conversion for topic
+	// Change motor value to rad/s
 	float pulseToVel(float value){
-		return (value*(2*M_PI))/60;
+		return (value * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
-	//Current (torque) conversion for topic
+	// Torque conversion for topic
 	float pulseToTor(float value){
 		return value;
 	}
@@ -326,13 +332,9 @@ class motor_state : public rclcpp::Node
 			//Check for mode change
 			if(!command[i].mode || command[i].mode != controlMode){
 				command[i].mode = controlMode;
-			}
-		}
-		
-		//Check operating mode for every motor and change accordingly
-		for(int i=0; i<4; i++){
-			if(dxl_mode[i] != command[i].mode){
+				
 				changeMode(stoi(command[i].id), command[i].mode);
+				
 				if(command[i].mode == 3){
 					addressGoal[i] = ADDR_GOAL_POSITION;
 					lenSize[i] = LEN_PV;
@@ -457,9 +459,6 @@ class motor_state : public rclcpp::Node
 		else if (dxl_error != 0){
 			printf("%s\n", packetHandler->getRxPacketError(dxl_error));
 		}
-		//else{
-			//printf("Dynamixel#%d has been successfully disconnected \n", id);
-		//}
 		
 		enableTorque(id);
 	}
@@ -558,7 +557,7 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
 		stateArray[id2 - 1].velocity = velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		
-		if((id1 == 1 || id1 == 2) && (id2 == 1 || id2 == 2)){
+		if((id1 == DXL1_ID || id1 == DXL2_ID) && (id2 == DXL1_ID || id2 == DXL2_ID)){
 			dxl_comm_result = torquePacket.txRxPacket();
 			if (dxl_comm_result != COMM_SUCCESS){
 				printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
