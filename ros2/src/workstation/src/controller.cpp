@@ -35,6 +35,8 @@ class controller : public rclcpp::Node
         
         controller(rclcpp::NodeOptions options) : Node("controller", options)
         {
+
+            tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
             command_publisher = this->create_publisher<control_input::msg::ControlInput>("control_cmd", 10);
             state_subscriber=this->create_subscription<control_input::msg::StateVector>(
                             "state_vector", 10, std::bind(&controller::updateState, this, std::placeholders::_1));
@@ -46,16 +48,19 @@ class controller : public rclcpp::Node
         rclcpp::TimerBase::SharedPtr timer_;
         float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2;
         float a=0.08;
-        float e=0.01;
-        float kp=0.01;
-        float period=0.01;
+        float e=0.1;
+        float kp=0.5;
+        float period=0.02;
+        float time=0;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
         rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        geometry_msgs::msg::TransformStamped transform_stamped_;
         control_input::msg::ControlInput command;
         Eigen::Matrix2f K;
         Eigen::Matrix2f K_inv;
         Eigen::Vector2f u;
-        Eigen::Vector2f xr;
+        Eigen::Vector2f xr{0,0};
         Eigen::Vector2f xrprev;
         Eigen::Vector2f xrdot;
         Eigen::Vector2f xp;
@@ -81,6 +86,18 @@ class controller : public rclcpp::Node
         command.delta1dot=dd1;
         command.delta2dot=dd2;
         command_publisher->publish(command);
+
+        transform_stamped_.header.stamp = this->now();
+        transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
+        transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
+        transform_stamped_.transform.translation.x = xr(0);
+        transform_stamped_.transform.translation.y = xr(1);
+        transform_stamped_.transform.translation.z = 0;
+        transform_stamped_.transform.rotation.x = 0;
+        transform_stamped_.transform.rotation.y = 0;
+        transform_stamped_.transform.rotation.z = 0;
+        transform_stamped_.transform.rotation.w = 1;
+        tf_broadcaster_->sendTransform(transform_stamped_);
         return;
     }
 
@@ -97,16 +114,20 @@ class controller : public rclcpp::Node
     }
 
     void updateK(){
-        K(0,0)=cos(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
-        K(0,1)=sin(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
-        K(1,0)=(-2*a*sin(d2 + theta)*cos(d1) - e*sin(d1 - d2)*cos(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
-        K(1,1)=(2*a*cos(d2)*cos(d1 + theta) - e*sin(d1 - d2)*sin(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
-        K_inv=K.inverse();
+        K_inv(0,0)=cos(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
+        K_inv(0,1)=sin(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
+        K_inv(1,0)=(-2*a*sin(d2 + theta)*cos(d1) - e*sin(d1 - d2)*cos(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
+        K_inv(1,1)=(2*a*cos(d2)*cos(d1 + theta) - e*sin(d1 - d2)*sin(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
+        //K_inv=K.inverse();
     }
 
     void getNextPoint(){
-        xr(0)=1;
-        xr(1)=1;
+        time+=period/10;
+        if(time>2*M_PI){
+            time-=2*M_PI;
+        }
+        xr(0)=2*cos(time);
+        xr(1)=2*sin(time);
 
         xrdot=(xr-xrprev)*period;
         xrprev=xr;

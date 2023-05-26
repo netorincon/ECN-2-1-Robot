@@ -26,9 +26,9 @@ class Ui_Form(object):
             self.launchP.waitForFinished(-1)
 
         if(self.simulation_radio.isChecked()):
-            self.launchP.start("ros2", ["launch", "mobile_robot", "simulation.launch.py", self.mode])
+            self.launchP.start("ros2", ["launch", "workstation", "simulation.launch.py", self.mode])
         else:
-            self.launchP.start("ros2", ["launch", "mobile_robot", "real_world.launch.py", self.mode])
+            self.launchP.start("ros2", ["launch", "workstation", "real_world.launch.py", self.mode])
 
         self.umSlider.setEnabled(manual_speed_mode)
         self.b1d_slider.setEnabled(manual_speed_mode)
