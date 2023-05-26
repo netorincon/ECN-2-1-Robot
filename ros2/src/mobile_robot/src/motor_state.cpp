@@ -653,7 +653,7 @@ class motor_state : public rclcpp::Node
 
 		//printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque, DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque, DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 		
-		printf("\n[ID:%03d] \n Present Position : %.2f \t\n [ID:%03d] \n Present Position : %.2f \t\n", DXL1_ID, stateArray[0].position, DXL2_ID, stateArray[1].position);
+		printf("\n[ID:%03d] \n Present Position : %.2f \t\n [ID:%03d] \n Present Position : %.2f \t\n", DXL3_ID, stateArray[2].position, DXL4_ID, stateArray[3].position);
 	}
 
 	void paramStorageWrite(uint8_t id, int address, int len, uint8_t param_goal_position[4]){
