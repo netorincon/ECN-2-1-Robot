@@ -291,13 +291,13 @@ class motor_state : public rclcpp::Node
 	// Position conversion for topic
 	// Change orientation motors position to radians
 	float pulseToPos(float value){
-		return (2048 - (value % 4095))*(M_PI / 2048);
+		return (2048 - (((int)value) % 4095))*(M_PI / 2048);
 	}
 	
 	// Velocity conversion for topic
 	// Change motor value to rad/s
 	float pulseToVel(float value){
-		return ((value % 1023) * 0.229 * 2 * M_PI) / 60;
+		return ((((int)value) % 1023) * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
