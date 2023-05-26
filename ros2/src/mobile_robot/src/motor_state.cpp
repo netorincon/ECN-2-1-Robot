@@ -180,42 +180,9 @@ class motor_state : public rclcpp::Node
 			
 			// Enable Dynamixel#4 Torque
 			enableTorque(DXL4_ID);
-
-			//// Add parameter storage for Dynamixel#1 present values
-			//paramStorageRead(DXL1_ID);
-			//if(exitParam){
-				//printf("\nParameter storage for DXL1 (return 0)");
-				////return 0;
-			//}
 			
-			//// Add parameter storage for Dynamixel#2 present values
-			//paramStorageRead(DXL2_ID);
-			//if(exitParam){
-				//printf("\nParameter storage for DXL2 (return 0)");
-				////return 0;
-			//}
-			
-			// Add parameter storage for Dynamixel#3 present values
-			paramStorageRead(DXL3_ID);
-			if(exitParam){
-				printf("\nParameter storage for DXL3 (return 0)");
-				//return 0;
-			}
-			
-			// Add parameter storage for Dynamixel#4 present values
-			paramStorageRead(DXL4_ID);
-			if(exitParam){
-				printf("\nParameter storage for DXL4 (return 0)");
-				//return 0;
-			}
-			
-			// Get initial values
-			getPresentValue();
-			if(exitParam){
-				printf("\nError in getting present values (return 0)");
-				//return 0;
-			}
-			
+			assignReadParam();
+				
 			// Initialize in mode 3 (Position Control) with current values
 			for(int i = 0; i < 4; i++){
 				command[i].id = std::to_string(i+1);
@@ -440,7 +407,9 @@ class motor_state : public rclcpp::Node
 	// Method to publish present values of the motors
 	void publishJointState(){
 		// Check present states
-		getPresentValue();
+		// Obtains present values and prints them
+		assignReadParam();
+		
 		if(exitParam){
 			printf("Could not obtain present value for publisher (return 0)");
 			//return 0;
@@ -516,15 +485,15 @@ class motor_state : public rclcpp::Node
 		//Motors 3 and 4 (rotational) do not have torque control, there's no need to read the value
 		//However, we could technically read present load in the motors
 		//In said case, remove the if condition which skips id 3 and 4
-		//if(id != 3 && id != 4){
-			//// Add parameter storage for Dynamixel#id present torque
-			//dxl_addparam_result = torquePacket.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-			//if (dxl_addparam_result != true){
-				//fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
-				//exitParam = true;
-				////return;
-			//}
-		//}
+		if(id != 3 && id != 4){
+			// Add parameter storage for Dynamixel#id present torque
+			dxl_addparam_result = torquePacket.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			if (dxl_addparam_result != true){
+				fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
+				exitParam = true;
+				//return;
+			}
+		}
 	}
 
 	void readAvailable(dynamixel::GroupBulkRead &groupBulkRead, uint8_t id, int address, int len){
@@ -536,124 +505,84 @@ class motor_state : public rclcpp::Node
 		}
 	}
 
-	void getPresentValue(){
+	void getPresentValue(uint8_t id1, uint8_t id2){
 		// Bulkread present state
 		dxl_comm_result = positionPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
-		//else if (positionPacket.getError(DXL1_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		//else if (positionPacket.getError(DXL2_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		else if (positionPacket.getError(DXL3_ID, &dxl_error)){
-			printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+		else if (positionPacket.getError(id1, &dxl_error)){
+			printf("[ID:%03d] %s\n", id1, packetHandler->getRxPacketError(dxl_error));
 		}
-		else if (positionPacket.getError(DXL4_ID, &dxl_error)){
-			printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+		else if (positionPacket.getError(id2, &dxl_error)){
+			printf("[ID:%03d] %s\n", id2, packetHandler->getRxPacketError(dxl_error));
 		}
 		
-		//readAvailable(positionPacket, DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
-		
-		//readAvailable(positionPacket, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
-		
-		readAvailable(positionPacket, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		readAvailable(positionPacket, id1, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
 			//return;
 		}
 		
-		readAvailable(positionPacket, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		readAvailable(positionPacket, id2, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
 			//return;
 		}
 		
 		// Store initial values
-		//stateArray[0].id = "1";
-		//stateArray[0].position = positionPacket.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//stateArray[1].id = "2";
-		//stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[2].id = "3";
-		stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[3].id = "4";
-		stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[id1 - 1].id = std::to_string(id1);
+		stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[id2 - 1].id = std::to_string(id2);
+		stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
-		//else if (velocityPacket.getError(DXL1_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		//else if (velocityPacket.getError(DXL2_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		else if (velocityPacket.getError(DXL3_ID, &dxl_error)){
-			printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+		else if (velocityPacket.getError(id1, &dxl_error)){
+			printf("[ID:%03d] %s\n", id1, packetHandler->getRxPacketError(dxl_error));
 		}
-		else if (velocityPacket.getError(DXL4_ID, &dxl_error)){
-			printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+		else if (velocityPacket.getError(id2, &dxl_error)){
+			printf("[ID:%03d] %s\n", id2, packetHandler->getRxPacketError(dxl_error));
 		}
 		
-		//readAvailable(velocityPacket, DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
-		
-		//readAvailable(velocityPacket, DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
-		
-		readAvailable(velocityPacket, DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		readAvailable(velocityPacket, id1, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
 			//return;
 		}
 		
-		readAvailable(velocityPacket, DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		readAvailable(velocityPacket, id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
 			//return;
 		}
 		
-		//stateArray[0].velocity = velocityPacket.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		//stateArray[1].velocity = velocityPacket.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		stateArray[2].velocity = velocityPacket.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		stateArray[3].velocity = velocityPacket.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[id2 - 1].velocity = velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		
-		//dxl_comm_result = torquePacket.txRxPacket();
-		//if (dxl_comm_result != COMM_SUCCESS){
-			//printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-		//}
-		//else if (torquePacket.getError(DXL1_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		//else if (torquePacket.getError(DXL2_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		
-		//readAvailable(torquePacket, DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		//if(exitParam){
-			////return;
-		//}
-		
-		//readAvailable(torquePacket, DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		//if(exitParam){
-			////return;
-		//}
-		
-		//stateArray[0].torque = torquePacket.getData(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		//stateArray[1].torque = torquePacket.getData(DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-
-		//printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque, DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque, DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
-		
-		printf("\n[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t\n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t\n", DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
+		if((id1 == 1 || id1 == 2) && (id2 == 1 || id2 == 2)){
+			dxl_comm_result = torquePacket.txRxPacket();
+			if (dxl_comm_result != COMM_SUCCESS){
+				printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+			}
+			else if (torquePacket.getError(id1, &dxl_error)){
+				printf("[ID:%03d] %s\n", id1, packetHandler->getRxPacketError(dxl_error));
+			}
+			else if (torquePacket.getError(id2, &dxl_error)){
+				printf("[ID:%03d] %s\n", id2, packetHandler->getRxPacketError(dxl_error));
+			}
+			
+			readAvailable(torquePacket, id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			if(exitParam){
+				//return;
+			}
+			
+			readAvailable(torquePacket, id2, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			if(exitParam){
+				//return;
+			}
+			
+			stateArray[id1 - 1].torque = torquePacket.getData(id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			stateArray[id2 - 1].torque = torquePacket.getData(id2, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+		}	
 	}
 
 	void paramStorageWrite(uint8_t id, int address, int len, uint8_t param_goal_position[4]){
@@ -663,6 +592,65 @@ class motor_state : public rclcpp::Node
 			exitParam = true;
 			//return;
 		}
+	}
+	
+	void assignReadParam(){
+		// Check Spinning motors first
+		// Add parameter storage for Dynamixel#1 present values
+		paramStorageRead(DXL1_ID);
+		if(exitParam){
+			printf("\nParameter storage for DXL1 (return 0)");
+			//return 0;
+		}
+		
+		// Add parameter storage for Dynamixel#2 present values
+		paramStorageRead(DXL2_ID);
+		if(exitParam){
+			printf("\nParameter storage for DXL2 (return 0)");
+			//return 0;
+		}
+		
+		// Get initial values
+		getPresentValue(DXL1_ID, DXL2_ID);
+		if(exitParam){
+			printf("\nError in getting present values (return 0)");
+			//return 0;
+		}
+		
+		positionPacket.clearParam();
+		velocityPacket.clearParam();
+		torquePacket.clearParam();
+		
+		// Check rotation motors second
+		// Add parameter storage for Dynamixel#3 present values
+		paramStorageRead(DXL3_ID);
+		if(exitParam){
+			printf("\nParameter storage for DXL3 (return 0)");
+			//return 0;
+		}
+		
+		// Add parameter storage for Dynamixel#4 present values
+		paramStorageRead(DXL4_ID);
+		if(exitParam){
+			printf("\nParameter storage for DXL4 (return 0)");
+			//return 0;
+		}
+		
+		// Get initial values
+		getPresentValue(DXL3_ID, DXL4_ID);
+		if(exitParam){
+			printf("\nError in getting present values (return 0)");
+			//return 0;
+		}
+		
+		positionPacket.clearParam();
+		velocityPacket.clearParam();
+		
+		printMotorState();
+	}
+	
+	void printMotorState(){
+		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque, DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque, DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 };
 
