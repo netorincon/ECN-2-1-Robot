@@ -76,8 +76,7 @@
 
 // Functions to read keyboard
 // Leave as is
-int getch()
-{
+int getch(){
 #if defined(__linux__) || defined(__APPLE__)
   struct termios oldt, newt;
   int ch;
@@ -93,8 +92,7 @@ int getch()
 #endif
 }
 
-int kbhit(void)
-{
+int kbhit(void){
 #if defined(__linux__) || defined(__APPLE__)
   struct termios oldt, newt;
   int ch;
@@ -126,15 +124,15 @@ int kbhit(void)
 
 struct MotorGoal{
 	std::string id;
-	int mode;
-	int value;
+	int mode = 3;
+	int value = 0;
 };
 
 struct MotorState{
 	std::string id;
-	float position;
-	float velocity;
-	float torque;
+	float position = 0;
+	float velocity = 0;
+	float torque = 0;
 };
 
 struct DxlState{
@@ -289,7 +287,7 @@ class motor_state : public rclcpp::Node
 		// 0 for torque (current)
 		// 1 velocity
 		// 3 position (default)
-		int dxl_mode[4];
+		int dxl_mode[4] = {3,3,3,3};
 		int addressGoal[4] = {ADDR_GOAL_POSITION,ADDR_GOAL_POSITION,ADDR_GOAL_POSITION,ADDR_GOAL_POSITION};
 		int lenSize[4] = {LEN_PV,LEN_PV,LEN_PV,LEN_PV}; // LEN_PV or LEN_CURRENT
 
@@ -449,6 +447,11 @@ class motor_state : public rclcpp::Node
 		}
 		
 		jointState.header.stamp = this->now();
+		jointState.name.clear();
+		jointState.position.clear();
+		jointState.velocity.clear();
+		jointState.effort.clear();
+		
 		for(int i=0;i<4;i++){
 			jointState.name[i] = stateArray[i].id;
 			jointState.position[i] = pulseToPos(stateArray[i].position);
@@ -494,14 +497,12 @@ class motor_state : public rclcpp::Node
 
 	// Add parameter storage for all dynamixels
 	void paramStorageRead(uint8_t id){
-		bool dxl_addparam_result = false;
-		
 		// Add parameter storage for Dynamixel#id present position
 		dxl_addparam_result = positionPacket.addParam(id, ADDR_PRESENT_POSITION, LEN_PV);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (position)", id);
 			exitParam = true;
-			return;
+			//return;
 		}
 		
 		// Add parameter storage for Dynamixel#id present velocity
@@ -509,7 +510,7 @@ class motor_state : public rclcpp::Node
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (velocity)", id);
 			exitParam = true;
-			return;
+			//return;
 		}
 		
 		//Motors 3 and 4 (rotational) do not have torque control, there's no need to read the value
@@ -521,7 +522,7 @@ class motor_state : public rclcpp::Node
 			if (dxl_addparam_result != true){
 				fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
 				exitParam = true;
-				return;
+				//return;
 			}
 		}
 	}
@@ -531,7 +532,7 @@ class motor_state : public rclcpp::Node
 		if (dxl_getdata_result != true){
 			fprintf(stderr, "[ID:%03d] groupBulkRead getdata failed", id);
 			exitParam = true;
-			return;
+			//return;
 		}
 	}
 
@@ -556,23 +557,33 @@ class motor_state : public rclcpp::Node
 		
 		readAvailable(positionPacket, DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(positionPacket, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(positionPacket, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(positionPacket, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
+		
+		// Store initial values
+		stateArray[0].id = "1";
+		stateArray[0].position = positionPacket.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[1].id = "2";
+		stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[2].id = "3";
+		stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[3].id = "4";
+		stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -593,23 +604,28 @@ class motor_state : public rclcpp::Node
 		
 		readAvailable(velocityPacket, DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(velocityPacket, DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(velocityPacket, DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(velocityPacket, DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
-			return;
+			//return;
 		}
+		
+		stateArray[0].velocity = velocityPacket.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[1].velocity = velocityPacket.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[2].velocity = velocityPacket.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
+		stateArray[3].velocity = velocityPacket.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		
 		dxl_comm_result = torquePacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -624,32 +640,16 @@ class motor_state : public rclcpp::Node
 		
 		readAvailable(torquePacket, DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
 		readAvailable(torquePacket, DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 		if(exitParam){
-			return;
+			//return;
 		}
 		
-		// Store initial values
-		stateArray[0].id = "1";
-		stateArray[0].position = positionPacket.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[0].velocity = velocityPacket.getData(DXL1_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		stateArray[0].torque = torquePacket.getData(DXL1_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		
-		stateArray[1].id = "2";
-		stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[1].velocity = velocityPacket.getData(DXL2_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 		stateArray[1].torque = torquePacket.getData(DXL2_ID, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-		
-		stateArray[2].id = "3";
-		stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[2].velocity = velocityPacket.getData(DXL3_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
-		
-		stateArray[3].id = "4";
-		stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[3].velocity = velocityPacket.getData(DXL4_ID, ADDR_PRESENT_VELOCITY, LEN_PV);
 
 		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n [ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque, DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque, DXL3_ID, stateArray[2].position, stateArray[2].velocity, DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
@@ -659,7 +659,7 @@ class motor_state : public rclcpp::Node
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] commandPacket addparam failed", id);
 			exitParam = true;
-			return;
+			//return;
 		}
 	}
 };
