@@ -30,6 +30,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PositionCommand.msg"
   "msg/MotorCommand.msg"
   "msg/SliderCommand.msg"
+  "msg/StateVector.msg"
   DEPENDENCIES sensor_msgs
 )
 if(BUILD_TESTING)
