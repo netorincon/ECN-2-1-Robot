@@ -104,19 +104,19 @@ class Ui_Form(object):
         return
     
     def updateB1dSlider(self):
-        self.b1d_slider.setValue(self.b1d_sb.value()*100)
+        self.b1d_slider.setValue(self.b1d_sb.value()*100/5.759586334)
         return
     
     def updateB1dBox(self):
-        self.b1d_sb.setValue(self.b1d_slider.value()/100)
+        self.b1d_sb.setValue(self.b1d_slider.value()*5.759586334/100)
         return
     
     def updateB2dSlider(self):
-        self.b2d_slider.setValue(self.b2d_sb.value()*100)
+        self.b2d_slider.setValue(self.b2d_sb.value()*100/5.759586334)
         return
     
     def updateB2dBox(self):
-        self.b2d_sb.setValue(self.b2d_slider.value()/100)
+        self.b2d_sb.setValue(self.b2d_slider.value()*5.759586334/100)
         return
     
     def switchToPositionMode(self):
@@ -298,7 +298,7 @@ class Ui_Form(object):
         self.manual_control_block.addWidget(self.beta1dot)
         self.b1d_control=QtWidgets.QHBoxLayout()
         self.b1d_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
-        self.b1d_sb.setRange(-1, 1)
+        self.b1d_sb.setRange(-6, 6)
         self.b1d_sb.setSingleStep(0.05)
         self.b1d_sb.setDisabled(True)
         self.b1d_control.addWidget(self.b1d_sb)
@@ -319,7 +319,7 @@ class Ui_Form(object):
         self.manual_control_block.addWidget(self.beta2dot)
         self.b2d_control=QtWidgets.QHBoxLayout()
         self.b2d_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
-        self.b2d_sb.setRange(-1, 1)
+        self.b2d_sb.setRange(-6, 6)
         self.b2d_sb.setSingleStep(0.05)
         self.b2d_sb.setDisabled(True)
         self.b2d_control.addWidget(self.b2d_sb)
