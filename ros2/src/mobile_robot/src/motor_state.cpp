@@ -188,26 +188,26 @@ class motor_state : public rclcpp::Node
 				//return 0;
 			}
 			
-			//// Add parameter storage for Dynamixel#2 present values
-			//paramStorageRead(DXL2_ID);
-			//if(exitParam){
-				//printf("\nParameter storage for DXL2 (return 0)");
-				////return 0;
-			//}
+			// Add parameter storage for Dynamixel#2 present values
+			paramStorageRead(DXL2_ID);
+			if(exitParam){
+				printf("\nParameter storage for DXL2 (return 0)");
+				//return 0;
+			}
 			
-			//// Add parameter storage for Dynamixel#3 present values
-			//paramStorageRead(DXL3_ID);
-			//if(exitParam){
-				//printf("\nParameter storage for DXL3 (return 0)");
-				////return 0;
-			//}
+			// Add parameter storage for Dynamixel#3 present values
+			paramStorageRead(DXL3_ID);
+			if(exitParam){
+				printf("\nParameter storage for DXL3 (return 0)");
+				//return 0;
+			}
 			
-			//// Add parameter storage for Dynamixel#4 present values
-			//paramStorageRead(DXL4_ID);
-			//if(exitParam){
-				//printf("\nParameter storage for DXL4 (return 0)");
-				////return 0;
-			//}
+			// Add parameter storage for Dynamixel#4 present values
+			paramStorageRead(DXL4_ID);
+			if(exitParam){
+				printf("\nParameter storage for DXL4 (return 0)");
+				//return 0;
+			}
 			
 			// Get initial values
 			getPresentValue();
@@ -545,45 +545,45 @@ class motor_state : public rclcpp::Node
 		else if (positionPacket.getError(DXL1_ID, &dxl_error)){
 			printf("[ID:%03d] %s\n", DXL1_ID, packetHandler->getRxPacketError(dxl_error));
 		}
-		//else if (positionPacket.getError(DXL2_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		//else if (positionPacket.getError(DXL3_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
-		//else if (positionPacket.getError(DXL4_ID, &dxl_error)){
-			//printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
-		//}
+		else if (positionPacket.getError(DXL2_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL2_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (positionPacket.getError(DXL3_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL3_ID, packetHandler->getRxPacketError(dxl_error));
+		}
+		else if (positionPacket.getError(DXL4_ID, &dxl_error)){
+			printf("[ID:%03d] %s\n", DXL4_ID, packetHandler->getRxPacketError(dxl_error));
+		}
 		
 		readAvailable(positionPacket, DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
 			//return;
 		}
 		
-		//readAvailable(positionPacket, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
+		readAvailable(positionPacket, DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			//return;
+		}
 		
-		//readAvailable(positionPacket, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
+		readAvailable(positionPacket, DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			//return;
+		}
 		
-		//readAvailable(positionPacket, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//if(exitParam){
-			////return;
-		//}
+		readAvailable(positionPacket, DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		if(exitParam){
+			//return;
+		}
 		
 		// Store initial values
 		stateArray[0].id = "1";
 		stateArray[0].position = positionPacket.getData(DXL1_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//stateArray[1].id = "2";
-		//stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//stateArray[2].id = "3";
-		//stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
-		//stateArray[3].id = "4";
-		//stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[1].id = "2";
+		stateArray[1].position = positionPacket.getData(DXL2_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[2].id = "3";
+		stateArray[2].position = positionPacket.getData(DXL3_ID, ADDR_PRESENT_POSITION, LEN_PV);
+		stateArray[3].id = "4";
+		stateArray[3].position = positionPacket.getData(DXL4_ID, ADDR_PRESENT_POSITION, LEN_PV);
 		
 		//dxl_comm_result = velocityPacket.txRxPacket();
 		//if (dxl_comm_result != COMM_SUCCESS){
