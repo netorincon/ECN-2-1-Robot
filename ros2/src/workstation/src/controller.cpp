@@ -29,6 +29,13 @@ The command input should include [um, deltaDot1 and deltaDot2]
 using namespace std::chrono_literals;
 using Eigen::MatrixXd;
 
+float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+    float max=(55.0/60.0)*(2*M_PI); 
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
+
 class controller : public rclcpp::Node
 {
     public :
@@ -49,7 +56,7 @@ class controller : public rclcpp::Node
         float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2;
         float a=0.08;
         float e=0.1;
-        float kp=0.1;
+        float kp=1.5;
         float period=0.02;
         float time=0;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
@@ -77,7 +84,7 @@ class controller : public rclcpp::Node
         u=K_inv*(xrdot+kp*(xr-xp));
 
         um=u(0);
-        dd1=u(1);
+        dd1=limit_deltaSpeed(u(1));
         dd2=dd1;
 
         //YOUR CODE SHOULD END HERE
@@ -114,10 +121,10 @@ class controller : public rclcpp::Node
     }
 
     void updateK(){
-        K_inv(0,0)=cos(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
-        K_inv(0,1)=sin(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*cos(d2)*cos(d1 + theta),2));
-        K_inv(1,0)=(-2*a*sin(d2 + theta)*cos(d1) - e*sin(d1 - d2)*cos(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
-        K_inv(1,1)=(2*a*cos(d2)*cos(d1 + theta) - e*sin(d1 - d2)*sin(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + pow(2*a*e*cos(d2)*cos(d1 + theta),2));
+        K_inv(0,0)=cos(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*cos(d2)*pow(cos(d1 + theta),2));
+        K_inv(0,1)=sin(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*cos(d2)*pow(cos(d1 + theta),2));
+        K_inv(1,0)=(-2*a*sin(d2 + theta)*cos(d1) - e*sin(d1 - d2)*cos(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*a*e*cos(d2)*pow(cos(d1 + theta),2));
+        K_inv(1,1)=(2*a*cos(d2)*cos(d1 + theta) - e*sin(d1 - d2)*sin(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*a*e*cos(d2)*pow(cos(d1 + theta),2));
         //K_inv=K.inverse();
     }
 
