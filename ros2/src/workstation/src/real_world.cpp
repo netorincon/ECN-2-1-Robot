@@ -167,7 +167,7 @@ class real_world : public rclcpp::Node
         beta2=d2+M_PI;
 
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
-        float U=phi1d*R/(2*cos(d2));"value",
+        float U=phi1d*R/(2*cos(d2));
 
         //We calculate current robot speeds and orientation motor 
         tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
