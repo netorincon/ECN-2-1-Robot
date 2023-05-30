@@ -149,24 +149,25 @@ class real_world : public rclcpp::Node
             stateArray[i].torque=jointState->effort[i];
         }
                
-        //Get the current speed of the spin actuators
-        phi1d=stateArray[1].speed; 
-        phi2d=stateArray[0].speed;
+        //Get the current position and velocity of the motors
+
+        d1=stateArray[2].position;
+        d2=stateArray[3].position;; //delta 2
+
+        phi1=stateArray[1].position;
+        phi2=stateArray[0].position;
 
         dd1=stateArray[2].speed;
         dd2=stateArray[3].speed;
 
-        d1+=dd1*period; //delta 1
-        d2+=dd2*period; //delta 2
+        phi1d=stateArray[1].speed; 
+        phi2d=stateArray[0].speed;
 
         beta1=d1;
         beta2=d2+M_PI;
-        phi1+=phi1d*period;
-        phi2+=phi2d*period;
-       
 
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
-        float U=phi1d*R/(2*cos(d2));
+        float U=phi1d*R/(2*cos(d2));"value",
 
         //We calculate current robot speeds and orientation motor 
         tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
