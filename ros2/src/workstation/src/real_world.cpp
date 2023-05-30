@@ -56,6 +56,12 @@ float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The d
     else if(a<= -max) {a=-max;} 
     return a;
 }
+
+double limit_angle(double a){
+    while( a >=  2*M_PI ) a -= 2*M_PI ;
+    while( a <  0 ) a += 2*M_PI ;
+    return a ;
+}
 class real_world : public rclcpp::Node
 {
     public :
@@ -110,8 +116,9 @@ class real_world : public rclcpp::Node
     private :
         //We initialize all variables of the state vector at 0
         float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
-        float frequency = 50; // fréquence de publication des transformations sur le topic /tf
-        float period = 1/frequency;
+        float dd1Cmd, dd2Cmd, phi1dCmd, phi2dCmd, d1Cmd, d2Cmd=0;
+        float frequency = 50; // HZ, fréquence de publication des transformations sur le topic /tf
+        float period = 1/frequency; //Seconds
         float a=0.05;//Base distance in meters
         float R=0.033; //Radius of the wheels in meters
         std::string mode;
@@ -142,27 +149,28 @@ class real_world : public rclcpp::Node
             stateArray[i].torque=jointState->effort[i];
         }
                
-        //Get the current speed of the spin actuators
-        phi1d=stateArray[1].speed; 
-        phi2d=stateArray[0].speed;
+        //Get the current position and velocity of the motors
+
+        d1=stateArray[2].position;
+        d2=stateArray[3].position;; //delta 2
+
+        phi1=stateArray[1].position;
+        phi2=stateArray[0].position;
 
         dd1=stateArray[2].speed;
         dd2=stateArray[3].speed;
 
-        d1+=dd1*period; //delta 1
-        d2+=dd2*period; //delta 2
+        phi1d=stateArray[1].speed; 
+        phi2d=stateArray[0].speed;
 
         beta1=d1;
         beta2=d2+M_PI;
-        phi1+=phi1d*period;
-        phi2+=phi2d*period;
-       
 
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
         float U=phi1d*R/(2*cos(d2));
 
         //We calculate current robot speeds and orientation motor 
-        tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
+        tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
         x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
         y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
 
@@ -170,10 +178,11 @@ class real_world : public rclcpp::Node
         x+=x_dot*period;
         y+=y_dot*period;
         tt+=tt_dot*period;
+        tt=limit_angle(tt);
         
         transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
-        transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
+        transform_stamped_.header.frame_id = "world"; // Name of the fixed frame
+        transform_stamped_.child_frame_id = "chassis"; // Name of the robot's frame
         transform_stamped_.transform.translation.x = x;
         transform_stamped_.transform.translation.y = y;
         transform_stamped_.transform.translation.z = 0;
@@ -197,11 +206,11 @@ class real_world : public rclcpp::Node
     }
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
             Um=0;
-            d1=msg->d1;
-            d2=msg->d2;
+            d1Cmd=msg->d1;
+            d2Cmd=msg->d2;
 
-            phi1d=0;
-            phi2d=0;
+            phi1dCmd=0;
+            phi2dCmd=0;
 
             //Arrange the speeds in an array for faster assignment during publishJointCommand 
             commandArray[0].id=1;
@@ -211,10 +220,10 @@ class real_world : public rclcpp::Node
             commandArray[1].position=0;
 
             commandArray[2].id=3;
-            commandArray[2].position=d1;
+            commandArray[2].position=d1Cmd;
 
             commandArray[3].id=4;
-            commandArray[3].position=d2;   
+            commandArray[3].position=d2Cmd;   
 
             for(int i=0;i<4;i++){
                 commandArray[i].speed=0;
@@ -225,27 +234,24 @@ class real_world : public rclcpp::Node
 
         void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
             Um=msg->um;
-            dd1=msg->delta1dot;
-            dd2=msg->delta2dot;
+            dd1Cmd=limit_deltaSpeed(msg->delta1dot);
+            dd2Cmd=limit_deltaSpeed(msg->delta2dot);
 
-            dd1=limit_deltaSpeed(dd1);
-            dd2=limit_deltaSpeed(dd2);
-
-            phi1d=limit_phiSpeed(2*cos(d2)*Um/R);
-            phi2d=limit_phiSpeed(2*cos(d1)*Um/R);
+            phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
+            phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
 
             //Arrange the speeds in an array for faster assignment during publishJointCommand 
             commandArray[0].id=1;
-            commandArray[0].speed=phi2d;
+            commandArray[0].speed=phi2dCmd;
 
             commandArray[1].id=2;
-            commandArray[1].speed=phi1d;
+            commandArray[1].speed=phi1dCmd;
 
             commandArray[2].id=3;
-            commandArray[2].speed=dd1;
+            commandArray[2].speed=dd1Cmd;
 
             commandArray[3].id=4;
-            commandArray[3].speed=dd2;   
+            commandArray[3].speed=dd2Cmd;   
 
             for(int i=0;i<4;i++){
                 commandArray[i].position=0;
