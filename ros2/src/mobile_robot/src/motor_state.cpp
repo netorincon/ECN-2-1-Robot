@@ -168,6 +168,8 @@ class motor_state : public rclcpp::Node
 						command[i].id = std::to_string(i+1);
 						command[i].mode = 3;
 						command[i].value = stateArray[i].position;
+						
+						changeMode(stoi(command[i].id), command[i].mode);
 					}
 						
 					//Subscriber for desired joint states		
