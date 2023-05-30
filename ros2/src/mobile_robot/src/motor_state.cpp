@@ -262,13 +262,23 @@ class motor_state : public rclcpp::Node
 	// Velocity conversion for spinning motors
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
-		return ((value * 60) / (2 * M_PI)) / 0.229;
+		int vel = ((value * 60) / (2 * M_PI)) / 0.229;
+		// Check for negative values
+		if(vel < 0){
+			vel = (pow(2,32)) - vel + 1;
+		}
+		return vel;
 	}
 	
 	// TODO
 	// Torque conversion for dynamixel
 	int torToPulse(float value){
-		return value;
+		int tor = value;
+		// Check for negative values
+		if(tor > (pow(2,15))){
+			tor = (pow(2,16)) - tor + 1;
+		}
+		return tor;
 	}
 	
 	// Position conversion for topic
