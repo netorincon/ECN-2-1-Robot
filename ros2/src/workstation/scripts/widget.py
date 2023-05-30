@@ -70,13 +70,18 @@ class Ui_Form(object):
     
     def reset_speed_sliders(self):
         self.umSlider.setProperty("value", 0)
+        self.um_sb.setValue(0)
         self.b1d_slider.setProperty("value", 0)
+        self.b1d_sb.setValue(0)
         self.b2d_slider.setProperty("value", 0)
+        self.b2d_sb.setValue(0)
         return
         
     def reset_pos_sliders(self):
         self.b1_slider.setProperty("value", 0)
+        self.beta1_sb.setValue(0)
         self.b2_slider.setProperty("value", 0)
+        self.beta2_sb.setValue(0)
         return
     
     def updateBeta1Slider(self):

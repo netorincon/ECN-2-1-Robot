@@ -85,7 +85,7 @@ class controller : public rclcpp::Node
 
         um=u(0);
         dd1=limit_deltaSpeed(u(1));
-        dd2=dd1;
+        dd2=-dd1;
 
         //YOUR CODE SHOULD END HERE
 
