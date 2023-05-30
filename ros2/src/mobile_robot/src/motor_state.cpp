@@ -267,7 +267,7 @@ class motor_state : public rclcpp::Node
 		printf("Converti a %d", vel);
 		// Check for negative values
 		if(vel < 0){
-			vel = (pow(2,31)) + vel + 1;
+			vel = int(pow(2,32)+1) & (int(pow(2,32)) + vel + 1);
 			printf("Carnal salio negativo: %d", vel);
 		}
 		return vel;
