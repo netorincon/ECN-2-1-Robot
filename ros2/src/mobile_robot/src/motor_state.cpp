@@ -262,10 +262,13 @@ class motor_state : public rclcpp::Node
 	// Velocity conversion for spinning motors
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
+		printf("Hola esta es mi velocidad: %0.2f", value);
 		int vel = ((value * 60) / (2 * M_PI)) / 0.229;
+		printf("Converti a %d", vel);
 		// Check for negative values
 		if(vel < 0){
 			vel = (pow(2,32)) + vel + 1;
+			printf("Carnal salio negativo: %d", vel);
 		}
 		return vel;
 	}
