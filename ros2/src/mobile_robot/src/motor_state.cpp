@@ -312,7 +312,7 @@ class motor_state : public rclcpp::Node
 			else if(cmd->mode[i] == "velocity"){
 				
 				//
-				std::cout << "Este valor de posicion : " << +cmd->cmd.velocity[i] << std::endl;
+				std::cout << "Este valor de velocidad : " << +cmd->cmd.velocity[i] << std::endl;
 				//printf("Este valor de posicion: %d",cmd->cmd.velocity[i]);
 				
 				controlMode = 1;
