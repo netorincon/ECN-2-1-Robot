@@ -538,6 +538,14 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
 		stateArray[id2 - 1].velocity = velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		
+		// Check for negative values
+		if(stateArray[id1 - 1].velocity > (pow(2,31))){
+			stateArray[id1 - 1].velocity = stateArray[id1 - 1].velocity - (pow(2,32)) - 1;
+		}
+		if(stateArray[id2 - 1].velocity > (pow(2,31))){
+			stateArray[id2 - 1].velocity = stateArray[id2 - 1].velocity - (pow(2,32)) - 1;
+		}
+		
 		if((id1 == DXL1_ID || id1 == DXL2_ID) && (id2 == DXL1_ID || id2 == DXL2_ID)){
 			dxl_comm_result = torquePacket.txRxPacket();
 			if (dxl_comm_result != COMM_SUCCESS){
@@ -564,6 +572,14 @@ class motor_state : public rclcpp::Node
 			
 			stateArray[id1 - 1].torque = torquePacket.getData(id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			stateArray[id2 - 1].torque = torquePacket.getData(id2, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+			
+			// Check for negative values
+			if(stateArray[id1 - 1].torque > (pow(2,15))){
+				stateArray[id1 - 1].torque = stateArray[id1 - 1].torque - (pow(2,16)) - 1;
+			}
+			if(stateArray[id2 - 1].torque > (pow(2,15))){
+				stateArray[id2 - 1].torque = stateArray[id2 - 1].torque - (pow(2,16)) - 1;
+			}
 		}	
 	}
 
