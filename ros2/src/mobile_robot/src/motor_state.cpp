@@ -356,7 +356,7 @@ class motor_state : public rclcpp::Node
 		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[0].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 1: %d" << +param1_goal_state << std::endl;
+		std::cout << "Le mandare esto al motor 1: " << unsigned(param1_goal_state[0]) << unsigned(param1_goal_state[1]) << unsigned(param1_goal_state[2]) << unsigned(param1_goal_state[3]) << std::endl;
 		//printf("Le mandare esto al motor 1: %d",param1_goal_state);
 		
 		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[1].value));
@@ -365,7 +365,7 @@ class motor_state : public rclcpp::Node
 		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[1].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 2: %d" << +param2_goal_state << std::endl;
+		std::cout << "Le mandare esto al motor 2: " << unsigned(param2_goal_state[0]) << unsigned(param2_goal_state[1]) << unsigned(param2_goal_state[2]) << unsigned(param2_goal_state[3]) << std::endl;
 		//printf("Le mandare esto al motor 2: %d",param2_goal_state);
 		
 		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[2].value));
@@ -374,7 +374,7 @@ class motor_state : public rclcpp::Node
 		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[2].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 3: %d" << +param3_goal_state << std::endl;
+		std::cout << "Le mandare esto al motor 3: " << unsigned(param3_goal_state[0]) << unsigned(param3_goal_state[1]) << unsigned(param3_goal_state[2]) << unsigned(param3_goal_state[3]) << std::endl;
 		//printf("Le mandare esto al motor 3: %d",param3_goal_state);
 		
 		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[3].value));
@@ -383,7 +383,7 @@ class motor_state : public rclcpp::Node
 		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[3].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 4: %d" << +param4_goal_state << std::endl;
+		std::cout << "Le mandare esto al motor 4: " << unsigned(param4_goal_state[0]) << unsigned(param4_goal_state[1]) << unsigned(param4_goal_state[2]) << unsigned(param4_goal_state[3]) << std::endl;
 		//printf("Le mandare esto al motor 4: %d",param4_goal_state);
 
 		// Add parameter storage for Dynamixels goal
