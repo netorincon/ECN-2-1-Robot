@@ -297,11 +297,24 @@ class motor_state : public rclcpp::Node
 			//Dynamixel ID
 			command[i].id = cmd->cmd.name[i];
 			
+			//
+			printf("Recibo ESTA id : %d \n", stoi(command[i].id));
+			
 			if(cmd->mode[i] == "position"){
+				
+				//
+				std::cout << "Este valor de posicion : " << +cmd->cmd.position[i] << std::endl;
+				//printf("Este valor de posicion: %d",cmd->cmd.position[i]);
+				
 				controlMode = 3;
 				command[i].value = posToPulse(cmd->cmd.position[i]);
 			}
 			else if(cmd->mode[i] == "velocity"){
+				
+				//
+				std::cout << "Este valor de posicion : " << +cmd->cmd.velocity[i] << std::endl;
+				//printf("Este valor de posicion: %d",cmd->cmd.velocity[i]);
+				
 				controlMode = 1;
 				command[i].value = velToPulse(cmd->cmd.velocity[i]);
 			}
@@ -314,6 +327,9 @@ class motor_state : public rclcpp::Node
 			
 			//Check for mode change
 			if(!command[i].mode || command[i].mode != controlMode){
+				//
+				printf("Hare cambio de modo dentro del nodo\n");
+				
 				command[i].mode = controlMode;
 				
 				changeMode(stoi(command[i].id), command[i].mode);
@@ -339,20 +355,36 @@ class motor_state : public rclcpp::Node
 		param1_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[0].value));
 		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[0].value));
 		
+		//
+		std::cout << "Le mandare esto al motor 1: %d" << +param1_goal_state << std::endl;
+		//printf("Le mandare esto al motor 1: %d",param1_goal_state);
+		
 		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[1].value));
 		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[1].value));
 		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[1].value));
 		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[1].value));
+		
+		//
+		std::cout << "Le mandare esto al motor 2: %d" << +param2_goal_state << std::endl;
+		//printf("Le mandare esto al motor 2: %d",param2_goal_state);
 		
 		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[2].value));
 		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[2].value));
 		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[2].value));
 		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[2].value));
 		
+		//
+		std::cout << "Le mandare esto al motor 3: %d" << +param3_goal_state << std::endl;
+		//printf("Le mandare esto al motor 3: %d",param3_goal_state);
+		
 		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[3].value));
 		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[3].value));
 		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[3].value));
 		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[3].value));
+		
+		//
+		std::cout << "Le mandare esto al motor 4: %d" << +param4_goal_state << std::endl;
+		//printf("Le mandare esto al motor 4: %d",param4_goal_state);
 
 		// Add parameter storage for Dynamixels goal
 		paramStorageWrite(DXL1_ID, addressGoal[0], lenSize[0], param1_goal_state);
@@ -384,6 +416,9 @@ class motor_state : public rclcpp::Node
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
+		
+		//
+		printf("Ya lo envie\n");
 
 		// Clear bulkwrite parameter storage
 		commandPacket.clearParam();
@@ -646,7 +681,7 @@ class motor_state : public rclcpp::Node
 		positionPacket.clearParam();
 		velocityPacket.clearParam();
 		
-		printMotorState();
+		//printMotorState();
 	}
 	
 	// TODO Quitar los print en español
