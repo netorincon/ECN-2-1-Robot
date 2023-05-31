@@ -379,7 +379,7 @@ class motor_state : public rclcpp::Node
 			jointState.name.push_back(stateArray[i].id);
 			
 			if(stateArray[i].id == MotorIds.at(4)){
-				jointState.position.push_back(pulseToPos(stateArray[i].position) + M_PI);
+				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position) + M_PI));
 			}
 			else{
 				jointState.position.push_back(pulseToPos(stateArray[i].position));
@@ -390,6 +390,13 @@ class motor_state : public rclcpp::Node
 			}
 		}
 		motor_state_publisher->publish(jointState);
+	}
+	
+	float limitAngle(float value){
+		if(value > M_PI){
+			value = value - (2 * M_PI);
+		}
+		return value;
 	}
 	
 	//ENABLE TORQUE TO MOTORS
