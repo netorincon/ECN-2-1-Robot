@@ -152,12 +152,6 @@ class motor_state : public rclcpp::Node
 				if (portHandler->setBaudRate(BAUDRATE)){
 					printf("Succeeded to change the baudrate!\n");
 					
-					// Dictionary for joint names;
-					JointNames["left_wheel_joint"]= 1;
-					JointNames["right_wheel_joint"] = 2;
-					JointNames["right_wheel_base_joint"] = 3;
-					JointNames["left_wheel_base_joint"] = 4;
-					
 					// Enable Dynamixel#1 Torque
 					enableTorque(DXL1_ID);
 					
@@ -253,7 +247,8 @@ class motor_state : public rclcpp::Node
 		uint8_t dxl_error = 0;                          // Dynamixel error
 		uint8_t param_goal_state[4];					// Goal state
 		
-		std::map<std::string, int>JointNames;
+		std::map<std::string, int> MotorNames{{"left_wheel_joint",1},{"right_wheel_joint",2},{"right_wheel_base_joint",3},{"left_wheel_base_joint",4}};
+		std::map<int, std::string> MotorIds{{1,"left_wheel_joint"},{2,"right_wheel_joint"},{3,"right_wheel_base_joint"},{4,"left_wheel_base_joint"}};
 		
 	// Position conversion for orientation motors
 	// 2048 is the wheel's 0
@@ -271,7 +266,6 @@ class motor_state : public rclcpp::Node
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
 		return ((value * 60) / (2 * M_PI)) / 0.229;
-
 	}
 	
 	// TODO
@@ -303,9 +297,12 @@ class motor_state : public rclcpp::Node
 		int id;
 		
 		for(int i=0;i<(int)cmd->name.size();i++){
-			id = JointNames.at(cmd->name[i]);
+			printf("\nIteracion %d\n",i);
+			id = MotorNames.at(cmd->name[i]);
+			printf("Motor %d\n",id);
 			command[i].id = id;
 			if(cmd->position.size() != 0){
+				printf("Modo Posicion\n");
 				if(command[id - 1].mode != 3){
 					changeMode(id, 3);
 					addressGoal[id - 1] = ADDR_GOAL_POSITION;
@@ -314,6 +311,7 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = posToPulse(cmd->position[i]);
 			}
 			else if(cmd->velocity.size() != 0){
+				printf("Modo Velocidad\n");
 				if(command[id - 1].mode != 1){
 					changeMode(id, 1);
 					addressGoal[id - 1] = ADDR_GOAL_VELOCITY;
@@ -322,6 +320,7 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = velToPulse(cmd->velocity[i]);
 			}
 			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (DXL4_ID)){
+				printf("Modo Torque\n");
 				if(command[id - 1].mode != 0){
 					changeMode(id, 0);
 					addressGoal[id - 1] = ADDR_GOAL_CURRENT;
@@ -377,7 +376,7 @@ class motor_state : public rclcpp::Node
 			jointState.name.push_back(stateArray[i].id);
 			jointState.position.push_back(pulseToPos(stateArray[i].position));
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
-			if(stateArray[i].id != std::to_string(DXL3_ID) && stateArray[i].id != std::to_string(DXL4_ID)){
+			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
 				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
 			}
 		}
@@ -476,9 +475,9 @@ class motor_state : public rclcpp::Node
 		}
 		
 		// Store initial values
-		stateArray[id1 - 1].id = std::to_string(id1);
+		stateArray[id1 - 1].id = MotorIds.at(id1);
 		stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
-		stateArray[id2 - 1].id = std::to_string(id2);
+		stateArray[id2 - 1].id = MotorIds.at(id2);
 		stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
