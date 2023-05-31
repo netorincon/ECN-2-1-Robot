@@ -189,6 +189,7 @@ class motor_state : public rclcpp::Node
 				printf("Failed to open the port!\n");
 				printf("Press CTRL + C terminate...\n");
 			}
+			printf("1\n");
         }
         
         MotorGoal command[4]; //Goal
@@ -212,6 +213,8 @@ class motor_state : public rclcpp::Node
 				printf("Dynamixel#%d's torque has been disabled \n", id);
 			}
 		}
+		
+		//printf("2\n");
 
     private :
 		rclcpp::TimerBase::SharedPtr timer_;
@@ -247,11 +250,14 @@ class motor_state : public rclcpp::Node
 		uint8_t param3_goal_state[4];
 		uint8_t param4_goal_state[4];
 		
+		//printf("3\n");
+		
 	// Position conversion for orientation motors
 	// 2048 is the wheel's 0
 	// + PI we need to add 2048
 	// - PI we need to substract 2048
 	int posToPulse(float value){
+		printf("4\n");
 		int pos = 2048 + ((value * 2048) / M_PI);
 		if(pos < 0 || pos > 4095){
 			pos = 0;
@@ -262,20 +268,23 @@ class motor_state : public rclcpp::Node
 	// Velocity conversion for spinning motors
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
-		printf("Hola esta es mi velocidad: %0.2f", value);
-		int vel = ((value * 60) / (2 * M_PI)) / 0.229;
-		printf("Converti a %d", vel);
-		// Check for negative values
-		if(vel < 0){
-			vel = (pow(2,31)) + vel + 1;
-			printf("Carnal salio negativo: %d", vel);
-		}
-		return vel;
+		printf("5\n");
+		//printf("Hola esta es mi velocidad: %0.2f", value);
+		//int vel = ((value * 60) / (2 * M_PI)) / 0.229;
+		//printf("Converti a %d", vel);
+		//// Check for negative values
+		//if(vel < 0){
+			//vel = (pow(2,31)) + vel + 1;
+			//printf("Carnal salio negativo: %d", vel);
+		//}
+		//return vel;
+		return ((value * 60) / (2 * M_PI)) / 0.229;
 	}
 	
 	// TODO
 	// Torque conversion for dynamixel
 	int torToPulse(float value){
+		printf("6\n");
 		int tor = value;
 		// Check for negative values
 		if(tor < 0){
@@ -287,51 +296,57 @@ class motor_state : public rclcpp::Node
 	// Position conversion for topic
 	// Change orientation motors position to radians
 	float pulseToPos(float value){
+		printf("7\n");
 		return ((((int)value) % 4096) - 2048)*(M_PI / 2048);
 	}
 	
 	// Velocity conversion for topic
 	// Change motor value to rad/s
 	float pulseToVel(float value){
+		printf("8\n");
 		return ((((int)value) % 1024) * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
 	// Torque conversion for topic
 	float pulseToTor(float value){
+		printf("9\n");
 		return value;
 	}
 	
 	// Method to obtain desired joint states
 	void goalJoints(const control_input::msg::MotorCommand::SharedPtr cmd){
+		printf("10\n");
 		int controlMode;
 		
 		for(int i=0;i<4;i++){
+			printf("11\n");
 			//Dynamixel ID
 			command[i].id = cmd->cmd.name[i];
 			
 			//
-			printf("Recibo ESTA id : %d \n", stoi(command[i].id));
+			//printf("Recibo ESTA id : %d \n", stoi(command[i].id));
 			
 			if(cmd->mode[i] == "position"){
-				
+				printf("12\n");
 				//
-				std::cout << "Este valor de posicion : " << +cmd->cmd.position[i] << std::endl;
+				//std::cout << "Este valor de posicion : " << +cmd->cmd.position[i] << std::endl;
 				//printf("Este valor de posicion: %d",cmd->cmd.position[i]);
 				
 				controlMode = 3;
 				command[i].value = posToPulse(cmd->cmd.position[i]);
 			}
 			else if(cmd->mode[i] == "velocity"){
-				
+				printf("13\n");
 				//
-				std::cout << "Este valor de velocidad : " << +cmd->cmd.velocity[i] << std::endl;
+				//std::cout << "Este valor de velocidad : " << +cmd->cmd.velocity[i] << std::endl;
 				//printf("Este valor de posicion: %d",cmd->cmd.velocity[i]);
 				
 				controlMode = 1;
 				command[i].value = velToPulse(cmd->cmd.velocity[i]);
 			}
 			else if(cmd->mode[i] == "torque"){
+				printf("14\n");
 				controlMode = 0;
 				if(cmd->cmd.name[i] != "3" && cmd->cmd.name[i] != "4"){
 					command[i].value = torToPulse(cmd->cmd.effort[i]);
@@ -340,28 +355,33 @@ class motor_state : public rclcpp::Node
 			
 			//Check for mode change
 			if(!command[i].mode || command[i].mode != controlMode){
+				printf("15\n");
 				//
-				printf("Hare cambio de modo dentro del nodo\n");
+				//printf("Hare cambio de modo dentro del nodo\n");
 				
 				command[i].mode = controlMode;
 				
 				changeMode(stoi(command[i].id), command[i].mode);
 				
 				if(command[i].mode == 3){
+					printf("16\n");
 					addressGoal[i] = ADDR_GOAL_POSITION;
 					lenSize[i] = LEN_PV;
 				}
 				else if(command[i].mode == 1){
+					printf("17\n");
 					addressGoal[i] = ADDR_GOAL_VELOCITY;
 					lenSize[i] = LEN_PV;
 				}
 				else if(command[i].mode == 0){
+					printf("18\n");
 					addressGoal[i] = ADDR_GOAL_CURRENT;
 					lenSize[i] = LEN_CURRENT;
 				}
 			}
 		}
-
+		
+		printf("19\n");
 		// Allocate goal position value into byte array
 		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[0].value));
 		param1_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[0].value));
@@ -369,36 +389,40 @@ class motor_state : public rclcpp::Node
 		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[0].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 1: " << unsigned(param1_goal_state[3]) << unsigned(param1_goal_state[2]) << unsigned(param1_goal_state[1]) << unsigned(param1_goal_state[0]) << std::endl;
+		//std::cout << "Le mandare esto al motor 1: " << unsigned(param1_goal_state[3]) << unsigned(param1_goal_state[2]) << unsigned(param1_goal_state[1]) << unsigned(param1_goal_state[0]) << std::endl;
 		//printf("Le mandare esto al motor 1: %d",param1_goal_state);
 		
+		printf("20\n");
 		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[1].value));
 		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[1].value));
 		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[1].value));
 		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[1].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 2: " << unsigned(param2_goal_state[3]) << unsigned(param2_goal_state[2]) << unsigned(param2_goal_state[1]) << unsigned(param2_goal_state[0]) << std::endl;
+		//std::cout << "Le mandare esto al motor 2: " << unsigned(param2_goal_state[3]) << unsigned(param2_goal_state[2]) << unsigned(param2_goal_state[1]) << unsigned(param2_goal_state[0]) << std::endl;
 		//printf("Le mandare esto al motor 2: %d",param2_goal_state);
 		
+		printf("21\n");
 		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[2].value));
 		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[2].value));
 		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[2].value));
 		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[2].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 3: " << unsigned(param3_goal_state[3]) << unsigned(param3_goal_state[2]) << unsigned(param3_goal_state[1]) << unsigned(param3_goal_state[0]) << std::endl;
+		//std::cout << "Le mandare esto al motor 3: " << unsigned(param3_goal_state[3]) << unsigned(param3_goal_state[2]) << unsigned(param3_goal_state[1]) << unsigned(param3_goal_state[0]) << std::endl;
 		//printf("Le mandare esto al motor 3: %d",param3_goal_state);
 		
+		printf("22\n");
 		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[3].value));
 		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[3].value));
 		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[3].value));
 		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[3].value));
 		
 		//
-		std::cout << "Le mandare esto al motor 4: " << unsigned(param4_goal_state[3]) << unsigned(param4_goal_state[2]) << unsigned(param4_goal_state[1]) << unsigned(param4_goal_state[0]) << std::endl;
+		//std::cout << "Le mandare esto al motor 4: " << unsigned(param4_goal_state[3]) << unsigned(param4_goal_state[2]) << unsigned(param4_goal_state[1]) << unsigned(param4_goal_state[0]) << std::endl;
 		//printf("Le mandare esto al motor 4: %d",param4_goal_state);
-
+		
+		printf("23\n");
 		// Add parameter storage for Dynamixels goal
 		paramStorageWrite(DXL1_ID, addressGoal[0], lenSize[0], param1_goal_state);
 		if(exitParam){
@@ -406,24 +430,28 @@ class motor_state : public rclcpp::Node
 			exitParam = false;
 		}
 		
+		printf("24\n");
 		paramStorageWrite(DXL2_ID, addressGoal[1], lenSize[1], param2_goal_state);
 		if(exitParam){
 			printf("Param write 2 (return 0) failed");
 			exitParam = false;
 		}
 		
+		printf("25\n");
 		paramStorageWrite(DXL3_ID, addressGoal[2], lenSize[2], param3_goal_state);
 		if(exitParam){
 			printf("Param write 3 (return 0) failed");
 			exitParam = false;
 		}
 		
+		printf("26\n");
 		paramStorageWrite(DXL4_ID, addressGoal[3], lenSize[3], param4_goal_state);
 		if(exitParam){
 			printf("Param write 4 (return 0) failed");
 			exitParam = false;
 		}
-
+		
+		printf("27\n");
 		// Bulkwrite goal joint states
 		dxl_comm_result = commandPacket.txPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -431,23 +459,27 @@ class motor_state : public rclcpp::Node
 		}
 		
 		//
-		printf("Ya lo envie\n");
+		//printf("Ya lo envie\n");
 
+		printf("28\n");
 		// Clear bulkwrite parameter storage
 		commandPacket.clearParam();
 	}
 	
 	// Method to publish present values of the motors
 	void publishJointState(){
+		printf("29\n");
 		// Check present states
 		// Obtains present values and prints them
 		assignReadParam();
 		
+		printf("30\n");
 		if(exitParam){
 			printf("Could not obtain present value for publisher (return 0)");
 			exitParam = false;
 		}
 		
+		printf("31\n");
 		jointState.header.stamp = this->now();
 		jointState.name.clear();
 		jointState.position.clear();
@@ -455,6 +487,7 @@ class motor_state : public rclcpp::Node
 		jointState.effort.clear();
 		
 		for(int i=0;i<4;i++){
+			printf("%d\n", 32+i);
 			jointState.name.push_back(stateArray[i].id);
 			jointState.position.push_back(pulseToPos(stateArray[i].position));
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
@@ -462,6 +495,7 @@ class motor_state : public rclcpp::Node
 				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
 			}
 		}
+		printf("36\n");
 		motor_state_publisher->publish(jointState);
 	}
 	
