@@ -378,7 +378,7 @@ class motor_state : public rclcpp::Node
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
 			
-			if(stateArray[i].id == MotorIds.at(2)){
+			if(stateArray[i].id == MotorIds.at(4)){
 				jointState.position.push_back(pulseToPos(stateArray[i].position) + M_PI);
 			}
 			else{
