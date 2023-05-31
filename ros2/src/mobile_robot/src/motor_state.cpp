@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//For map
+#include <map>
+
 #include <algorithm>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -123,7 +126,7 @@ int kbhit(void){
 }
 
 struct MotorGoal{
-	std::string id;
+	int id;
 	int mode = 3;
 	int value = 0;
 };
@@ -149,6 +152,12 @@ class motor_state : public rclcpp::Node
 				if (portHandler->setBaudRate(BAUDRATE)){
 					printf("Succeeded to change the baudrate!\n");
 					
+					// Dictionary for joint names;
+					JointNames["left_wheel_joint"]= 1;
+					JointNames["right_wheel_joint"] = 2;
+					JointNames["right_wheel_base_joint"] = 3;
+					JointNames["left_wheel_base_joint"] = 4;
+					
 					// Enable Dynamixel#1 Torque
 					enableTorque(DXL1_ID);
 					
@@ -165,19 +174,19 @@ class motor_state : public rclcpp::Node
 						
 					// Initialize in mode 3 (Position Control) with current values
 					for(int i = 0; i < 4; i++){
-						command[i].id = std::to_string(i+1);
+						command[i].id = i+1;
 						command[i].mode = 3;
 						command[i].value = stateArray[i].position;
 						
-						changeMode(stoi(command[i].id), command[i].mode);
+						changeMode(command[i].id, command[i].mode);
 					}
 						
 					//Subscriber for desired joint states		
-					motor_command_subscriber = this->create_subscription<control_input::msg::MotorCommand>(
+					motor_command_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
 								"motor_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
 					
 					//Publisher for present joint states
-					motor_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_states",10);
+					motor_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
 					timer_ = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&motor_state::publishJointState,this));
 				}
 				else{
@@ -209,7 +218,7 @@ class motor_state : public rclcpp::Node
 				printf("%s\n", packetHandler->getRxPacketError(dxl_error));
 			}
 			else{
-				printf("Dynamixel#%d's torque has been disabled \n", id);
+				//printf("Dynamixel#%d's torque has been disabled \n", id);
 			}
 		}
 
@@ -218,7 +227,7 @@ class motor_state : public rclcpp::Node
 		sensor_msgs::msg::JointState jointState;
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr motor_state_publisher;
-        rclcpp::Subscription<control_input::msg::MotorCommand>::SharedPtr motor_command_subscriber;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr motor_command_subscriber;
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
@@ -242,10 +251,9 @@ class motor_state : public rclcpp::Node
 		int lenSize[4] = {LEN_PV,LEN_PV,LEN_PV,LEN_PV}; // LEN_PV or LEN_CURRENT
 
 		uint8_t dxl_error = 0;                          // Dynamixel error
-		uint8_t param1_goal_state[4];					// Goal state
-		uint8_t param2_goal_state[4];
-		uint8_t param3_goal_state[4];
-		uint8_t param4_goal_state[4];
+		uint8_t param_goal_state[4];					// Goal state
+		
+		std::map<std::string, int>JointNames;
 		
 	// Position conversion for orientation motors
 	// 2048 is the wheel's 0
@@ -262,26 +270,14 @@ class motor_state : public rclcpp::Node
 	// Velocity conversion for spinning motors
 	// Increments are of 0.229 rpm in both motors
 	int velToPulse(float value){
-		printf("Hola esta es mi velocidad: %0.2f", value);
-		int vel = ((value * 60) / (2 * M_PI)) / 0.229;
-		printf("Converti a %d", vel);
-		// Check for negative values
-		if(vel < 0){
-			vel = vel;//int(pow(2,32)+1) & (vel + 1);
-			printf("Carnal salio negativo: %d", vel);
-		}
-		return vel;
+		return ((value * 60) / (2 * M_PI)) / 0.229;
+
 	}
 	
 	// TODO
 	// Torque conversion for dynamixel
 	int torToPulse(float value){
-		int tor = value;
-		// Check for negative values
-		if(tor < 0){
-			tor = (pow(2,16)) + tor + 1;
-		}
-		return tor;
+		return value;
 	}
 	
 	// Position conversion for topic
@@ -303,136 +299,59 @@ class motor_state : public rclcpp::Node
 	}
 	
 	// Method to obtain desired joint states
-	void goalJoints(const control_input::msg::MotorCommand::SharedPtr cmd){
-		int controlMode;
+	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
+		int id;
 		
-		for(int i=0;i<4;i++){
-			//Dynamixel ID
-			command[i].id = cmd->cmd.name[i];
+		for(int i=0;i<(int)cmd->name.size();i++){
+			id = JointNames.at(cmd->name[i]);
+			command[i].id = id;
+			if(cmd->position.size() != 0){
+				if(command[id - 1].mode != 3){
+					changeMode(id, 3);
+					addressGoal[id - 1] = ADDR_GOAL_POSITION;
+					lenSize[id - 1] = LEN_PV;
+				}
+				command[id - 1].value = posToPulse(cmd->position[i]);
+			}
+			else if(cmd->velocity.size() != 0){
+				if(command[id - 1].mode != 1){
+					changeMode(id, 1);
+					addressGoal[id - 1] = ADDR_GOAL_VELOCITY;
+					lenSize[id - 1] = LEN_PV;
+				}
+				command[id - 1].value = velToPulse(cmd->velocity[i]);
+			}
+			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (DXL4_ID)){
+				if(command[id - 1].mode != 0){
+					changeMode(id, 0);
+					addressGoal[id - 1] = ADDR_GOAL_CURRENT;
+					lenSize[id - 1] = LEN_CURRENT;
+				}
+				command[id - 1].value = torToPulse(cmd->effort[i]);
+			}
+			else{
+				printf("Array could not be read\n");
+			}
 			
-			//
-			printf("Recibo ESTA id : %d \n", stoi(command[i].id));
+			param_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(command[id - 1].value));
+			param_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(command[id - 1].value));
+			param_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(command[id - 1].value));
+			param_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(command[id - 1].value));
 			
-			if(cmd->mode[i] == "position"){
-				
-				//
-				std::cout << "Este valor de posicion : " << +cmd->cmd.position[i] << std::endl;
-				//printf("Este valor de posicion: %d",cmd->cmd.position[i]);
-				
-				controlMode = 3;
-				command[i].value = posToPulse(cmd->cmd.position[i]);
-			}
-			else if(cmd->mode[i] == "velocity"){
-				
-				//
-				std::cout << "Este valor de velocidad : " << +cmd->cmd.velocity[i] << std::endl;
-				//printf("Este valor de posicion: %d",cmd->cmd.velocity[i]);
-				
-				controlMode = 1;
-				command[i].value = velToPulse(cmd->cmd.velocity[i]);
-			}
-			else if(cmd->mode[i] == "torque"){
-				controlMode = 0;
-				if(cmd->cmd.name[i] != "3" && cmd->cmd.name[i] != "4"){
-					command[i].value = torToPulse(cmd->cmd.effort[i]);
-				}
-			}
-			
-			//Check for mode change
-			if(!command[i].mode || command[i].mode != controlMode){
-				//
-				printf("Hare cambio de modo dentro del nodo\n");
-				
-				command[i].mode = controlMode;
-				
-				changeMode(stoi(command[i].id), command[i].mode);
-				
-				if(command[i].mode == 3){
-					addressGoal[i] = ADDR_GOAL_POSITION;
-					lenSize[i] = LEN_PV;
-				}
-				else if(command[i].mode == 1){
-					addressGoal[i] = ADDR_GOAL_VELOCITY;
-					lenSize[i] = LEN_PV;
-				}
-				else if(command[i].mode == 0){
-					addressGoal[i] = ADDR_GOAL_CURRENT;
-					lenSize[i] = LEN_CURRENT;
-				}
+			// Add parameter storage for Dynamixels goal
+			paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
+			if(exitParam){
+				printf("Param write ID : %d (return 0) failed",id);
+				exitParam = false;
 			}
 		}
-
-		// Allocate goal position value into byte array
-		param1_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[0].value));
-		param1_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[0].value));
-		param1_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[0].value));
-		param1_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[0].value));
 		
-		//
-		std::cout << "Le mandare esto al motor 1: " << unsigned(param1_goal_state[3]) << unsigned(param1_goal_state[2]) << unsigned(param1_goal_state[1]) << unsigned(param1_goal_state[0]) << std::endl;
-		//printf("Le mandare esto al motor 1: %d",param1_goal_state);
-		
-		param2_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[1].value));
-		param2_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[1].value));
-		param2_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[1].value));
-		param2_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[1].value));
-		
-		//
-		std::cout << "Le mandare esto al motor 2: " << unsigned(param2_goal_state[3]) << unsigned(param2_goal_state[2]) << unsigned(param2_goal_state[1]) << unsigned(param2_goal_state[0]) << std::endl;
-		//printf("Le mandare esto al motor 2: %d",param2_goal_state);
-		
-		param3_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[2].value));
-		param3_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[2].value));
-		param3_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[2].value));
-		param3_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[2].value));
-		
-		//
-		std::cout << "Le mandare esto al motor 3: " << unsigned(param3_goal_state[3]) << unsigned(param3_goal_state[2]) << unsigned(param3_goal_state[1]) << unsigned(param3_goal_state[0]) << std::endl;
-		//printf("Le mandare esto al motor 3: %d",param3_goal_state);
-		
-		param4_goal_state[0] = DXL_LOBYTE(DXL_LOWORD((int)command[3].value));
-		param4_goal_state[1] = DXL_HIBYTE(DXL_LOWORD((int)command[3].value));
-		param4_goal_state[2] = DXL_LOBYTE(DXL_HIWORD((int)command[3].value));
-		param4_goal_state[3] = DXL_HIBYTE(DXL_HIWORD((int)command[3].value));
-		
-		//
-		std::cout << "Le mandare esto al motor 4: " << unsigned(param4_goal_state[3]) << unsigned(param4_goal_state[2]) << unsigned(param4_goal_state[1]) << unsigned(param4_goal_state[0]) << std::endl;
-		//printf("Le mandare esto al motor 4: %d",param4_goal_state);
-
-		// Add parameter storage for Dynamixels goal
-		paramStorageWrite(DXL1_ID, addressGoal[0], lenSize[0], param1_goal_state);
-		if(exitParam){
-			printf("Param write 1 (return 0) failed");
-			exitParam = false;
-		}
-		
-		paramStorageWrite(DXL2_ID, addressGoal[1], lenSize[1], param2_goal_state);
-		if(exitParam){
-			printf("Param write 2 (return 0) failed");
-			exitParam = false;
-		}
-		
-		paramStorageWrite(DXL3_ID, addressGoal[2], lenSize[2], param3_goal_state);
-		if(exitParam){
-			printf("Param write 3 (return 0) failed");
-			exitParam = false;
-		}
-		
-		paramStorageWrite(DXL4_ID, addressGoal[3], lenSize[3], param4_goal_state);
-		if(exitParam){
-			printf("Param write 4 (return 0) failed");
-			exitParam = false;
-		}
-
 		// Bulkwrite goal joint states
 		dxl_comm_result = commandPacket.txPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
 			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
 		}
 		
-		//
-		printf("Ya lo envie\n");
-
 		// Clear bulkwrite parameter storage
 		commandPacket.clearParam();
 	}
@@ -458,7 +377,7 @@ class motor_state : public rclcpp::Node
 			jointState.name.push_back(stateArray[i].id);
 			jointState.position.push_back(pulseToPos(stateArray[i].position));
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
-			if(stateArray[i].id != "3" && stateArray[i].id != "4"){
+			if(stateArray[i].id != std::to_string(DXL3_ID) && stateArray[i].id != std::to_string(DXL4_ID)){
 				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
 			}
 		}
@@ -475,7 +394,7 @@ class motor_state : public rclcpp::Node
 			printf("%s\n", packetHandler->getRxPacketError(dxl_error));
 		}
 		else{
-			printf("Dynamixel#%d's torque has been enabled \n", id);
+			//printf("Dynamixel#%d's torque has been enabled \n", id);
 		}
 	}
 
@@ -513,7 +432,7 @@ class motor_state : public rclcpp::Node
 		//Motors 3 and 4 (rotational) do not have torque control, there's no need to read the value
 		//However, we could technically read present load in the motors
 		//In said case, remove the if condition which skips id 3 and 4
-		if(id != 3 && id != 4){
+		if(id != DXL3_ID && id != DXL4_ID){
 			// Add parameter storage for Dynamixel#id present torque
 			dxl_addparam_result = torquePacket.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			if (dxl_addparam_result != true){
