@@ -324,9 +324,9 @@ class motor_state : public rclcpp::Node
 			
 			try{
 				//Dynamixel ID
-				printf("%s",cmd->cmd.name[i]);
+				std::cout << cmd->cmd.name[i] << std::endl;
 				command[i].id = cmd->cmd.name[i];
-				printf("%s",command[i].id);
+				std::cout << command[i].id << std::endl;
 			}
 			catch(const std::exception &exc){
 				printf("%s",exc.what());
