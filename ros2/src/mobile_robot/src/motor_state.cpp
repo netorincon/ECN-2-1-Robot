@@ -377,7 +377,13 @@ class motor_state : public rclcpp::Node
 		
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
-			jointState.position.push_back(pulseToPos(stateArray[i].position));
+			
+			if(stateArray[i].id == MotorIds.at(2)){
+				jointState.position.push_back(pulseToPos(stateArray[i].position) + M_PI);
+			}
+			else{
+				jointState.position.push_back(pulseToPos(stateArray[i].position));
+			}
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
 			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
 				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
