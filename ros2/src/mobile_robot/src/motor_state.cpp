@@ -300,11 +300,12 @@ class motor_state : public rclcpp::Node
 			printf("\nIteracion %d\n",i);
 			id = MotorNames.at(cmd->name[i]);
 			printf("Motor %d\n",id);
-			command[i].id = id;
+			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
 				printf("Modo Posicion\n");
 				if(command[id - 1].mode != 3){
 					changeMode(id, 3);
+					command[id - 1].mode = 3;
 					addressGoal[id - 1] = ADDR_GOAL_POSITION;
 					lenSize[id - 1] = LEN_PV;
 				}
@@ -314,15 +315,17 @@ class motor_state : public rclcpp::Node
 				printf("Modo Velocidad\n");
 				if(command[id - 1].mode != 1){
 					changeMode(id, 1);
+					command[id - 1].mode = 1;
 					addressGoal[id - 1] = ADDR_GOAL_VELOCITY;
 					lenSize[id - 1] = LEN_PV;
 				}
 				command[id - 1].value = velToPulse(cmd->velocity[i]);
 			}
-			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (DXL4_ID)){
+			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (id != DXL4_ID)){
 				printf("Modo Torque\n");
 				if(command[id - 1].mode != 0){
 					changeMode(id, 0);
+					command[id - 1].mode = 0;
 					addressGoal[id - 1] = ADDR_GOAL_CURRENT;
 					lenSize[id - 1] = LEN_CURRENT;
 				}
