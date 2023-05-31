@@ -1,17 +1,43 @@
 /*Real world node
 
-The objective of this node is to convert the control input command into joint commands which are then published in the joint_cmd topic
 
-It also obtains the joint speeds of the real robot and calculates its position in the real world
-Then it assembles a transform and published it to /tf2 to be able to see the robot's motion in rviz
+################### BEGIN EXPLANATION ######################
+
+    The objective of this node is to convert the control input command into joint commands which are then published in the motor_cmd topic
+
+    It also obtains the joint speeds of the real robot and calculates its pose with respect to the odom frame
+    Then it assembles a transform and publishes it to /tf to be able to see the robot's motion in rviz
+
+    We subscribe to control_cmd or position_cmd depending on the value of the "mode" argument sent to this node.
+
+    if mode="position", The node will subscribe to position_cmd and forward the value to the motor_cmd topic
+    if mode="velocity" or "controller", the node will subscribe to control_cmd and generate the desired joint speeds to be sent to motor_cmd from a control input. 
+     
 
 ---Subscriptions:
-    /input_cmd
-        The command input should include [um, deltaDot1 and deltaDot2]
-    /joint_states topic
+    /position_cmd
+    /control_cmd
+    /joint_states
     
 ---Publishers
     /joint_cmd
+    /state_vector
+
+    To convert joint states into tf2 transform:
+
+    We subscribe to the topic joint_states via state_susbscriber 
+    This subscriber will receive a JointState type message, which will include a list of the states of each of the four motors. 
+    (position, speed, and torque)
+    To calculate current pose, we obtain (solve from the rows corresponding to PHI in the S(q) matrix. 
+    We calculate the current twist using the motor speeds and then integrate over time to obtain the current pose.
+    
+
+    ---To calculate the desired joint speeds---
+    We obtain the control_cmd (or position_cmd in case of manual position mode)
+    We multiply by UM the corresponding rows of S(q) in case of control_cmd
+    Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
+
+#################### END EXPLANATION #####################
 */
 
 #include <algorithm>
@@ -75,25 +101,9 @@ class real_world : public rclcpp::Node
             for(int i=0;i<names.size(); i++){
                 joint_cmd.name.push_back(names[i]);
             }
-            /*s
-            ---To convert joint states into tf2 transform:---
-            We subscribe to the topic joint_states via state_susbscriber 
-            This subscriber will receive a JointState type message, which will include a list of the states of each of the four motors. 
-            (position, speed, and torque)
-            To calculate current pose, we obtain (solve for) 'um' from the rows corresponding to PHI in the S(q) matrix. 
-            Then we calculate the current twist using this um.
-            Finally the values are integrated over time to obtain the current state vector.
-            
-
-            ---To calculate the desired joint speeds---
-            We obtain the control input command
-            We multiply by the corresponding rows of S(q)
-            Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
-
-            */
 
             state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-                             "motor_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
+                             "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
 
             if(mode=="position"){
                 position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
@@ -108,7 +118,7 @@ class real_world : public rclcpp::Node
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
-            joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+            //joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
             //timer_ = this->create_wall_timer(20ms, std::bind(&real_world::publishJointCommand, this));
             
