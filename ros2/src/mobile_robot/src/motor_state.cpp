@@ -327,7 +327,8 @@ class motor_state : public rclcpp::Node
 				command[i].id = cmd->cmd.name[i];
 			}
 			catch(const std::exception &exc){
-				std::cerr << exc.what() << std::endl;
+				printf("%s",exc.what());
+				//std::cerr << exc.what() << std::endl;
 			}
 			
 			//
