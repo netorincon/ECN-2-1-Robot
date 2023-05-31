@@ -321,8 +321,14 @@ class motor_state : public rclcpp::Node
 		
 		for(int i=0;i<4;i++){
 			printf("11\n");
-			//Dynamixel ID
-			command[i].id = cmd->cmd.name[i];
+			
+			try{
+				//Dynamixel ID
+				command[i].id = cmd->cmd.name[i];
+			}
+			catch(const std::exception &exc){
+				std::cerr << exc.what() << std::endl;
+			}
 			
 			//
 			//printf("Recibo ESTA id : %d \n", stoi(command[i].id));
