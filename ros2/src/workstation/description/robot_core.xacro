@@ -33,7 +33,7 @@
     
     
     
-    <!-- Chassis -->
+    <!-- base_link -->
     <xacro:property name="big_bar_length" value="0.3"/>
     <xacro:property name="chassis_thickness" value="0.015"/>
     <xacro:property name="front_base_length" value="0.18"/>
@@ -45,17 +45,17 @@
 	
 	
 	
-	<!-- Create fixed world frame -->
+	<!-- Create fixed odom frame -->
 	
-	<link name="world"></link>
+	<link name="odom"></link>
 	
 	<joint name="world_joint" type="floating">
-		<parent link="world"></parent>
-		<child link="chassis"></child>
+		<parent link="odom"></parent>
+		<child link="base_link"></child>
 		<origin xyz="0 0 0.1"></origin>
 	</joint>
 	
-    <link name="chassis">
+    <link name="base_link">
 		<visual>
             <geometry>
                 <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
@@ -97,7 +97,7 @@
         </visual>
     </link>
     
-    <gazebo reference="chassis">
+    <gazebo reference="base_link">
 		<material>Gazebo/White</material>
     </gazebo>
 
@@ -128,19 +128,19 @@
             <geometry>
                 <box size="${l2} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-l2/2-thickness/2} 0 ${-l1+thickness/2}"/>
+            <origin xyz="${l2/2+thickness/2} 0 ${-l1+thickness/2}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${thickness} ${thickness} ${l3}"/>
             </geometry>
-            <origin xyz="${-l2} ${0} ${-l3/2-l1}"/>
+            <origin xyz="${l2} ${0} ${-l3/2-l1}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l4} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
+            <origin xyz="${wheel_thickness/2+l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
     </link>
@@ -150,7 +150,7 @@
     </gazebo>
 
     <joint name="left_wheel_base_joint" type="continuous">
-        <parent link="chassis"/>
+        <parent link="base_link"/>
         <child link="left_wheel_base"/>
         <origin xyz="${-a} ${0} ${thickness/2}" rpy="0.0 0.0 ${pi/2}"/>
         <axis xyz="0 0 1"/>
@@ -197,19 +197,19 @@
             <geometry>
                 <box size="${l2} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-l2/2-thickness/2} 0 ${-l1+thickness/2}"/>
+            <origin xyz="${l2/2+thickness/2} 0 ${-l1+thickness/2}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${thickness} ${thickness} ${l3}"/>
             </geometry>
-            <origin xyz="${-l2} ${0} ${-l3/2-l1}"/>
+            <origin xyz="${l2} ${0} ${-l3/2-l1}"/>
         </visual>
         <visual>
             <geometry>
                 <box size="${l4} ${thickness} ${thickness}"/>
             </geometry>
-            <origin xyz="${-wheel_thickness/2-l4/2} 0 ${-l_tot+3*thickness/2}"/>
+            <origin xyz="${wheel_thickness/2+l4/2} 0 ${-l_tot+3*thickness/2}"/>
             
         </visual>
     </link>
@@ -219,7 +219,7 @@
     </gazebo>
 
     <joint name="right_wheel_base_joint" type="continuous">
-        <parent link="chassis"/>
+        <parent link="base_link"/>
         <child link="right_wheel_base"/>
         <origin xyz="${a} ${0} ${thickness/2}" rpy="0.0 0.0 ${-pi/2}"/>
         <axis xyz="0 0 1"/>
@@ -272,7 +272,7 @@
 	
 	
 	<joint name="castor_joint" type="fixed">
-		<parent link="chassis"></parent>
+		<parent link="base_link"></parent>
 		<child link="castor_wheel"></child>
         <origin xyz="0 ${front_base_length} ${thickness/2}" />
 	</joint>

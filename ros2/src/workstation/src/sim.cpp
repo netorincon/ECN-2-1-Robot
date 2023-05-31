@@ -109,6 +109,7 @@ class sim : public rclcpp::Node
         float a=0.08;//Base distance
         float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)
+
         Point ICRLocation;
 
         void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
@@ -124,7 +125,6 @@ class sim : public rclcpp::Node
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
                 dd1 = limit_deltaSpeed(msg->delta1dot);
-
                 dd2 = limit_deltaSpeed(msg->delta2dot);
 
                 //We calculate current robot speeds and orientation motor speeds
@@ -184,12 +184,10 @@ class sim : public rclcpp::Node
 
             diff=alpha1-alpha2;
             //See PDF for detailed calculations
-            //RCLCPP_INFO(this->get_logger(), "Difference: '%f'", sin(diff));
             if(sin(diff)!=0){
                 ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
                 ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
             }
-
         }
 
 
@@ -203,8 +201,8 @@ class sim : public rclcpp::Node
            
 
             //Message that contains the chassis transform with respect to the world         
-            transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
-            transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
+            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
+            transform_stamped_.child_frame_id = "base_link"; // Nom du repère du robot
             transform_stamped_.transform.translation.x = x;
             transform_stamped_.transform.translation.y = y;
             transform_stamped_.transform.translation.z = 0;
@@ -216,7 +214,7 @@ class sim : public rclcpp::Node
             
             //Message that contains the position of the ICR with respect to the robot chassis
             calculateICR();        
-            icr.header.frame_id = "chassis"; // Nom du repère fixe
+            icr.header.frame_id = "base_link"; // Nom du repère fixe
             icr.child_frame_id = "icr"; // Nom du repère du robot
             icr.transform.translation.x = ICRLocation.x;
             icr.transform.translation.y = ICRLocation.y;
