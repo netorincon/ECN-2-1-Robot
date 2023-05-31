@@ -71,7 +71,10 @@ class real_world : public rclcpp::Node
             get_parameter("mode", mode);
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-
+            
+            for(int i=0;i<names.size(); i++){
+                joint_cmd.name.push_back(names[i]);
+            }
             /*s
             ---To convert joint states into tf2 transform:---
             We subscribe to the topic joint_states via state_susbscriber 
@@ -103,11 +106,11 @@ class real_world : public rclcpp::Node
             }
             
 
-            joint_command_publisher = this->create_publisher<control_input::msg::MotorCommand>("motor_cmd", 10);
+            joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
-            timer_ = this->create_wall_timer(20ms, std::bind(&real_world::publishJointCommand, this));
+            //timer_ = this->create_wall_timer(20ms, std::bind(&real_world::publishJointCommand, this));
             
         }
 
@@ -117,6 +120,7 @@ class real_world : public rclcpp::Node
         //We initialize all variables of the state vector at 0
         float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
         float dd1Cmd, dd2Cmd, phi1dCmd, phi2dCmd, d1Cmd, d2Cmd=0;
+        float v1, v2=0;
         float frequency = 50; // HZ, fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency; //Seconds
         float a=0.05;//Base distance in meters
@@ -129,60 +133,68 @@ class real_world : public rclcpp::Node
 
         rclcpp::TimerBase::SharedPtr timer_;
         geometry_msgs::msg::TransformStamped transform_stamped_;
-        control_input::msg::MotorCommand joint_cmd;
-        rclcpp::Publisher<control_input::msg::MotorCommand>::SharedPtr joint_command_publisher;
+        sensor_msgs::msg::JointState joint_cmd;
+        
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_command_publisher;
         rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        
+        std::vector<std::string> names={ "right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"};
+        
 
 
     void calculatePose(const sensor_msgs::msg::JointState::SharedPtr jointState){
 
         //Save the values locally for easy access
-        for(int i=0;i<4;i++){
-            stateArray[i].id=jointState->name[i];
-            stateArray[i].position=jointState->position[i];
-            stateArray[i].speed=jointState->velocity[i];
-            stateArray[i].torque=jointState->effort[i];
-        }
+        // for(int i=0;i<4;i++){
+        //     stateArray[i].id=jointState->name[i];
+        //     stateArray[i].position=jointState->position[i];
+        //     stateArray[i].speed=jointState->velocity[i];
+        //     stateArray[i].torque=jointState->effort[i];
+        // }
                
         //Get the current position and velocity of the motors
 
-        d1=stateArray[2].position;
-        d2=stateArray[3].position;; //delta 2
+        d1=jointState->position[0];
+        phi1=jointState->position[1];
+        d2=jointState->position[2];
+        phi2=jointState->position[3];
 
-        phi1=stateArray[1].position;
-        phi2=stateArray[0].position;
-
-        dd1=stateArray[2].speed;
-        dd2=stateArray[3].speed;
-
-        phi1d=stateArray[1].speed; 
-        phi2d=stateArray[0].speed;
+        dd1=jointState->velocity[0];
+        phi1d=jointState->velocity[1]; 
+        dd2=jointState->velocity[2];
+        phi2d=jointState->velocity[3];
 
         beta1=d1;
         beta2=d2+M_PI;
 
+
+        v1=abs(phi1d*R); //Tangent speed of wheel one
+        v1=v1*(cos(d1)/cos(d2));
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
-        float U=phi1d*R/(2*cos(d2));
+        //float U=phi1d*R/(2*cos(d2));
 
         //We calculate current robot speeds and orientation motor 
-        tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
-        x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
-        y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
+        //tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
+        //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
+        //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
+        tt_dot=(2/a)*(v1*sin(d1)-v2*sin(d2));
+        tt+=tt_dot*period;
 
+        x_dot=v1*cos(d1)*cos(tt)-v2*sin(d2)*sin(tt);
+        y_dot=v1*cos(d1)*sin(tt)-v2*sin(d2)*cos(tt);
         //We integrate the speeds over time (add each time we get a new value)
         x+=x_dot*period;
         y+=y_dot*period;
-        tt+=tt_dot*period;
         tt=limit_angle(tt);
         
         transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "world"; // Name of the fixed frame
-        transform_stamped_.child_frame_id = "chassis"; // Name of the robot's frame
+        transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
+        transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
         transform_stamped_.transform.translation.x = x;
         transform_stamped_.transform.translation.y = y;
         transform_stamped_.transform.translation.z = 0;
@@ -205,84 +217,36 @@ class real_world : public rclcpp::Node
         return;
     }
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
-            Um=0;
-            d1Cmd=msg->d1;
-            d2Cmd=msg->d2;
-
-            phi1dCmd=0;
-            phi2dCmd=0;
-
-            //Arrange the speeds in an array for faster assignment during publishJointCommand 
-            commandArray[0].id=1;
-            commandArray[0].position=0;
-
-            commandArray[1].id=2;
-            commandArray[1].position=0;
-
-            commandArray[2].id=3;
-            commandArray[2].position=d1Cmd;
-
-            commandArray[3].id=4;
-            commandArray[3].position=d2Cmd;   
-
-            for(int i=0;i<4;i++){
-                commandArray[i].speed=0;
-                commandArray[i].torque=0;
-            }
-            joint_cmd.mode={"position", "position", "position", "position"};
+        joint_cmd.position.push_back(msg->d1);
+        joint_cmd.position.push_back(msg->phi1);
+        joint_cmd.position.push_back(msg->d2);
+        joint_cmd.position.push_back(msg->phi2); 
+        publishJointCommand();  
     }
 
-        void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
-            Um=msg->um;
-            dd1Cmd=limit_deltaSpeed(msg->delta1dot);
-            dd2Cmd=limit_deltaSpeed(msg->delta2dot);
+    void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
+        Um=msg->um;
+        dd1Cmd=limit_deltaSpeed(msg->delta1dot);
+        dd2Cmd=limit_deltaSpeed(msg->delta2dot);
 
-            phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
-            phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
+        phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
+        phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
 
-            //Arrange the speeds in an array for faster assignment during publishJointCommand 
-            commandArray[0].id=1;
-            commandArray[0].speed=phi2dCmd;
-
-            commandArray[1].id=2;
-            commandArray[1].speed=phi1dCmd;
-
-            commandArray[2].id=3;
-            commandArray[2].speed=dd1Cmd;
-
-            commandArray[3].id=4;
-            commandArray[3].speed=dd2Cmd;   
-
-            for(int i=0;i<4;i++){
-                commandArray[i].position=0;
-                commandArray[i].torque=0;
-            }
-            joint_cmd.mode={"velocity", "velocity", "velocity", "velocity"};
+        joint_cmd.velocity.push_back(dd1Cmd);
+        joint_cmd.velocity.push_back(phi1dCmd);
+        joint_cmd.velocity.push_back(dd2Cmd);
+        joint_cmd.velocity.push_back(phi2dCmd);
+        publishJointCommand();
 
     }
     void publishJointCommand(){
-        
-        joint_cmd.cmd.header.stamp=this->now();
-        joint_cmd.cmd.name.clear();
-        joint_cmd.cmd.velocity.clear();
-        joint_cmd.cmd.position.clear();
-        joint_cmd.cmd.effort.clear();
-
-        for(int i=0;i<4;i++){
-            //TODO Change the name parameter to the robot joint name instead of using just a number
-            joint_cmd.cmd.name.push_back(std::to_string(i+1));
-            joint_cmd.cmd.velocity.push_back(commandArray[i].speed);
-            joint_cmd.cmd.position.push_back(commandArray[i].position);
-            joint_cmd.cmd.effort.push_back(commandArray[i].torque);
-        }
-        std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
-        std::vector<double> posValues={beta2, beta1, phi2, phi1};
-        std::vector<double> velValues={dd2, dd1, phi2d, phi1d};
-        joint_state.name=names;
-        joint_state.position = posValues;
-        joint_state.header.stamp=this->now();
-        joint_publisher->publish(joint_state);
+        joint_cmd.header.stamp=this->now();
         joint_command_publisher->publish(joint_cmd);
+
+        //We clear the command for next time
+        joint_cmd.velocity.clear();
+        joint_cmd.position.clear();
+        joint_cmd.effort.clear();
     }
 
 };
