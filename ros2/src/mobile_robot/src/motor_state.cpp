@@ -493,10 +493,10 @@ class motor_state : public rclcpp::Node
 		
 		//
 		if(id2 == 2){
-			printf("El 2 me envio esta posicion de vuelta: %f",stateArray[id2 - 1].position);
+			printf("El 2 me envio esta posicion de vuelta: %f\n",stateArray[id2 - 1].position);
 		}
 		if(id1 == 3){
-			printf("El 3 me envio esta posicion de vuelta: %f",stateArray[id1 - 1].position);
+			printf("El 3 me envio esta posicion de vuelta: %f\n",stateArray[id1 - 1].position);
 		}
 		//
 		
