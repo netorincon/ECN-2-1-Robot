@@ -133,9 +133,9 @@ struct MotorGoal{
 
 struct MotorState{
 	std::string id;
-	float position = 0;
-	float velocity = 0;
-	float torque = 0;
+	int position = 0;
+	int velocity = 0;
+	int torque = 0;
 };
 
 class motor_state : public rclcpp::Node
@@ -276,19 +276,19 @@ class motor_state : public rclcpp::Node
 	
 	// Position conversion for topic
 	// Change orientation motors position to radians
-	float pulseToPos(float value){
+	float pulseToPos(int value){
 		return ((((int)value) % 4096) - 2048)*(M_PI / 2048);
 	}
 	
 	// Velocity conversion for topic
 	// Change motor value to rad/s
-	float pulseToVel(float value){
+	float pulseToVel(int value){
 		return ((((int)value) % 1024) * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
 	// Torque conversion for topic
-	float pulseToTor(float value){
+	float pulseToTor(int value){
 		return value;
 	}
 	
