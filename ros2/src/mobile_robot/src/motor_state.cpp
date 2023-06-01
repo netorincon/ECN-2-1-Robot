@@ -391,7 +391,7 @@ class motor_state : public rclcpp::Node
 		while(value > M_PI){
 			value = value - (2 * M_PI);
 		}
-		while(value < M_PI){
+		while(value < (-M_PI)){
 			value = value + (2 * M_PI);
 		}
 		return value;
