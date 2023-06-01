@@ -297,12 +297,9 @@ class motor_state : public rclcpp::Node
 		int id;
 		
 		for(int i=0;i<(int)cmd->name.size();i++){
-			printf("\nIteracion %d\n",i);
 			id = MotorNames.at(cmd->name[i]);
-			printf("Motor %d\n",id);
 			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
-				printf("Modo Posicion\n");
 				if(command[id - 1].mode != 3){
 					changeMode(id, 3);
 					command[id - 1].mode = 3;
@@ -312,7 +309,6 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = posToPulse(cmd->position[i]);
 			}
 			else if(cmd->velocity.size() != 0){
-				printf("Modo Velocidad\n");
 				if(command[id - 1].mode != 1){
 					changeMode(id, 1);
 					command[id - 1].mode = 1;
@@ -322,7 +318,6 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = velToPulse(cmd->velocity[i]);
 			}
 			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (id != DXL4_ID)){
-				printf("Modo Torque\n");
 				if(command[id - 1].mode != 0){
 					changeMode(id, 0);
 					command[id - 1].mode = 0;
@@ -495,6 +490,15 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
 		stateArray[id2 - 1].id = MotorIds.at(id2);
 		stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
+		
+		//
+		if(id2 == 2){
+			printf("El 2 me envio esta posicion de vuelta: %f",stateArray[id2 - 1].position);
+		}
+		if(id1 == 3){
+			printf("El 3 me envio esta posicion de vuelta: %f",stateArray[id1 - 1].position);
+		}
+		//
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
