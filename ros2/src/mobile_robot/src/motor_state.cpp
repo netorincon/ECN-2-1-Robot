@@ -205,7 +205,7 @@ class motor_state : public rclcpp::Node
 		return value;
 	}
 	
-	// Method to obtain desired joint states
+	// Subscriber callback
 	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
 		int id;
 		bool validation; // Avoid sending empty data to motors
@@ -255,7 +255,6 @@ class motor_state : public rclcpp::Node
 				// Add parameter storage for Dynamixels goal
 				paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
 				if(exitParam){
-					printf("Param write ID : %d (return 0) failed",id);
 					exitParam = false;
 				}
 			}
@@ -271,16 +270,10 @@ class motor_state : public rclcpp::Node
 		commandPacket.clearParam();
 	}
 	
-	// Method to publish present values of the motors
+	// Publisher callback
 	void publishJointState(){
 		// Check present states
-		// Obtains present values and prints them
 		assignReadParam();
-		
-		if(exitParam){
-			printf("Could not obtain present value for publisher (return 0)");
-			exitParam = false;
-		}
 		
 		jointState.header.stamp = this->now();
 		jointState.name.clear();
@@ -290,8 +283,7 @@ class motor_state : public rclcpp::Node
 		
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
-			
-			if(stateArray[i].id == MotorIds.at(DXL4_ID)){
+			if(stateArray[i].id == MotorIds.at(DXL4_ID)){ // Send beta 2 instead of delta 2
 				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position) + M_PI));
 			}
 			else{
@@ -315,7 +307,7 @@ class motor_state : public rclcpp::Node
 		return value;
 	}
 	
-	//ENABLE TORQUE TO MOTORS
+	//ENABLE TORQUE
 	void enableTorque(uint8_t id){
 		dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -324,9 +316,6 @@ class motor_state : public rclcpp::Node
 		else if (dxl_error != 0){
 			printf("%s\n", packetHandler->getRxPacketError(dxl_error));
 		}
-		//else{
-			//printf("Dynamixel#%d's torque has been enabled \n", id);
-		//}
 	}
 
 	//DEFINE OR CHANGE OPERATING MODE OF MOTORS
@@ -344,31 +333,31 @@ class motor_state : public rclcpp::Node
 		enableTorque(id);
 	}
 
-	// Add parameter storage for all dynamixels
+	// Add parameter storage for dynamixel
 	void paramStorageRead(uint8_t id){
-		// Add parameter storage for Dynamixel#id present position
 		dxl_addparam_result = positionPacket.addParam(id, ADDR_PRESENT_POSITION, LEN_PV);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (position)", id);
 			exitParam = true;
+			return;
 		}
 		
-		// Add parameter storage for Dynamixel#id present velocity
 		dxl_addparam_result = velocityPacket.addParam(id, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (velocity)", id);
 			exitParam = true;
+			return;
 		}
 		
 		//Motors 3 and 4 (rotational) do not have torque control, there's no need to read the value
 		//However, we could technically read present load in the motors
 		//In said case, remove the if condition which skips id 3 and 4
 		if(id != DXL3_ID && id != DXL4_ID){
-			// Add parameter storage for Dynamixel#id present torque
 			dxl_addparam_result = torquePacket.addParam(id, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			if (dxl_addparam_result != true){
 				fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed (torque)", id);
 				exitParam = true;
+				return;
 			}
 		}
 	}
@@ -397,13 +386,13 @@ class motor_state : public rclcpp::Node
 		readAvailable(positionPacket, id1, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
 			exitParam = false;
-			//return;
+			return;
 		}
 		
 		readAvailable(positionPacket, id2, ADDR_PRESENT_POSITION, LEN_PV);
 		if(exitParam){
 			exitParam = false;
-			//return;
+			return;
 		}
 		
 		// Store initial values
@@ -411,15 +400,6 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
 		stateArray[id2 - 1].id = MotorIds.at(id2);
 		stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
-		
-		//
-		if(id2 == 2){
-			printf("El 2 me envio esta posicion de vuelta: %d\n",stateArray[id2 - 1].position);
-		}
-		if(id1 == 3){
-			printf("El 3 me envio esta posicion de vuelta: %d\n",stateArray[id1 - 1].position);
-		}
-		//
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -435,13 +415,13 @@ class motor_state : public rclcpp::Node
 		readAvailable(velocityPacket, id1, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
 			exitParam = false;
-			//return;
+			return;
 		}
 		
 		readAvailable(velocityPacket, id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		if(exitParam){
 			exitParam = false;
-			//return;
+			return;
 		}
 		
 		stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
@@ -470,13 +450,13 @@ class motor_state : public rclcpp::Node
 			readAvailable(torquePacket, id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			if(exitParam){
 				exitParam = false;
-				//return;
+				return;
 			}
 			
 			readAvailable(torquePacket, id2, ADDR_PRESENT_CURRENT, LEN_CURRENT);
 			if(exitParam){
 				exitParam = false;
-				//return;
+				return;
 			}
 			
 			stateArray[id1 - 1].torque = torquePacket.getData(id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
@@ -497,30 +477,25 @@ class motor_state : public rclcpp::Node
 		if (dxl_addparam_result != true){
 			fprintf(stderr, "[ID:%03d] commandPacket addparam failed", id);
 			exitParam = true;
-			//return;
 		}
 	}
 	
 	void assignReadParam(){
 		// Check Spinning motors first
-		// Add parameter storage for Dynamixel#1 present values
 		paramStorageRead(DXL1_ID);
 		if(exitParam){
-			printf("\nParameter storage for DXL1 (return 0)");
 			exitParam = false;
+			return;
 		}
 		
-		// Add parameter storage for Dynamixel#2 present values
 		paramStorageRead(DXL2_ID);
 		if(exitParam){
-			printf("\nParameter storage for DXL2 (return 0)");
 			exitParam = false;
+			return;
 		}
 		
-		// Get initial values
 		getPresentValue(DXL1_ID, DXL2_ID);
 		if(exitParam){
-			printf("\nError in getting present values (return 0)");
 			exitParam = false;
 		}
 		
@@ -529,24 +504,22 @@ class motor_state : public rclcpp::Node
 		torquePacket.clearParam();
 		
 		// Check rotation motors second
-		// Add parameter storage for Dynamixel#3 present values
 		paramStorageRead(DXL3_ID);
 		if(exitParam){
-			printf("\nParameter storage for DXL3 (return 0)");
 			exitParam = false;
+			return;
 		}
 		
 		// Add parameter storage for Dynamixel#4 present values
 		paramStorageRead(DXL4_ID);
 		if(exitParam){
-			printf("\nParameter storage for DXL4 (return 0)");
 			exitParam = false;
+			return;
 		}
 		
 		// Get initial values
 		getPresentValue(DXL3_ID, DXL4_ID);
 		if(exitParam){
-			printf("\nError in getting present values (return 0)");
 			exitParam = false;
 		}
 		
