@@ -48,16 +48,16 @@ class controller : public rclcpp::Node
             state_subscriber=this->create_subscription<control_input::msg::StateVector>(
                             "state_vector", 10, std::bind(&controller::updateState, this, std::placeholders::_1));
 
-            timer_ = this->create_wall_timer(20ms, std::bind(&controller::calculateControlInput, this));
+            timer_ = this->create_wall_timer(100ms, std::bind(&controller::calculateControlInput, this));
             updateK();
         }
     private:
         rclcpp::TimerBase::SharedPtr timer_;
-        float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2;
+        float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0;
         float a=0.08;
         float e=0.1;
-        float kp=1.5;
-        float period=0.02;
+        float kp=0.25;
+        float period=0.1;
         float time=0;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
         rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
@@ -82,6 +82,7 @@ class controller : public rclcpp::Node
         xp(1)=y+a*sin(theta)+e*sin(theta+d1);
 
         u=K_inv*(xrdot+kp*(xr-xp));
+        //printf("%f", u(0));
 
         um=u(0);
         dd1=limit_deltaSpeed(u(1));
@@ -95,7 +96,7 @@ class controller : public rclcpp::Node
         command_publisher->publish(command);
 
         transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
+        transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
         transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
         transform_stamped_.transform.translation.x = xr(0);
         transform_stamped_.transform.translation.y = xr(1);
@@ -133,8 +134,8 @@ class controller : public rclcpp::Node
         if(time>2*M_PI){
             time-=2*M_PI;
         }
-        xr(0)=2*cos(time);
-        xr(1)=2*sin(time);
+        xr(0)=0.5*cos(time);
+        xr(1)=0.5*sin(time);
 
         xrdot=(xr-xrprev)*period;
         xrprev=xr;
