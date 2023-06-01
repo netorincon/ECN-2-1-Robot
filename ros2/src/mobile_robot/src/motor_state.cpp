@@ -211,9 +211,9 @@ class motor_state : public rclcpp::Node
 			else if (dxl_error != 0){
 				printf("%s\n", packetHandler->getRxPacketError(dxl_error));
 			}
-			else{
+			//else{
 				//printf("Dynamixel#%d's torque has been disabled \n", id);
-			}
+			//}
 		}
 
     private :
@@ -373,11 +373,11 @@ class motor_state : public rclcpp::Node
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
 			
-			if(stateArray[i].id == MotorIds.at(4)){
+			if(stateArray[i].id == MotorIds.at(DXL4_ID)){
 				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position) + M_PI));
 			}
 			else{
-				jointState.position.push_back(pulseToPos(stateArray[i].position));
+				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position)));
 			}
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
 			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
@@ -388,8 +388,11 @@ class motor_state : public rclcpp::Node
 	}
 	
 	float limitAngle(float value){
-		if(value > M_PI){
+		while(value > M_PI){
 			value = value - (2 * M_PI);
+		}
+		while(value < M_PI){
+			value = value + (2 * M_PI);
 		}
 		return value;
 	}
@@ -637,13 +640,9 @@ class motor_state : public rclcpp::Node
 	
 	// TODO Quitar los print en español
 	void printMotorState(){
-		printf("ID 1 debe estar en modo: %d", command[0].mode);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
-		printf("ID 2 debe estar en modo: %d", command[1].mode);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
-		printf("ID 3 debe estar en modo: %d", command[2].mode);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
-		printf("ID 4 debe estar en modo: %d", command[3].mode);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 };
