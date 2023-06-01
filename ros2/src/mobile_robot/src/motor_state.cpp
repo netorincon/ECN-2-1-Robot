@@ -133,9 +133,9 @@ struct MotorGoal{
 
 struct MotorState{
 	std::string id;
-	float position = 0;
-	float velocity = 0;
-	float torque = 0;
+	int position = 0;
+	int velocity = 0;
+	int torque = 0;
 };
 
 class motor_state : public rclcpp::Node
@@ -276,19 +276,19 @@ class motor_state : public rclcpp::Node
 	
 	// Position conversion for topic
 	// Change orientation motors position to radians
-	float pulseToPos(float value){
+	float pulseToPos(int value){
 		return ((((int)value) % 4096) - 2048)*(M_PI / 2048);
 	}
 	
 	// Velocity conversion for topic
 	// Change motor value to rad/s
-	float pulseToVel(float value){
+	float pulseToVel(int value){
 		return ((((int)value) % 1024) * 0.229 * 2 * M_PI) / 60;
 	}
 	
 	// TODO
 	// Torque conversion for topic
-	float pulseToTor(float value){
+	float pulseToTor(int value){
 		return value;
 	}
 	
@@ -297,12 +297,9 @@ class motor_state : public rclcpp::Node
 		int id;
 		
 		for(int i=0;i<(int)cmd->name.size();i++){
-			printf("\nIteracion %d\n",i);
 			id = MotorNames.at(cmd->name[i]);
-			printf("Motor %d\n",id);
 			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
-				printf("Modo Posicion\n");
 				if(command[id - 1].mode != 3){
 					changeMode(id, 3);
 					command[id - 1].mode = 3;
@@ -312,7 +309,6 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = posToPulse(cmd->position[i]);
 			}
 			else if(cmd->velocity.size() != 0){
-				printf("Modo Velocidad\n");
 				if(command[id - 1].mode != 1){
 					changeMode(id, 1);
 					command[id - 1].mode = 1;
@@ -322,7 +318,6 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = velToPulse(cmd->velocity[i]);
 			}
 			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (id != DXL4_ID)){
-				printf("Modo Torque\n");
 				if(command[id - 1].mode != 0){
 					changeMode(id, 0);
 					command[id - 1].mode = 0;
@@ -377,13 +372,26 @@ class motor_state : public rclcpp::Node
 		
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
-			jointState.position.push_back(pulseToPos(stateArray[i].position));
+			
+			if(stateArray[i].id == MotorIds.at(4)){
+				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position) + M_PI));
+			}
+			else{
+				jointState.position.push_back(pulseToPos(stateArray[i].position));
+			}
 			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
 			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
 				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
 			}
 		}
 		motor_state_publisher->publish(jointState);
+	}
+	
+	float limitAngle(float value){
+		if(value > M_PI){
+			value = value - (2 * M_PI);
+		}
+		return value;
 	}
 	
 	//ENABLE TORQUE TO MOTORS
@@ -482,6 +490,15 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
 		stateArray[id2 - 1].id = MotorIds.at(id2);
 		stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
+		
+		//
+		if(id2 == 2){
+			printf("El 2 me envio esta posicion de vuelta: %d\n",stateArray[id2 - 1].position);
+		}
+		if(id1 == 3){
+			printf("El 3 me envio esta posicion de vuelta: %d\n",stateArray[id1 - 1].position);
+		}
+		//
 		
 		dxl_comm_result = velocityPacket.txRxPacket();
 		if (dxl_comm_result != COMM_SUCCESS){
@@ -621,13 +638,13 @@ class motor_state : public rclcpp::Node
 	// TODO Quitar los print en español
 	void printMotorState(){
 		printf("ID 1 debe estar en modo: %d", command[0].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
 		printf("ID 2 debe estar en modo: %d", command[1].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
 		printf("ID 3 debe estar en modo: %d", command[2].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
 		printf("ID 4 debe estar en modo: %d", command[3].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 };
 
