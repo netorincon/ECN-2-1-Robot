@@ -493,10 +493,10 @@ class motor_state : public rclcpp::Node
 		
 		//
 		if(id2 == 2){
-			printf("El 2 me envio esta posicion de vuelta: %f\n",stateArray[id2 - 1].position);
+			printf("El 2 me envio esta posicion de vuelta: %d\n",stateArray[id2 - 1].position);
 		}
 		if(id1 == 3){
-			printf("El 3 me envio esta posicion de vuelta: %f\n",stateArray[id1 - 1].position);
+			printf("El 3 me envio esta posicion de vuelta: %d\n",stateArray[id1 - 1].position);
 		}
 		//
 		
@@ -638,13 +638,13 @@ class motor_state : public rclcpp::Node
 	// TODO Quitar los print en español
 	void printMotorState(){
 		printf("ID 1 debe estar en modo: %d", command[0].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
 		printf("ID 2 debe estar en modo: %d", command[1].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \t Present Torque : %.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
 		printf("ID 3 debe estar en modo: %d", command[2].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
 		printf("ID 4 debe estar en modo: %d", command[3].mode);
-		printf("[ID:%03d] \n Present Position : %.2f \t Present Velocity : %.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
+		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 };
 
