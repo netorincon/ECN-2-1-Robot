@@ -84,8 +84,8 @@ float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The d
 }
 
 double limit_angle(double a){
-    while( a >=  2*M_PI ) a -= 2*M_PI ;
-    while( a <  0 ) a += 2*M_PI ;
+    while( a >=  M_PI ) a -= 2*M_PI ;
+    while( a <  -M_PI ) a += 2*M_PI ;
     return a ;
 }
 class real_world : public rclcpp::Node
@@ -169,19 +169,19 @@ class real_world : public rclcpp::Node
                
         //Get the current position and velocity of the motors
 
-        d1=jointState->position[0];
+        d1=jointState->position[2];
         phi1=jointState->position[1];
-        d2=jointState->position[2];
-        phi2=jointState->position[3];
 
-        dd1=jointState->velocity[0];
+        beta2=jointState->position[3];
+        d2=beta2-M_PI;
+        phi2=jointState->position[0];
+
+        dd1=jointState->velocity[2];
         phi1d=jointState->velocity[1]; 
-        dd2=jointState->velocity[2];
-        phi2d=jointState->velocity[3];
+        dd2=jointState->velocity[3];
+        phi2d=jointState->velocity[0];
 
         beta1=d1;
-        beta2=d2+M_PI;
-
 
         v1=abs(phi1d*R); //Tangent speed of wheel one
         v1=v1*(cos(d1)/cos(d2));
