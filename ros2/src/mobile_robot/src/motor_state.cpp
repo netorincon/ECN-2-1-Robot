@@ -107,7 +107,7 @@ class motor_state : public rclcpp::Node
 					
 					// Publisher for present joint states
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
-					timer_ = this->create_wall_timer(std::chrono::milliseconds(10), std::bind(&motor_state::publishJointState,this));
+					timer_ = this->create_wall_timer(std::chrono::milliseconds(100), std::bind(&motor_state::publishJointState,this));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -208,8 +208,10 @@ class motor_state : public rclcpp::Node
 	// Method to obtain desired joint states
 	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
 		int id;
+		bool validation; // Avoid sending empty data to motors
 		
 		for(int i = 0; i < (int)cmd->name.size(); i++){
+			validation = true;
 			id = MotorNames.at(cmd->name[i]);
 			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
@@ -240,19 +242,22 @@ class motor_state : public rclcpp::Node
 				command[id - 1].value = torToPulse(cmd->effort[i]);
 			}
 			else{
-				printf("Motor command topic could not be read\n");
+				printf("Motor command topic could not be read for motor ID : %d\n",id);
+				validation = false;
 			}
 			
-			param_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(command[id - 1].value));
-			param_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(command[id - 1].value));
-			param_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(command[id - 1].value));
-			param_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(command[id - 1].value));
-			
-			// Add parameter storage for Dynamixels goal
-			paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
-			if(exitParam){
-				printf("Param write ID : %d (return 0) failed",id);
-				exitParam = false;
+			if(validation){
+				param_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(command[id - 1].value));
+				param_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(command[id - 1].value));
+				param_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(command[id - 1].value));
+				param_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(command[id - 1].value));
+				
+				// Add parameter storage for Dynamixels goal
+				paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
+				if(exitParam){
+					printf("Param write ID : %d (return 0) failed",id);
+					exitParam = false;
+				}
 			}
 		}
 		
