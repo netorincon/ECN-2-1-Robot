@@ -171,7 +171,6 @@ class motor_state : public rclcpp::Node
 
         //
         float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, Um = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
-        float dd1Cmd, dd2Cmd, phi1dCmd, phi2dCmd, d1Cmd, d2Cmd=0;
         float v1 = 0, v2 = 0;
         float frequency = 10;                           // HZ, fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;                     // Seconds
@@ -521,18 +520,19 @@ class motor_state : public rclcpp::Node
     // Odom
     void calculatePose(){
         //Get the current position and velocity of the motors
-        beta1 = stateArray[2].position;
+        // TODO no seas, convierte cuando asignas
+        beta1 = pulseToPos(stateArray[2].position);
         d1 = beta1;
-        phi1 = stateArray[1].position;
+        phi1 = pulseToPos(stateArray[1].position);
 
-        beta2 = stateArray[3].position;
+        beta2 = pulseToPos(stateArray[3].position);
         d2 = limitAngle(beta2 - M_PI);
-        phi2 = stateArray[0].position;
+        phi2 = pulseToPos(stateArray[0].position);
 
-        dd1 = stateArray[2].velocity;
-        phi1d = stateArray[1].velocity;
-        dd2 = stateArray[3].velocity;
-        phi2d=stateArray[0].velocity;
+        dd1 = pulseToVel(stateArray[2].velocity);
+        phi1d = pulseToVel(stateArray[1].velocity);
+        dd2 = pulseToVel(stateArray[3].velocity);
+        phi2d = pulseToVel(stateArray[0].velocity);
 
         v1 = phi1d * R; //Tangent speed of wheel one
         v2 = v1 * cos(d1) / cos(d2);
