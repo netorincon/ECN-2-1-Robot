@@ -76,14 +76,14 @@ class sim : public rclcpp::Node
             Then the values are integrated over time to obtain the current state vector.
             
             */  
-            if(mode=="position"){
+            // if(mode=="position"){
                 position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
                     "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
-            }
-            if(mode=="velocity" || mode=="controller"){
+            // }
+            // if(mode=="velocity" || mode=="controller"){
                 control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
                     "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
-            }
+            // }
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);

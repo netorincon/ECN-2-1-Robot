@@ -1,0 +1,281 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+	
+	
+	<xacro:include filename="inertial_macros.xacro" />
+	
+	
+
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <material name="orange">
+        <color rgba="1 0.3 0.1 1"/>
+    </material>
+
+    <material name="blue">
+        <color rgba="0.2 0.2 1 1"/>
+    </material>
+
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+    
+    <material name="grey">
+        <color rgba="0.5 0.5 0.5 1"/>
+    </material>
+    
+    
+    
+    <!-- base_link -->
+    <xacro:property name="big_bar_length" value="0.3"/>
+    <xacro:property name="chassis_thickness" value="0.015"/>
+    <xacro:property name="front_base_length" value="0.18"/>
+    <xacro:property name="base_to_back_distance" value="0.065"/>
+    <xacro:property name="a" value="0.08"/>
+
+
+	
+	
+	
+	
+	<!-- Create fixed odom frame -->
+	
+	<link name="odom"></link>
+	
+	<joint name="world_joint" type="floating">
+		<parent link="odom"></parent>
+		<child link="base_link"></child>
+		<origin xyz="0 0 0.1"></origin>
+	</joint>
+	
+    <link name="base_link">
+		<visual>
+            <geometry>
+                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+            </geometry>
+            <material name="orange"/>
+            <origin xyz="0 ${-base_to_back_distance - chassis_thickness/2} 0"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+            </geometry>
+            <origin xyz="0 ${big_bar_length - base_to_back_distance + chassis_thickness/2} 0"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${chassis_thickness} ${big_bar_length} ${chassis_thickness}"/>
+            </geometry>
+            <material name="grey"/>
+            <origin xyz="${-big_bar_length/2+chassis_thickness/2} ${big_bar_length/2 - base_to_back_distance} 0"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${chassis_thickness} ${big_bar_length} ${chassis_thickness}"/>
+            </geometry>
+            <material name="grey"/>
+            <origin xyz="${big_bar_length/2-chassis_thickness/2} ${big_bar_length/2 - base_to_back_distance} 0"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+            </geometry>
+            <origin xyz="0 0 ${chassis_thickness}"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${big_bar_length} ${chassis_thickness} ${chassis_thickness}"/>
+            </geometry>
+            <origin xyz="0 ${front_base_length} ${chassis_thickness}"/>
+        </visual>
+    </link>
+    
+    <gazebo reference="base_link">
+		<material>Gazebo/White</material>
+    </gazebo>
+
+
+
+    <xacro:property name="a" value="0.08"/>
+    <xacro:property name="l1" value="0.05"/>
+    <xacro:property name="l2" value="0.017"/>
+    <xacro:property name="l3" value="0.076"/>
+    <xacro:property name="thickness" value="0.015"/>
+    <xacro:property name="motor_side" value="0.02"/>
+    <xacro:property name="wheel_thickness" value="0.01"/>
+    <xacro:property name="l4" value="${l2-thickness/2-wheel_thickness/2}"/>
+    <xacro:property name="l_tot" value="${l1+l3+thickness}"/>
+    
+
+    <!-- Left_wheel_base-->
+
+    <link name="left_wheel_base">
+        <visual>
+            <geometry>
+                <box size="${thickness} ${thickness} ${l1}" />
+            </geometry>
+            <origin xyz="${0} 0 ${-l1/2}"/>
+            <material name="white"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${l2} ${thickness} ${thickness}"/>
+            </geometry>
+            <origin xyz="${l2/2+thickness/2} 0 ${-l1+thickness/2}"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${thickness} ${thickness} ${l3}"/>
+            </geometry>
+            <origin xyz="${l2} ${0} ${-l3/2-l1}"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${l4} ${thickness} ${thickness}"/>
+            </geometry>
+            <origin xyz="${wheel_thickness/2+l4/2} 0 ${-l_tot+3*thickness/2}"/>
+            
+        </visual>
+    </link>
+    
+    <gazebo reference="left_wheel_base_joint">
+		<material>Gazebo/Blue</material>
+    </gazebo>
+
+    <joint name="left_wheel_base_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_wheel_base"/>
+        <origin xyz="${-a} ${0} ${thickness/2}" rpy="0.0 0.0 ${pi/2}"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    
+
+    <!-- Left_wheel-->
+
+    <xacro:property name="wheel_radius" value="0.033"/>
+
+    <link name="left_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <origin xyz="${0} 0 ${0}" rpy="${pi/2} 0 0"/> 
+			<material name="grey"/>      
+        </visual>                    
+    </link>
+    
+
+    <joint name="left_wheel_joint" type="continuous">
+        <parent link="left_wheel_base"/>
+        <child link="left_wheel"/>
+        <origin xyz="${0} 0 ${-l_tot-thickness+wheel_radius}" rpy="0 0 ${pi/2}"/>
+        <axis xyz="0 1 0"/>    
+    </joint>
+
+
+
+
+    <!-- right_wheel_base-->
+
+    <link name="right_wheel_base">
+<visual>
+            <geometry>
+                <box size="${thickness} ${thickness} ${l1}" />
+            </geometry>
+            <origin xyz="${0} 0 ${-l1/2}"/>
+            <material name="white"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${l2} ${thickness} ${thickness}"/>
+            </geometry>
+            <origin xyz="${l2/2+thickness/2} 0 ${-l1+thickness/2}"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${thickness} ${thickness} ${l3}"/>
+            </geometry>
+            <origin xyz="${l2} ${0} ${-l3/2-l1}"/>
+        </visual>
+        <visual>
+            <geometry>
+                <box size="${l4} ${thickness} ${thickness}"/>
+            </geometry>
+            <origin xyz="${wheel_thickness/2+l4/2} 0 ${-l_tot+3*thickness/2}"/>
+            
+        </visual>
+    </link>
+    
+    <gazebo reference="right_wheel_base_joint">
+		<material>Gazebo/Blue</material>
+    </gazebo>
+
+    <joint name="right_wheel_base_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_wheel_base"/>
+        <origin xyz="${a} ${0} ${thickness/2}" rpy="0.0 0.0 ${-pi/2}"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+
+    <!-- right_wheel-->
+
+
+    <link name="right_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <origin xyz="${0} 0 ${0}" rpy="${pi/2} 0 0"/> 
+			<material name="grey"/>      
+        </visual>  
+    </link>
+    
+    <gazebo reference="right_wheel">
+		<material>Gazebo/Black</material>
+    </gazebo>
+
+
+    <joint name="right_wheel_joint" type="continuous">
+        <parent link="right_wheel_base"/>
+        <child link="right_wheel"/>
+        <origin xyz="${0} 0 ${-l_tot-thickness+wheel_radius}" rpy="0 0 ${pi/2}"/>
+        <axis xyz="0 1 0"/>
+        
+    </joint>
+    
+    <!-- castor wheel-->
+    
+    <link name="castor_wheel">
+		<visual>
+			<geometry>
+				<box size="${thickness} ${thickness} ${l1+l3}"/>
+			</geometry>
+            <origin xyz="0 0 ${-(l1+l3)/2}"/>
+			<material name="white"/>
+		</visual>
+		<visual>
+			<geometry>
+				<sphere radius="${wheel_radius}"/>
+			</geometry>
+			<origin xyz="0 0 ${-(l1+l3)}"/>
+		</visual>
+    </link>
+	
+	
+	<joint name="castor_joint" type="fixed">
+		<parent link="base_link"></parent>
+		<child link="castor_wheel"></child>
+        <origin xyz="0 ${front_base_length} ${thickness/2}" />
+	</joint>
+
+
+</robot>
