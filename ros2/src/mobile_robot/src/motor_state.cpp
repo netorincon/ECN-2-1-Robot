@@ -177,8 +177,6 @@ class motor_state : public rclcpp::Node
 		
 		std::map<std::string, int> MotorNames{{"left_wheel_joint",1},{"right_wheel_joint",2},{"right_wheel_base_joint",3},{"left_wheel_base_joint",4}};
 		std::map<int, std::string> MotorIds{{1,"left_wheel_joint"},{2,"right_wheel_joint"},{3,"right_wheel_base_joint"},{4,"left_wheel_base_joint"}};
-		
-        int counter = TRIES; // Error counter
 
 	// Conversion methods for command values (radians -> DXL)
 	int posToPulse(float value){
@@ -214,11 +212,12 @@ class motor_state : public rclcpp::Node
 	
 	// Subscriber callback
 	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
-		int id;
+        int id, counter;
 		bool validation; // Avoid sending empty data to motors
 		
 		for(int i = 0; i < (int)cmd->name.size(); i++){
 			validation = true;
+            counter = TRIES;
 			id = MotorNames.at(cmd->name[i]);
 			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
@@ -454,7 +453,7 @@ class motor_state : public rclcpp::Node
     }
 	
 	void assignReadParam(){
-        counter = TRIES;
+        int counter = TRIES;
 
         do{
             exitParam = false;
@@ -495,10 +494,6 @@ class motor_state : public rclcpp::Node
 	}
 
     void exitNode(){
-        disableTorque(DXL1_ID);
-        disableTorque(DXL2_ID);
-        disableTorque(DXL3_ID);
-        disableTorque(DXL4_ID);
         kill(pid,SIGINT);
     }
 };
