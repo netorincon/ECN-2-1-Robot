@@ -58,7 +58,8 @@
 #define VELOCITY_CONTROL				1
 #define TORQUE_CONTROL					0
 
-#define TRIES                           3 // Tries before giving up in communication error
+#define PERIOD                          100 // In milliseconds
+#define TRIES                           10  // Tries before giving up in communication error
 
 struct MotorGoal{
 	int id;
@@ -109,7 +110,7 @@ class motor_state : public rclcpp::Node
 					
 					// Publisher for present joint states
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
-					timer_ = this->create_wall_timer(std::chrono::milliseconds(100), std::bind(&motor_state::publishJointState,this));
+                    timer_ = this->create_wall_timer(std::chrono::milliseconds(PERIOD), std::bind(&motor_state::publishJointState,this));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -259,10 +260,17 @@ class motor_state : public rclcpp::Node
 				param_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(command[id - 1].value));
 				
 				// Add parameter storage for Dynamixels goal
-				paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
-				if(exitParam){
-					exitParam = false;
-				}
+                do{
+                    exitParam = false;
+                    counter--;
+                    paramStorageWrite(id, addressGoal[id - 1], lenSize[id - 1], param_goal_state);
+                }while(exitParam && (counter > 0));
+
+                // Last try and still error
+                if((counter <= 0) && exitParam){
+                    //THIS NODE SHOULD END
+                    exitNode();
+                }
 			}
 		}
 		
@@ -475,7 +483,7 @@ class motor_state : public rclcpp::Node
         // Last try and still error
         if((counter <= 0) && exitParam){
             //THIS NODE SHOULD END
-            kill(pid,SIGINT);
+            exitNode();
         }
 	}
 	
@@ -485,6 +493,14 @@ class motor_state : public rclcpp::Node
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
+
+    void exitNode(){
+        disableTorque(DXL1_ID);
+        disableTorque(DXL2_ID);
+        disableTorque(DXL3_ID);
+        disableTorque(DXL4_ID);
+        kill(pid,SIGINT);
+    }
 };
 
 int main(int argc, char** argv)
