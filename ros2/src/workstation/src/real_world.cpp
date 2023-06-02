@@ -47,6 +47,7 @@
 #include <chrono>
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -85,9 +86,14 @@ float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The d
 
 double limit_angle(double a){
     while( a >=  2*M_PI ) a -= 2*M_PI ;
-    while( a <  0 ) a += 2*M_PI ;
+    while( a <  -2*M_PI ) a += 2*M_PI ;
     return a ;
 }
+
+struct Point{
+    float x;
+    float y;
+};
 class real_world : public rclcpp::Node
 {
     public :
@@ -131,19 +137,22 @@ class real_world : public rclcpp::Node
         float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
         float dd1Cmd, dd2Cmd, phi1dCmd, phi2dCmd, d1Cmd, d2Cmd=0;
         float v1, v2=0;
-        float frequency = 50; // HZ, fréquence de publication des transformations sur le topic /tf
+        float frequency = 10; // HZ, fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency; //Seconds
-        float a=0.05;//Base distance in meters
+        float a=0.08;//Base distance in meters
         float R=0.033; //Radius of the wheels in meters
         std::string mode;
         MotorState stateArray[4];
         MotorState commandArray[4];
         sensor_msgs::msg::JointState joint_state;
         control_input::msg::StateVector robot_state;
+        Point ICRLocation;
 
         rclcpp::TimerBase::SharedPtr timer_;
         geometry_msgs::msg::TransformStamped transform_stamped_;
         sensor_msgs::msg::JointState joint_cmd;
+        geometry_msgs::msg::TransformStamped icr;
+        tf2::Quaternion rotation;
         
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
@@ -169,22 +178,22 @@ class real_world : public rclcpp::Node
                
         //Get the current position and velocity of the motors
 
-        d1=jointState->position[0];
+        d1=jointState->position[2];
         phi1=jointState->position[1];
-        d2=jointState->position[2];
-        phi2=jointState->position[3];
 
-        dd1=jointState->velocity[0];
+        beta2=jointState->position[3];
+        d2=limit_angle(beta2-M_PI);
+        phi2=jointState->position[0];
+
+        dd1=jointState->velocity[2];
         phi1d=jointState->velocity[1]; 
-        dd2=jointState->velocity[2];
-        phi2d=jointState->velocity[3];
+        dd2=jointState->velocity[3];
+        phi2d=jointState->velocity[0];
 
         beta1=d1;
-        beta2=d2+M_PI;
 
-
-        v1=abs(phi1d*R); //Tangent speed of wheel one
-        v1=v1*(cos(d1)/cos(d2));
+        v1=phi1d*R; //Tangent speed of wheel one
+        v2=phi2d*R;
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
         //float U=phi1d*R/(2*cos(d2));
 
@@ -192,11 +201,11 @@ class real_world : public rclcpp::Node
         //tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
         //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
         //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
-        tt_dot=(2/a)*(v1*sin(d1)-v2*sin(d2));
+        tt_dot=(1/(2*a))*(v1*sin(d1)-v2*sin(d2));
         tt+=tt_dot*period;
 
         x_dot=v1*cos(d1)*cos(tt)-v2*sin(d2)*sin(tt);
-        y_dot=v1*cos(d1)*sin(tt)-v2*sin(d2)*cos(tt);
+        y_dot=v1*cos(d1)*sin(tt)+v2*sin(d2)*cos(tt);
         //We integrate the speeds over time (add each time we get a new value)
         x+=x_dot*period;
         y+=y_dot*period;
@@ -208,10 +217,11 @@ class real_world : public rclcpp::Node
         transform_stamped_.transform.translation.x = x;
         transform_stamped_.transform.translation.y = y;
         transform_stamped_.transform.translation.z = 0;
-        transform_stamped_.transform.rotation.x += 0;
-        transform_stamped_.transform.rotation.y += 0;
-        transform_stamped_.transform.rotation.z += tt;
-        transform_stamped_.transform.rotation.w = 1.0;
+        rotation.setRPY(0,0,tt);
+        transform_stamped_.transform.rotation.x = rotation.getX();
+        transform_stamped_.transform.rotation.y = rotation.getY();
+        transform_stamped_.transform.rotation.z = rotation.getZ();
+        transform_stamped_.transform.rotation.w = rotation.getW();
         tf_broadcaster_->sendTransform(transform_stamped_);
 
         //We publish the current state vector to be read by the controller
@@ -224,6 +234,14 @@ class real_world : public rclcpp::Node
         robot_state.phi2=phi2;
         state_vector_publisher->publish(robot_state);
 
+        calculateICR();        
+        icr.header.frame_id = "base_link"; // Nom du repère fixe
+        icr.child_frame_id = "icr"; // Nom du repère du robot
+        icr.transform.translation.x = ICRLocation.x;
+        icr.transform.translation.y = ICRLocation.y;
+        icr.transform.translation.z = 0;
+        icr.header.stamp = this->now();
+        tf_broadcaster_->sendTransform(icr);
         return;
     }
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
@@ -257,6 +275,40 @@ class real_world : public rclcpp::Node
         joint_cmd.velocity.clear();
         joint_cmd.position.clear();
         joint_cmd.effort.clear();
+    }
+
+        void calculateICR(){
+        //We define alpha1 and alpha2 as temporary angles for ICR calculation
+        float alpha1=d1+M_PI/2;
+        float alpha2=d2+M_PI/2;
+        alpha1=limit_angle(alpha1);
+        alpha2=limit_angle(alpha2);
+
+        float diff=alpha1-alpha2;
+        float diffAbs=abs(diff);
+        if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
+            alpha2+=M_PI;
+        }
+        else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
+            alpha1-=M_PI;
+        }
+        else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
+            alpha1+=M_PI;
+            alpha2+=M_PI;
+        }
+        else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
+            alpha2-=M_PI;
+        }
+        else if((diff<0) && (diffAbs>=M_PI)){
+            alpha1+=M_PI;
+        }
+
+        diff=alpha1-alpha2;
+        //See PDF for detailed calculations
+        if(sin(diff)!=0){
+            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
+            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
+        }
     }
 
 };
