@@ -13,11 +13,14 @@
 #include <algorithm>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <chrono>
 #include "DynamixelSDK.h"
+#include <control_input/msg/state_vector.hpp>
 
 // Control table address
 // EEPROM Area
@@ -74,6 +77,11 @@ struct MotorState{
 	int torque = 0;
 };
 
+struct Point{
+    float x;
+    float y;
+};
+
 class motor_state : public rclcpp::Node
 {
 	public :
@@ -103,6 +111,8 @@ class motor_state : public rclcpp::Node
 						
 						changeMode(command[i].id, command[i].mode);
 					}
+
+                    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 						
 					// Subscriber for desired joint states		
 					motor_command_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
@@ -110,6 +120,7 @@ class motor_state : public rclcpp::Node
 					
 					// Publisher for present joint states
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
+                    state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
                     timer_ = this->create_wall_timer(std::chrono::milliseconds(PERIOD), std::bind(&motor_state::publishJointState,this));
 				}
 				else{
@@ -145,11 +156,29 @@ class motor_state : public rclcpp::Node
     private :
 		rclcpp::TimerBase::SharedPtr timer_;
 		sensor_msgs::msg::JointState jointState;
+
+        geometry_msgs::msg::TransformStamped transform_stamped_;
+        tf2::Quaternion rotation;
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        control_input::msg::StateVector robot_state;
+        geometry_msgs::msg::TransformStamped icr;
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr motor_command_subscriber;
+        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
 
         int pid; // Get process ID
+
+        //
+        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, Um = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float dd1Cmd, dd2Cmd, phi1dCmd, phi2dCmd, d1Cmd, d2Cmd=0;
+        float v1 = 0, v2 = 0;
+        float frequency = 10;                           // HZ, fréquence de publication des transformations sur le topic /tf
+        float period = 1/frequency;                     // Seconds
+        float a = 0.08;                                 // Base distance in meters
+        float R = 0.033;                                // Radius of the wheels in meters
+        Point ICRLocation;
+        //
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
@@ -308,6 +337,9 @@ class motor_state : public rclcpp::Node
 			}
 		}
 		joint_state_publisher->publish(jointState);
+
+        // Send odometry
+        calculatePose();
 	}
 	
 	float limitAngle(float value){
@@ -486,6 +518,109 @@ class motor_state : public rclcpp::Node
         }
 	}
 	
+    // Odom
+    void calculatePose(){
+        //Get the current position and velocity of the motors
+        beta1 = stateArray[2].position;
+        d1 = beta1;
+        phi1 = stateArray[1].position;
+
+        beta2 = stateArray[3].position;
+        d2 = limitAngle(beta2 - M_PI);
+        phi2 = stateArray[0].position;
+
+        dd1 = stateArray[2].velocity;
+        phi1d = stateArray[1].velocity;
+        dd2 = stateArray[3].velocity;
+        phi2d=stateArray[0].velocity;
+
+        v1 = phi1d * R; //Tangent speed of wheel one
+        v2 = v1 * cos(d1) / cos(d2);
+        //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
+        //float U=phi1d*R/(2*cos(d2));
+
+        //We calculate current robot speeds and orientation motor
+        //tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
+        //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
+        //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
+        tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
+        tt += tt_dot * period;
+
+        x_dot = v1 * cos(d1) * cos(tt) - v2 * sin(d2) * sin(tt);
+        y_dot = v1 * cos(d1) * sin(tt) + v2 * sin(d2) * cos(tt);
+        //We integrate the speeds over time (add each time we get a new value)
+        x += x_dot * period;
+        y += y_dot * period;
+        tt = limitAngle(tt);
+
+        transform_stamped_.header.stamp = this->now();
+        transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
+        transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
+        transform_stamped_.transform.translation.x = x;
+        transform_stamped_.transform.translation.y = y;
+        transform_stamped_.transform.translation.z = 0;
+        rotation.setRPY(0,0,tt);
+        transform_stamped_.transform.rotation.x = rotation.getX();
+        transform_stamped_.transform.rotation.y = rotation.getY();
+        transform_stamped_.transform.rotation.z = rotation.getZ();
+        transform_stamped_.transform.rotation.w = rotation.getW();
+        tf_broadcaster_->sendTransform(transform_stamped_);
+
+        //We publish the current state vector to be read by the controller
+        robot_state.x=x;
+        robot_state.y=y;
+        robot_state.theta=tt;
+        robot_state.delta1=d1;
+        robot_state.delta2=d2;
+        robot_state.phi1=phi1;
+        robot_state.phi2=phi2;
+        state_vector_publisher->publish(robot_state);
+
+        calculateICR();
+        icr.header.frame_id = "base_link"; // Nom du repère fixe
+        icr.child_frame_id = "icr"; // Nom du repère du robot
+        icr.transform.translation.x = ICRLocation.x;
+        icr.transform.translation.y = ICRLocation.y;
+        icr.transform.translation.z = 0;
+        icr.header.stamp = this->now();
+        tf_broadcaster_->sendTransform(icr);
+        return;
+    }
+
+    void calculateICR(){
+        //We define alpha1 and alpha2 as temporary angles for ICR calculation
+        float alpha1 = d1+M_PI/2;
+        float alpha2 = d2+M_PI/2;
+        alpha1 = limitAngle(alpha1);
+        alpha2 = limitAngle(alpha2);
+
+        float diff = alpha1 - alpha2;
+        float diffAbs = abs(diff);
+        if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
+            alpha2+=M_PI;
+        }
+        else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
+            alpha1-=M_PI;
+        }
+        else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
+            alpha1+=M_PI;
+            alpha2+=M_PI;
+        }
+        else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
+            alpha2-=M_PI;
+        }
+        else if((diff<0) && (diffAbs>=M_PI)){
+            alpha1+=M_PI;
+        }
+
+        diff=alpha1-alpha2;
+        //See PDF for detailed calculations
+        if(sin(diff)!=0){
+            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
+            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
+        }
+    }
+
 	void printMotorState(){
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
 		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
