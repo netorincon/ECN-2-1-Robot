@@ -77,7 +77,7 @@ class motor_state : public rclcpp::Node
 {
 	public :
 		motor_state() : Node("motor_state"){
-			
+            pid = getpid();
 			// Open port
 			if (portHandler->openPort()){
 				printf("Succeeded to open the port!\n");
@@ -147,6 +147,8 @@ class motor_state : public rclcpp::Node
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr motor_command_subscriber;
+
+        int pid; // Get process ID
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
@@ -473,7 +475,7 @@ class motor_state : public rclcpp::Node
         // Last try and still error
         if((counter <= 0) && exitParam){
             //THIS NODE SHOULD END
-            std::exit(0);
+            kill(pid,SIGINT);
         }
 	}
 	
