@@ -427,6 +427,8 @@ class motor_state : public rclcpp::Node
 		stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
 		stateArray[id2 - 1].velocity = velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV);
 		
+        std::cout << "Lei velocidad del " << id1 << ": " << stateArray[id2 - 1].velocity << std::endl;
+
 		// Check for negative values
 		if(stateArray[id1 - 1].velocity > (pow(2,31))){
 			stateArray[id1 - 1].velocity = stateArray[id1 - 1].velocity - (pow(2,32)) - 1;
