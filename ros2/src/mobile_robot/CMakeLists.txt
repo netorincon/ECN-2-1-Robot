@@ -40,7 +40,7 @@ motor_state
 endif()
 
 install(
-    DIRECTORY config description launch
+    DIRECTORY description launch
     DESTINATION share/${PROJECT_NAME}
     )
     
