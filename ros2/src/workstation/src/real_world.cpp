@@ -111,15 +111,15 @@ class real_world : public rclcpp::Node
             state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
                              "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
 
-            if(mode=="position"){
+            // if(mode=="position"){
                 position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
                             "position_cmd", 10, std::bind(&real_world::jointCommandFromPositionCmd, this, std::placeholders::_1));
 
-            }
-            if(mode=="velocity" || mode=="controller"){
+            // }
+            // if(mode=="velocity" || mode=="controller"){
             control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
                             "control_cmd", 10, std::bind(&real_world::jointCommandFromControlCmd, this, std::placeholders::_1));
-            }
+            // }
             
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
@@ -168,14 +168,6 @@ class real_world : public rclcpp::Node
 
     void calculatePose(const sensor_msgs::msg::JointState::SharedPtr jointState){
 
-        //Save the values locally for easy access
-        // for(int i=0;i<4;i++){
-        //     stateArray[i].id=jointState->name[i];
-        //     stateArray[i].position=jointState->position[i];
-        //     stateArray[i].speed=jointState->velocity[i];
-        //     stateArray[i].torque=jointState->effort[i];
-        // }
-               
         //Get the current position and velocity of the motors
 
         d1=jointState->position[2];

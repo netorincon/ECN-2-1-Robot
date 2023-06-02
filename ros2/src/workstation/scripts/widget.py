@@ -2,12 +2,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from qwt.text import QwtTextLabel
 import os, signal
+import time
 
 windowHeight=680
 windowWidth=420
 
 
 class Ui_Form(object):
+    end=False
     def launchFile(self):
         #Check radio button state
         manual_speed_mode=self.manual_speed_mode_radio.isChecked()
@@ -49,9 +51,14 @@ class Ui_Form(object):
         return
     
     def endLaunch(self):
+        self.end=True
+        self.reset_pos_sliders()
+        self.reset_speed_sliders()
+        
         if(self.launchP.processId()!=0):
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
+        time.sleep(0.5)
         self.simulation_radio.setDisabled(False)
         self.real_world_radio.setDisabled(False)
         self.launch_button.setDisabled(False)
@@ -59,13 +66,12 @@ class Ui_Form(object):
         self.control_mode_radio.setEnabled(True)
         self.manual_speed_mode_radio.setEnabled(True)
         self.manual_pos_mode_radio.setEnabled(True)
+        self.end=False
+
         return
     
     def exit(self):
-        if(self.launchP.processId()!=0):
-            print("Trying to terminate the process ", self.launchP.processId())
-            os.kill(self.launchP.processId(), signal.SIGINT)
-            self.launchP.waitForFinished(-1)
+        self.endLaunch()
         return
     
     def reset_speed_sliders(self):
