@@ -185,7 +185,7 @@ class real_world : public rclcpp::Node
         beta1=d1;
 
         v1=phi1d*R; //Tangent speed of wheel one
-        v2=phi2d*R;
+        v2=v1*cos(d1)/cos(d2);
         //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
         //float U=phi1d*R/(2*cos(d2));
 

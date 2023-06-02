@@ -79,7 +79,7 @@ def generate_launch_description():
         
         #joint_state_publisher_gui,
         #rqt,
-        #robot_state_publisher,
+        robot_state_publisher,
         real_world,
         rviz,
         controller
