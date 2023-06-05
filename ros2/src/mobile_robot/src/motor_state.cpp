@@ -250,25 +250,21 @@ class motor_state : public rclcpp::Node
 			command[id - 1].id = id;
 			if(cmd->position.size() != 0){
 				if(command[id - 1].mode != POSITION_CONTROL){
-					printf("Cambiando a modo posicion\n");
 					changeMode(id, POSITION_CONTROL);
 					command[id - 1].mode = POSITION_CONTROL;
 					addressGoal[id - 1] = ADDR_GOAL_POSITION;
 					lenSize[id - 1] = LEN_PV;
 				}
 				command[id - 1].value = posToPulse(cmd->position[i]);
-				printf("Mandando posicion: %f\n", command[id - 1].value);
 			}
 			else if(cmd->velocity.size() != 0){
 				if(command[id - 1].mode != VELOCITY_CONTROL){
-					printf("Cambiando a modo velocidad\n");
 					changeMode(id, VELOCITY_CONTROL);
 					command[id - 1].mode = VELOCITY_CONTROL;
 					addressGoal[id - 1] = ADDR_GOAL_VELOCITY;
 					lenSize[id - 1] = LEN_PV;
 				}
 				command[id - 1].value = velToPulse(cmd->velocity[i]);
-				printf("Mandando posicion: %f\n", command[id - 1].value);
 			}
 			else if((cmd->effort.size() != 0) && (id != DXL3_ID) && (id != DXL4_ID)){
 				if(command[id - 1].mode != TORQUE_CONTROL){
