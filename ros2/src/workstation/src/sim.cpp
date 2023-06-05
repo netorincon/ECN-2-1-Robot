@@ -8,23 +8,31 @@ The command input should include [um, deltaDot1 and deltaDot2]
 
 */
 
-#include <algorithm>
+/*
+We subscribe to the topic cmd_robot via cmd_susbscriber 
+It receives the input vector which includes [um, delta1dot and delta2dot].
+qDot (derivative of the configuration vector) is estimated using the S matrix obtained in the Kinematic model calculations
+times the um input. 
+
+Then the values are integrated over time to obtain the current state vector.
+*/
+
+#include <chrono>
 #include <string>
 #include <math.h>
+#include <algorithm>
 #include <rclcpp/rclcpp.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <control_input/msg/slider_command.hpp>
-#include <control_input/msg/control_input.hpp>
-#include <control_input/msg/position_command.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <chrono>
-#include <control_input/msg/position_command.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 #include <control_input/msg/state_vector.hpp>
+#include <control_input/msg/control_input.hpp>
+#include <control_input/msg/slider_command.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <control_input/msg/position_command.hpp>
 
 struct MotorState{
     std::string id;
@@ -42,6 +50,7 @@ double limit_angle(double a){
     while( a <  0 ) a += 2*M_PI ;
     return a ;
 }
+
 float limit_phiSpeed(float a){
     float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
     if( a >=  max) {a =max;}
@@ -67,30 +76,18 @@ class sim : public rclcpp::Node
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-            /*
-            We subscribe to the topic cmd_robot via cmd_susbscriber 
-            It receives the input vector which includes [um, delta1dot and delta2dot].
-            qDot (derivative of the configuration vector) is estimated using the S matrix obtained in the Kinematic model calculations
-            times the um input. 
+            position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
+                "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
 
-            Then the values are integrated over time to obtain the current state vector.
-            
-            */  
-            // if(mode=="position"){
-                position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
-                    "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
-            // }
-            // if(mode=="velocity" || mode=="controller"){
-                control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
-                    "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
-            // }
+            control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
+                "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             
         }
         //We initialize all variables of the state vector at 0
-        float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
+        float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;
 
     private :
         geometry_msgs::msg::TransformStamped transform_stamped_;
