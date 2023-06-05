@@ -91,16 +91,14 @@ class real_world : public rclcpp::Node
     public :
         real_world(rclcpp::NodeOptions options) : Node("real_world", options)
         {
-
+            declare_parameter("frequency", 20);
+            get_parameter("frequency", frequency);
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
             
             for(uint i=0;i<names.size(); i++){
                 joint_cmd.name.push_back(names[i]);
             }
-
-            state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-                "joint_states", 10, std::bind(&real_world::calculatePose, this, std::placeholders::_1));
 
             position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
                 "position_cmd", 10, std::bind(&real_world::jointCommandFromPositionCmd, this, std::placeholders::_1));
@@ -123,8 +121,8 @@ class real_world : public rclcpp::Node
 
         //We initialize all variables of the state vector at 0
         float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;
-        float frequency = 20; // HZ, used for calculating positions via integrals
-        float period = 1/frequency; //Seconds
+        float frequency; // HZ, used for calculating positions via integrals
+        //float period = 1/frequency; //Seconds
         
         Point ICRLocation;
         tf2::Quaternion rotation;
@@ -148,75 +146,6 @@ class real_world : public rclcpp::Node
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
 
-
-    void calculatePose(const sensor_msgs::msg::JointState::SharedPtr jointState){
-
-        // //Get the current position and velocity of the motors
-        // auto start=jointState->name.begin();
-        // auto d1_index = std::find(jointState->name.begin(), jointState->name.end(),"right_wheel_base_joint")-start;
-        // auto d2_index = std::find(jointState->name.begin(), jointState->name.end(),"left_wheel_base_joint")-start;
-        // auto phi1_index = std::find(jointState->name.begin(), jointState->name.end(),"right_wheel_joint")-start;
-        // auto phi2_index = std::find(jointState->name.begin(), jointState->name.end(),"left_wheel_joint")-start;
-        
-        // d1=jointState->position[d1_index];
-        // phi1=jointState->position[phi1_index];
-        // phi2=jointState->position[phi2_index];
-        // beta2=jointState->position[d2_index];
-        // beta1=d1;
-        // d2=limit_angle(beta2-M_PI);
-
-        // dd1=jointState->velocity[d1_index];
-        // dd2=jointState->velocity[d2_index];
-        // phi1d=jointState->velocity[phi1_index]; 
-        // phi2d=jointState->velocity[phi2_index];
-
-        // //Tangent speed of the wheels
-        // v1=phi1d*R; 
-        // v2=v1*cos(d1)/cos(d2);
-
-        // tt_dot=(1/(2*a))*(v1*sin(d1)-v2*sin(d2));
-        // tt+=tt_dot*period;
-
-        // x_dot=v1*cos(d1)*cos(tt)-v2*sin(d2)*sin(tt);
-        // y_dot=v1*cos(d1)*sin(tt)+v2*sin(d2)*cos(tt);
-
-        // //We integrate the speeds over time (add each time we get a new value)
-        // x+=x_dot*period;
-        // y+=y_dot*period;
-        // tt=limit_angle(tt);
-        
-        // transform_stamped_.header.stamp = this->now();
-        // transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
-        // transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
-        // transform_stamped_.transform.translation.x = x;
-        // transform_stamped_.transform.translation.y = y;
-        // transform_stamped_.transform.translation.z = 0;
-        // rotation.setRPY(0,0,tt);
-        // transform_stamped_.transform.rotation.x = rotation.getX();
-        // transform_stamped_.transform.rotation.y = rotation.getY();
-        // transform_stamped_.transform.rotation.z = rotation.getZ();
-        // transform_stamped_.transform.rotation.w = rotation.getW();
-        // //tf_broadcaster_->sendTransform(transform_stamped_);
-
-        // //We publish the current state vector to be read by the controller
-        // robot_state.x=x;
-        // robot_state.y=y;
-        // robot_state.theta=tt;
-        // robot_state.delta1=d1;
-        // robot_state.delta2=d2;
-        // robot_state.phi1=phi1;
-        // robot_state.phi2=phi2;
-        // state_vector_publisher->publish(robot_state);
-
-        // calculateICR();        
-        // icr.header.frame_id = "base_link"; // Name of the robot frame
-        // icr.child_frame_id = "icr"; // Name of the ICR frame
-        // icr.transform.translation.x = ICRLocation.x;
-        // icr.transform.translation.y = ICRLocation.y;
-        // icr.transform.translation.z = 0;
-        // icr.header.stamp = this->now();
-        // //tf_broadcaster_->sendTransform(icr);
-    }
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
         joint_cmd.position.push_back(msg->d1);
         joint_cmd.position.push_back(msg->phi1);
@@ -248,41 +177,6 @@ class real_world : public rclcpp::Node
         joint_cmd.velocity.clear();
         joint_cmd.position.clear();
         joint_cmd.effort.clear();
-    }
-
-        void calculateICR(){
-
-        //We define alpha1 and alpha2 as temporary angles for ICR calculation
-        float alpha1=d1+M_PI/2;
-        float alpha2=d2+M_PI/2;
-        alpha1=limit_angle(alpha1);
-        alpha2=limit_angle(alpha2);
-
-        float diff=alpha1-alpha2;
-        float diffAbs=abs(diff);
-        if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
-            alpha2+=M_PI;
-        }
-        else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
-            alpha1-=M_PI;
-        }
-        else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
-            alpha1+=M_PI;
-            alpha2+=M_PI;
-        }
-        else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
-            alpha2-=M_PI;
-        }
-        else if((diff<0) && (diffAbs>=M_PI)){
-            alpha1+=M_PI;
-        }
-
-        diff=alpha1-alpha2;
-        //See PDF for detailed calculations
-        if(sin(diff)!=0){
-            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
-            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
-        }
     }
 
 };

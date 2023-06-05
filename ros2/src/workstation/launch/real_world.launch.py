@@ -17,6 +17,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_ros2_control = LaunchConfiguration('use_ros2_control')
     mode=LaunchConfiguration('mode')
+    period=LaunchConfiguration('period')
 
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('workstation'))
@@ -31,10 +32,12 @@ def generate_launch_description():
         output = 'screen',
         parameters = [params1]
     )
+    real_world_params={'period': period}
     real_world = Node(
         package = 'workstation',
         executable = 'real_world',
         output = 'screen',
+        parameters=[real_world_params]
     )
 
     rqt = Node(
@@ -43,11 +46,13 @@ def generate_launch_description():
         output = 'screen',
     )
 
+    controller_params={'period' : period}
     controller =Node(
         package='workstation',
         executable='controller',
         output='screen',
         condition=LaunchConfigurationEquals('mode', 'controller'),
+        parameters=[controller_params]
     )
     # Create Rviz node
     rviz = Node(

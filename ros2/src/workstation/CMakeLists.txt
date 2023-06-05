@@ -24,7 +24,8 @@ find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
-find_package(Eigen3 3.4.0 REQUIRED)
+find_package(eigen3_cmake_module REQUIRED)
+find_package(Eigen3)
 
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
@@ -36,7 +37,9 @@ ament_python_install_package(${PROJECT_NAME})
 
 add_executable(controller src/controller.cpp)
 ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input Eigen3 tf2_ros)
-target_link_libraries(controller Eigen3::Eigen)
+ament_export_dependencies(eigen3_cmake_module)
+ament_export_dependencies(Eigen3)
+#target_link_libraries(controller Eigen3::Eigen)
 
 install(TARGETS
     sim

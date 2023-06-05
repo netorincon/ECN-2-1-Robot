@@ -42,13 +42,15 @@ class controller : public rclcpp::Node
         
         controller(rclcpp::NodeOptions options) : Node("controller", options)
         {
-
+            declare_parameter("frequency", 20); //Obtain loop frequency in HZ
+            get_parameter("frequency", frequency);
+            period=(1/frequency)*1000;
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
             command_publisher = this->create_publisher<control_input::msg::ControlInput>("control_cmd", 10);
             state_subscriber=this->create_subscription<control_input::msg::StateVector>(
                             "state_vector", 10, std::bind(&controller::updateState, this, std::placeholders::_1));
 
-            timer_ = this->create_wall_timer(50ms, std::bind(&controller::calculateControlInput, this));
+            timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period)), std::bind(&controller::calculateControlInput, this));
             updateK();
         }
     private:
@@ -57,7 +59,8 @@ class controller : public rclcpp::Node
         float a=0.08;
         float e=0.1;
         float kp=0.25;
-        float period=0.05;
+        float period;
+        float frequency;
         float time=0;
         bool initialized=false;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
