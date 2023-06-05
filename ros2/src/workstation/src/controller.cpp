@@ -59,6 +59,7 @@ class controller : public rclcpp::Node
         float kp=0.25;
         float period=0.1;
         float time=0;
+        bool initialized=false;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
         rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -77,36 +78,39 @@ class controller : public rclcpp::Node
 
         //YOUR CODE SHOULD START HERE
         //At the end you should be assignning a value to um, dd1 and dd2.
-        getNextPoint();
-        xp(0)=x+a*cos(theta)+e*cos(theta+d1);
-        xp(1)=y+a*sin(theta)+e*sin(theta+d1);
+        if(initialized){
+            getNextPoint();
+            xp(0)=x+a*cos(theta)+e*cos(theta+d1);
+            xp(1)=y+a*sin(theta)+e*sin(theta+d1);
 
-        u=K_inv*(xrdot+kp*(xr-xp));
-        //printf("%f", u(0));
+            u=K_inv*(xrdot+kp*(xr-xp));
+            //printf("%f", u(0));
 
-        um=u(0);
-        dd1=limit_deltaSpeed(u(1));
-        dd2=-dd1;
+            um=u(0);
+            dd1=limit_deltaSpeed(u(1));
+            dd2=-dd1;
 
-        //YOUR CODE SHOULD END HERE
+            //YOUR CODE SHOULD END HERE
 
-        command.um=um;
-        command.delta1dot=dd1;
-        command.delta2dot=dd2;
-        command_publisher->publish(command);
+            command.um=um;
+            command.delta1dot=dd1;
+            command.delta2dot=dd2;
+            command_publisher->publish(command);
 
-        transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
-        transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
-        transform_stamped_.transform.translation.x = xr(0);
-        transform_stamped_.transform.translation.y = xr(1);
-        transform_stamped_.transform.translation.z = 0;
-        transform_stamped_.transform.rotation.x = 0;
-        transform_stamped_.transform.rotation.y = 0;
-        transform_stamped_.transform.rotation.z = 0;
-        transform_stamped_.transform.rotation.w = 1;
-        tf_broadcaster_->sendTransform(transform_stamped_);
-        return;
+            transform_stamped_.header.stamp = this->now();
+            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
+            transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
+            transform_stamped_.transform.translation.x = xr(0);
+            transform_stamped_.transform.translation.y = xr(1);
+            transform_stamped_.transform.translation.z = 0;
+            transform_stamped_.transform.rotation.x = 0;
+            transform_stamped_.transform.rotation.y = 0;
+            transform_stamped_.transform.rotation.z = 0;
+            transform_stamped_.transform.rotation.w = 1;
+            tf_broadcaster_->sendTransform(transform_stamped_);
+            return;
+        }
+
     }
 
     void updateState(const control_input::msg::StateVector::SharedPtr msg){
@@ -118,6 +122,7 @@ class controller : public rclcpp::Node
         phi1=msg->phi1;
         phi2=msg->phi2;
         updateK();
+        initialized=true;
         return;
     }
 
