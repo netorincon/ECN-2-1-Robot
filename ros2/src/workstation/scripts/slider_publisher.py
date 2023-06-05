@@ -17,7 +17,7 @@ class publisherNode(Node):
         self.position_publisher = self.create_publisher(PositionCommand, 'position_cmd', 10)
         self.velocity_publisher = self.create_publisher(ControlInput, 'control_cmd', 10)
         self.abort_publisher = self.create_publisher(JointState, 'motor_cmd', 10)
-        timer_period = 0.1  # seconds
+        timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):

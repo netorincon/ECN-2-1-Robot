@@ -57,7 +57,7 @@ class controller : public rclcpp::Node
         float a=0.08;
         float e=0.1;
         float kp=0.25;
-        float period=0.1;
+        float period=0.05;
         float time=0;
         bool initialized=false;
         rclcpp::Publisher<control_input::msg::ControlInput>::SharedPtr command_publisher;
