@@ -342,10 +342,10 @@ class motor_state : public rclcpp::Node
 	}
 	
 	float limitAngle(float value){
-		while(value > M_PI){
+        while(value >= M_PI){
 			value = value - (2 * M_PI);
 		}
-		while(value < (-M_PI)){
+        while(value <= (-M_PI)){
 			value = value + (2 * M_PI);
 		}
 		return value;
@@ -417,10 +417,10 @@ class motor_state : public rclcpp::Node
             stateArray[id2 - 1].position = limitAngle(pulseToPos(positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV)));
             // Send beta2 instead of delta2
             if(id1 == DXL4_ID){
-                stateArray[id1 - 1].position = stateArray[id1 - 1].position + M_PI;
+                stateArray[id1 - 1].position = limitAngle(stateArray[id1 - 1].position + M_PI);
             }
             else if(id2 == DXL4_ID){
-                stateArray[id2 - 1].position = stateArray[id2 - 1].position + M_PI;
+                stateArray[id2 - 1].position = limitAngle(stateArray[id2 - 1].position + M_PI);
             }
         }
 
@@ -527,7 +527,6 @@ class motor_state : public rclcpp::Node
     // Odom
     void calculatePose(){
         //Get the current position and velocity of the motors
-        // TODO no seas, convierte cuando asignas
         beta1 = stateArray[2].position;
         d1 = beta1;
         phi1 = stateArray[1].position;
