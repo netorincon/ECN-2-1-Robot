@@ -170,7 +170,7 @@ class motor_state : public rclcpp::Node
         int pid; // Get process ID
 
         //
-        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, Um = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
         float frequency = 10;                           // HZ, fréquence de publication des transformations sur le topic /tf
         float period = 1/frequency;                     // Seconds
@@ -324,16 +324,16 @@ class motor_state : public rclcpp::Node
 		
 		for(int i=0;i<4;i++){
 			jointState.name.push_back(stateArray[i].id);
-			if(stateArray[i].id == MotorIds.at(DXL4_ID)){ // Send beta 2 instead of delta 2
-				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position) + M_PI));
-			}
-			else{
-				jointState.position.push_back(limitAngle(pulseToPos(stateArray[i].position)));
-			}
-			jointState.velocity.push_back(pulseToVel(stateArray[i].velocity));
+            jointState.position.push_back(stateArray[i].position);
+            jointState.velocity.push_back(stateArray[i].velocity);
 			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
-				jointState.effort.push_back(pulseToTor(stateArray[i].torque));
+                jointState.effort.push_back(stateArray[i].torque);
 			}
+            else{
+                // TODO
+                // What should we send to 3 and 4?
+                // Is it empty? Are there 0s?
+            }
 		}
 		joint_state_publisher->publish(jointState);
 
@@ -412,9 +412,16 @@ class motor_state : public rclcpp::Node
 
         readAvailable(positionPacket, id1, ADDR_PRESENT_POSITION, LEN_PV, positionError);
         readAvailable(positionPacket, id2, ADDR_PRESENT_POSITION, LEN_PV, positionError);
-        if(!positionError){
-            stateArray[id1 - 1].position = positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV);
-            stateArray[id2 - 1].position = positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV);
+        if(!positionError){ // Saved in radians
+            stateArray[id1 - 1].position = limitAngle(pulseToPos(positionPacket.getData(id1, ADDR_PRESENT_POSITION, LEN_PV)));
+            stateArray[id2 - 1].position = limitAngle(pulseToPos(positionPacket.getData(id2, ADDR_PRESENT_POSITION, LEN_PV)));
+            // Send beta2 instead of delta2
+            if(id1 == DXL4_ID){
+                stateArray[id1 - 1].position = stateArray[id1 - 1].position + M_PI;
+            }
+            else if(id2 == DXL4_ID){
+                stateArray[id2 - 1].position = stateArray[id2 - 1].position + M_PI;
+            }
         }
 
         dxl_comm_result = velocityPacket.txRxPacket();
@@ -430,9 +437,9 @@ class motor_state : public rclcpp::Node
 
         readAvailable(velocityPacket, id1, ADDR_PRESENT_VELOCITY, LEN_PV, velocityError);
         readAvailable(velocityPacket, id2, ADDR_PRESENT_VELOCITY, LEN_PV, velocityError);
-        if(!velocityError){
-            stateArray[id1 - 1].velocity = velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV);
-            stateArray[id2 - 1].velocity = velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV);
+        if(!velocityError){ // Send in radians/second
+            stateArray[id1 - 1].velocity = pulseToVel(velocityPacket.getData(id1, ADDR_PRESENT_VELOCITY, LEN_PV));
+            stateArray[id2 - 1].velocity = pulseToVel(velocityPacket.getData(id2, ADDR_PRESENT_VELOCITY, LEN_PV));
         }
 
         if((id1 == DXL1_ID || id1 == DXL2_ID) && (id2 == DXL1_ID || id2 == DXL2_ID)){
@@ -450,8 +457,8 @@ class motor_state : public rclcpp::Node
             readAvailable(torquePacket, id1, ADDR_PRESENT_CURRENT, LEN_CURRENT, torqueError);
             readAvailable(torquePacket, id2, ADDR_PRESENT_CURRENT, LEN_CURRENT, torqueError);
             if(!torqueError){
-                stateArray[id1 - 1].torque = torquePacket.getData(id1, ADDR_PRESENT_CURRENT, LEN_CURRENT);
-                stateArray[id2 - 1].torque = torquePacket.getData(id2, ADDR_PRESENT_CURRENT, LEN_CURRENT);
+                stateArray[id1 - 1].torque = pulseToTor(torquePacket.getData(id1, ADDR_PRESENT_CURRENT, LEN_CURRENT));
+                stateArray[id2 - 1].torque = pulseToTor(torquePacket.getData(id2, ADDR_PRESENT_CURRENT, LEN_CURRENT));
             }
         }
 
@@ -521,18 +528,18 @@ class motor_state : public rclcpp::Node
     void calculatePose(){
         //Get the current position and velocity of the motors
         // TODO no seas, convierte cuando asignas
-        beta1 = pulseToPos(stateArray[2].position);
+        beta1 = stateArray[2].position;
         d1 = beta1;
-        phi1 = pulseToPos(stateArray[1].position);
+        phi1 = stateArray[1].position;
 
-        beta2 = pulseToPos(stateArray[3].position);
-        d2 = limitAngle(beta2 - M_PI);
-        phi2 = pulseToPos(stateArray[0].position);
+        beta2 = stateArray[3].position;
+        d2 = beta2 - M_PI;
+        phi2 = stateArray[0].position;
 
-        dd1 = pulseToVel(stateArray[2].velocity);
-        phi1d = pulseToVel(stateArray[1].velocity);
-        dd2 = pulseToVel(stateArray[3].velocity);
-        phi2d = pulseToVel(stateArray[0].velocity);
+        dd1 = stateArray[2].velocity;
+        phi1d = stateArray[1].velocity;
+        dd2 = stateArray[3].velocity;
+        phi2d = stateArray[0].velocity;
 
         v1 = phi1d * R; //Tangent speed of wheel one
         v2 = v1 * cos(d1) / cos(d2);
