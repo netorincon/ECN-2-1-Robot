@@ -533,7 +533,7 @@ class motor_state : public rclcpp::Node
         phi1 = stateArray[1].position;
 
         beta2 = stateArray[3].position;
-        d2 = beta2 - M_PI;
+        d2 = limitAngle(beta2 - M_PI);
         phi2 = stateArray[0].position;
 
         dd1 = stateArray[2].velocity;
