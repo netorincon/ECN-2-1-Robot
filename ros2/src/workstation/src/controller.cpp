@@ -48,7 +48,7 @@ class controller : public rclcpp::Node
             state_subscriber=this->create_subscription<control_input::msg::StateVector>(
                             "state_vector", 10, std::bind(&controller::updateState, this, std::placeholders::_1));
 
-            timer_ = this->create_wall_timer(100ms, std::bind(&controller::calculateControlInput, this));
+            timer_ = this->create_wall_timer(50ms, std::bind(&controller::calculateControlInput, this));
             updateK();
         }
     private:

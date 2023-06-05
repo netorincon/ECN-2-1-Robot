@@ -172,8 +172,8 @@ class motor_state : public rclcpp::Node
         //
         float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
-        float frequency = 10;                           // HZ, fréquence de publication des transformations sur le topic /tf
-        //float PERIOD = 1/frequency;                     // Seconds
+        float frequency = 20;                           // HZ, fréquence de publication des transformations sur le topic /tf
+        float period = 1/frequency;                     // Seconds
         float a = 0.08;                                 // Base distance in meters
         float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
@@ -554,13 +554,13 @@ class motor_state : public rclcpp::Node
         //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
         //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
         tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
-        tt += tt_dot * PERIOD;
+        tt += tt_dot * period;
 
         x_dot = v1 * cos(d1) * cos(tt) - v2 * sin(d2) * sin(tt);
         y_dot = v1 * cos(d1) * sin(tt) + v2 * sin(d2) * cos(tt);
         //We integrate the speeds over time (add each time we get a new value)
-        x += x_dot * PERIOD;
-        y += y_dot * PERIOD;
+        x += x_dot * period;
+        y += y_dot * period;
         tt = limitAngle(tt);
 
         transform_stamped_.header.stamp = this->now();
