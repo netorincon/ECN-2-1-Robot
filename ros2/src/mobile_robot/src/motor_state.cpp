@@ -72,9 +72,9 @@ struct MotorGoal{
 
 struct MotorState{
 	std::string id;
-	int position = 0;
-	int velocity = 0;
-	int torque = 0;
+    float position = 0;
+    float velocity = 0;
+    float torque = 0;
 };
 
 struct Point{
