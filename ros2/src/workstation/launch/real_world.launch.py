@@ -31,12 +31,10 @@ def generate_launch_description():
         output = 'screen',
         parameters = [params1]
     )
-    nodeParams={"mode": mode}
     real_world = Node(
         package = 'workstation',
         executable = 'real_world',
         output = 'screen',
-        parameters=[nodeParams]
     )
 
     rqt = Node(
@@ -78,8 +76,8 @@ def generate_launch_description():
             description = 'Use manual velocity sliders as default'),
         
         #joint_state_publisher_gui,
-        #rqt,
-        robot_state_publisher,
+        rqt,
+        #robot_state_publisher,
         real_world,
         rviz,
         controller

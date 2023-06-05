@@ -31,12 +31,10 @@ def generate_launch_description():
         parameters = [params1]
     )
 
-    simParams={"mode": mode}
     sim = Node(
         package = 'workstation',
         executable = 'sim',
         output = 'screen',
-        parameters=[simParams]
     )
 
     rqt = Node(
