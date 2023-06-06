@@ -58,7 +58,9 @@ class controller : public rclcpp::Node
         float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0, d1Cmd = 0, d2Cmd = 0;
         float a=0.08;
         float e=0.1;
-        float kp=0.35;
+        float kp=0.7;
+        float ki=0.0;
+        float kd=0.0;
         float period;
         float frequency;
         float time=0;
@@ -75,6 +77,10 @@ class controller : public rclcpp::Node
         Eigen::Vector2f xrprev;
         Eigen::Vector2f xrdot;
         Eigen::Vector2f xp;
+        Eigen::Vector2f sumError{0,0};
+        Eigen::Vector2f prevError{0,0};
+        Eigen::Vector2f deltaError{0,0};
+        Eigen::Vector2f Error{0,0};
 
 
     void calculateControlInput(){
@@ -85,8 +91,11 @@ class controller : public rclcpp::Node
             getNextPoint();
             xp(0)=x+a*cos(theta)+e*cos(theta+d1);
             xp(1)=y+a*sin(theta)+e*sin(theta+d1);
-
-            u=K_inv*(xrdot+kp*(xr-xp));
+            Error=(xr-xp)*period;
+            deltaError=prevError-Error;
+            sumError+= Error;
+            prevError=Error;
+            u=K_inv*(xrdot+kp*(xr-xp)+((ki/period)*sumError)+kp*(deltaError));
             //printf("%f", u(0));
 
             um=u(0);
