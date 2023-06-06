@@ -55,7 +55,7 @@ class controller : public rclcpp::Node
         }
     private:
         rclcpp::TimerBase::SharedPtr timer_;
-        float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0;
+        float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0, d1Cmd = 0, d2Cmd = 0;
         float a=0.08;
         float e=0.1;
         float kp=0.25;
@@ -91,13 +91,19 @@ class controller : public rclcpp::Node
 
             um=u(0);
             dd1=limit_deltaSpeed(u(1));
-            dd2=-dd1;
+            //dd2=-dd1;
 
             //YOUR CODE SHOULD END HERE
+
+            // Change in position for d1 and d2
+            d1Cmd = d1 + (dd1 * period);
+            d2Cmd = -d1Cmd;
 
             command.um=um;
             command.delta1dot=dd1;
             command.delta2dot=dd2;
+            //command.delta1 = d1Cmd;
+            //command.delta2 = d2Cmd;
             command_publisher->publish(command);
 
             transform_stamped_.header.stamp = this->now();
@@ -160,4 +166,3 @@ int main(int argc, char** argv)
   rclcpp::shutdown();
   return 0;
 }
-
