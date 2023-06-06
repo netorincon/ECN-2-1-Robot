@@ -169,13 +169,8 @@ class real_world : public rclcpp::Node
 
     void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
         Um=msg->um;
-        dd1Cmd=limit_deltaSpeed(msg->delta1dot);
-        dd2Cmd=limit_deltaSpeed(msg->delta2dot);
-
-        // Change in position for d1 and d2
-        d1Cmd = d1 + (dd1Cmd * period);
-        //d2Cmd = d2 + (dd2Cmd * period);
-        d2Cmd = -d1Cmd;
+        d1Cmd=limit_deltaSpeed(msg->delta1);
+        d2Cmd=limit_deltaSpeed(msg->delta2);
 
         phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
@@ -183,16 +178,12 @@ class real_world : public rclcpp::Node
         joint_cmd.name.push_back(names[0]);
         joint_cmd.name.push_back(names[2]);
         joint_cmd.position.push_back(d1Cmd);
-        //joint_cmd.position.push_back(0);
         joint_cmd.position.push_back(d2Cmd);
-        //joint_cmd.position.push_back(0);
         publishJointCommand();
 
         joint_cmd.name.push_back(names[1]);
         joint_cmd.name.push_back(names[3]);
-        //joint_cmd.velocity.push_back(dd1Cmd);
         joint_cmd.velocity.push_back(phi1dCmd);
-        //joint_cmd.velocity.push_back(dd2Cmd);
         joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
     }

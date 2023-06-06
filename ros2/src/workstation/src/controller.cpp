@@ -100,10 +100,8 @@ class controller : public rclcpp::Node
             d2Cmd = -d1Cmd;
 
             command.um=um;
-            command.delta1dot=dd1;
-            command.delta2dot=dd2;
-            //command.delta1 = d1Cmd;
-            //command.delta2 = d2Cmd;
+            command.delta1 = d1Cmd;
+            command.delta2 = d2Cmd;
             command_publisher->publish(command);
 
             transform_stamped_.header.stamp = this->now();
