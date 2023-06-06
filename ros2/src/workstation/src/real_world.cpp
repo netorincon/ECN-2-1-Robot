@@ -95,10 +95,6 @@ class real_world : public rclcpp::Node
             //get_parameter("frequency", frequency);
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-            
-            for(uint i=0;i<names.size(); i++){
-                joint_cmd.name.push_back(names[i]);
-            }
 
             position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
                 "position_cmd", 10, std::bind(&real_world::jointCommandFromPositionCmd, this, std::placeholders::_1));
@@ -159,6 +155,10 @@ class real_world : public rclcpp::Node
     }
 
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
+        for(uint i=0;i<names.size(); i++){
+            joint_cmd.name.push_back(names[i]);
+        }
+
         joint_cmd.position.push_back(msg->d1);
         joint_cmd.position.push_back(msg->phi1);
         joint_cmd.position.push_back(msg->d2);
@@ -178,17 +178,19 @@ class real_world : public rclcpp::Node
         phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
 
+        joint_cmd.name.push_back(names[0]);
+        joint_cmd.name.push_back(names[2]);
         joint_cmd.position.push_back(d1Cmd);
-        joint_cmd.position.push_back(0);
+        //joint_cmd.position.push_back(0);
         joint_cmd.position.push_back(d2Cmd);
-        joint_cmd.position.push_back(0);
+        //joint_cmd.position.push_back(0);
         publishJointCommand();
 
+        joint_cmd.name.push_back(names[1]);
+        joint_cmd.name.push_back(names[3]);
         //joint_cmd.velocity.push_back(dd1Cmd);
-        joint_cmd.velocity.push_back(0);
         joint_cmd.velocity.push_back(phi1dCmd);
         //joint_cmd.velocity.push_back(dd2Cmd);
-        joint_cmd.velocity.push_back(0);
         joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
     }
@@ -201,6 +203,7 @@ class real_world : public rclcpp::Node
         joint_cmd.velocity.clear();
         joint_cmd.position.clear();
         joint_cmd.effort.clear();
+        joint_cmd.name.clear();
     }
 
 };
