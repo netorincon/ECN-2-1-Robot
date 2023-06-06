@@ -58,7 +58,7 @@ class controller : public rclcpp::Node
         float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0, d1Cmd = 0, d2Cmd = 0;
         float a=0.08;
         float e=0.1;
-        float kp=0.25;
+        float kp=0.35;
         float period;
         float frequency;
         float time=0;
@@ -146,8 +146,8 @@ class controller : public rclcpp::Node
         if(time>2*M_PI){
             time-=2*M_PI;
         }
-        xr(0)=0.5*cos(time);
-        xr(1)=0.5*sin(time);
+        xr(0)=cos(time);
+        xr(1)=sin(time);
 
         xrdot=(xr-xrprev)*period;
         xrprev=xr;

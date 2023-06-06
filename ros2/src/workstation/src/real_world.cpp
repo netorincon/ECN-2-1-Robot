@@ -172,8 +172,8 @@ class real_world : public rclcpp::Node
         d1Cmd=limit_deltaSpeed(msg->delta1);
         d2Cmd=limit_deltaSpeed(msg->delta2);
 
-        phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
-        phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
+        phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/R);
+        phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/R);
 
         joint_cmd.name.push_back(names[0]);
         joint_cmd.name.push_back(names[2]);

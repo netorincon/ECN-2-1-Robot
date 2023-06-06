@@ -115,19 +115,19 @@ class Ui_Form(object):
         return
     
     def updateB1dSlider(self):
-        self.b1d_slider.setValue(self.b1d_sb.value()*100)
+        self.b1d_slider.setValue(self.b1d_sb.value())
         return
     
     def updateB1dBox(self):
-        self.b1d_sb.setValue(self.b1d_slider.value()/100)
+        self.b1d_sb.setValue(self.b1d_slider.value())
         return
     
     def updateB2dSlider(self):
-        self.b2d_slider.setValue(self.b2d_sb.value()*100)
+        self.b2d_slider.setValue(self.b2d_sb.value())
         return
     
     def updateB2dBox(self):
-        self.b2d_sb.setValue(self.b2d_slider.value()/100)
+        self.b2d_sb.setValue(self.b2d_slider.value())
         return
     
     def switchToPositionMode(self):
