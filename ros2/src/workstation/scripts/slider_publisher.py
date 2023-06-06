@@ -13,14 +13,20 @@ import math
 class publisherNode(Node):
     def __init__(self, ui):
         super().__init__('slider_publisher')
+
+        self.declare_parameter('frequency', 20)
+
         self.ui = ui
         self.position_publisher = self.create_publisher(PositionCommand, 'position_cmd', 10)
         self.velocity_publisher = self.create_publisher(ControlInput, 'control_cmd', 10)
         self.abort_publisher = self.create_publisher(JointState, 'motor_cmd', 10)
-        timer_period = 0.05  # seconds
+
+        frequency=self.get_parameter('frequency').get_parameter_value()
+        timer_period = 1/frequency
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
+        
         if(self.ui.end):
             msg=JointState()
             msg.name={ "right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"}
