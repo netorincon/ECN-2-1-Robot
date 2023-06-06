@@ -173,7 +173,8 @@ class real_world : public rclcpp::Node
 
         // Change in position for d1 and d2
         d1Cmd = d1 + (dd1Cmd * period);
-        d2Cmd = d2 + (dd2Cmd * period);
+        //d2Cmd = d2 + (dd2Cmd * period);
+        d2Cmd = -d1Cmd;
 
         phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
