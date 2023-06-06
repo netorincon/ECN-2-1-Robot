@@ -106,7 +106,9 @@ class real_world : public rclcpp::Node
 
             control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
                 "control_cmd", 10, std::bind(&real_world::jointCommandFromControlCmd, this, std::placeholders::_1));
-         
+
+            joint_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+                "joint_states", 10, std::bind(&real_world::motorStates, this, std::placeholders::_1));
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
             //state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
@@ -144,8 +146,18 @@ class real_world : public rclcpp::Node
 
         //Defining subscribers
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
+
+    void motorStates(const sensor_msgs::msg::JointState::SharedPtr motor){
+        auto start = motor->name.begin();
+        auto d1_index = std::find(motor->name.begin(), motor->name.end(), "right_wheel_base_joint") - start;
+        auto d2_index = std::find(motor->name.begin(), motor->name.end(), "left_wheel_base_joint") - start;
+
+        d1 = motor->position[d1_index];
+        d2 = limit_angle(motor->position[d2_index] - M_PI);
+    }
 
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
         joint_cmd.position.push_back(msg->d1);
@@ -160,16 +172,28 @@ class real_world : public rclcpp::Node
         dd1Cmd=limit_deltaSpeed(msg->delta1dot);
         dd2Cmd=limit_deltaSpeed(msg->delta2dot);
 
+        // Change in position for d1 and d2
+        d1Cmd = d1 + (dd1Cmd * period);
+        d2Cmd = d2 + (dd2Cmd * period);
+
         phi1dCmd=limit_phiSpeed(2*cos(d2)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1)*Um/R);
 
-        joint_cmd.velocity.push_back(dd1Cmd);
-        joint_cmd.velocity.push_back(phi1dCmd);
-        joint_cmd.velocity.push_back(dd2Cmd);
-        joint_cmd.velocity.push_back(phi2dCmd);
+        joint_cmd.position.push_back(d1Cmd);
+        joint_cmd.position.push_back(0);
+        joint_cmd.position.push_back(d2Cmd);
+        joint_cmd.position.push_back(0);
         publishJointCommand();
 
+        //joint_cmd.velocity.push_back(dd1Cmd);
+        joint_cmd.velocity.push_back(0);
+        joint_cmd.velocity.push_back(phi1dCmd);
+        //joint_cmd.velocity.push_back(dd2Cmd);
+        joint_cmd.velocity.push_back(0);
+        joint_cmd.velocity.push_back(phi2dCmd);
+        publishJointCommand();
     }
+
     void publishJointCommand(){
         joint_cmd.header.stamp=this->now();
         joint_command_publisher->publish(joint_cmd);
