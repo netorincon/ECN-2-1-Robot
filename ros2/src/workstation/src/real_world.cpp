@@ -105,7 +105,9 @@ class real_world : public rclcpp::Node
 
             control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
                 "control_cmd", 10, std::bind(&real_world::jointCommandFromControlCmd, this, std::placeholders::_1));
-         
+
+            joint_state_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
+                "joint_states", 10, std::bind(&real_world::motorStates, this, std::placeholders::_1));
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
@@ -143,8 +145,18 @@ class real_world : public rclcpp::Node
 
         //Defining subscribers
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr state_subscriber;
+        rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
+
+    void motorStates(const sensor_msgs::msg::JointState::SharedPtr motor){
+        auto start = motor->name.begin();
+        auto d1_index = std::find(motor->name.begin(), motor->name.end(), "right_wheel_base_joint") - start;
+        auto d2_index = std::find(motor->name.begin(), motor->name.end(), "left_wheel_base_joint") - start;
+
+        d1 = motor->position[d1_index];
+        d2 = limit_angle(motor->position[d2_index] - M_PI);
+    }
 
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
         joint_cmd.position.push_back(msg->d1);
