@@ -330,9 +330,7 @@ class motor_state : public rclcpp::Node
                 jointState.effort.push_back(stateArray[i].torque);
 			}
             else{
-                // TODO
-                // What should we send to 3 and 4?
-                // Is it empty? Are there 0s?
+                jointState.effort.push_back(0);
             }
 		}
 		joint_state_publisher->publish(jointState);
@@ -628,10 +626,10 @@ class motor_state : public rclcpp::Node
     }
 
 	void printMotorState(){
-		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
-		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \t Present Torque : %d \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
-		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
-		printf("[ID:%03d] \n Present Position : %d \t Present Velocity : %d \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
+        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
+        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
+        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
+        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
 	}
 
     void exitNode(){
