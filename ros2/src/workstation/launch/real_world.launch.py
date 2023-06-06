@@ -16,8 +16,8 @@ def generate_launch_description():
     # Check if we are told to use sim time
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_ros2_control = LaunchConfiguration('use_ros2_control')
-    mode=LaunchConfiguration('mode')
-    period=LaunchConfiguration('period')
+    paramFile="~/ECN-1-2-Robot/ros2/src/global_params.yaml"
+    #period=LaunchConfiguration('period')
 
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('workstation'))
@@ -30,14 +30,14 @@ def generate_launch_description():
         package = 'robot_state_publisher',
         executable = 'robot_state_publisher',
         output = 'screen',
-        parameters = [params1]
+        
     )
-    real_world_params={'period': period}
+    #real_world_params={'period': period}
     real_world = Node(
         package = 'workstation',
         executable = 'real_world',
         output = 'screen',
-        parameters=[real_world_params]
+        parameters=[paramFile]
     )
 
     rqt = Node(
@@ -46,13 +46,12 @@ def generate_launch_description():
         output = 'screen',
     )
 
-    controller_params={'period' : period}
     controller =Node(
         package='workstation',
         executable='controller',
         output='screen',
         condition=LaunchConfigurationEquals('mode', 'controller'),
-        parameters=[controller_params]
+        parameters=[paramFile]
     )
     # Create Rviz node
     rviz = Node(
