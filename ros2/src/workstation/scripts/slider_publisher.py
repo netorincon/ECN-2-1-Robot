@@ -36,8 +36,8 @@ class publisherNode(Node):
         if(self.ui.manual_speed_mode_radio.isChecked()):   
             msg=ControlInput()
             msg.um=float(self.ui.um_sb.value())
-            msg.delta1dot=self.ui.b1d_sb.value()
-            msg.delta2dot=self.ui.b2d_sb.value()
+            msg.delta1dot=self.ui.b1d_sb.value()*math.pi/180
+            msg.delta2dot=self.ui.b2d_sb.value()*math.pi/180 
             self.velocity_publisher.publish(msg)
             
         elif(self.ui.manual_pos_mode_radio.isChecked()):

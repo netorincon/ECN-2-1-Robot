@@ -122,12 +122,12 @@ class sim : public rclcpp::Node
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
-                dd1 = limit_deltaSpeed(msg->delta1dot);
-                dd2 = limit_deltaSpeed(msg->delta2dot);
+                d1 = msg->delta1; //limit_deltaSpeed(msg->delta1);
+                d2 = msg->delta2; //limit_deltaSpeed(msg->delta2);
 
                 //We calculate current robot speeds and orientation motor speeds
-                d1+=dd1*period; //Delta 1
-                d2+=dd2*period; //Delta 2
+                //d1+=dd1*period; //Delta 1
+                //d2+=dd2*period; //Delta 2
 
                 tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
                 tt+=tt_dot*period;
