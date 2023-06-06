@@ -71,8 +71,9 @@ class sim : public rclcpp::Node
         
         sim(rclcpp::NodeOptions options) : Node("sim", options)
         {
-            declare_parameter("mode", "velocity");
-            get_parameter("mode", mode);
+            declare_parameter("frequency", 20);
+            frequency = this->get_parameter("frequency").as_int();
+            period = 1.0/frequency; //Seconds
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -101,8 +102,8 @@ class sim : public rclcpp::Node
         sensor_msgs::msg::JointState joint_state;
         control_input::msg::StateVector robot_state;
         tf2::Quaternion rotation;
-        float frequency = 50; // fréquence de publication des transformations sur le topic /tf
-        float period = 1/frequency;
+        float frequency; // fréquence de publication des transformations sur le topic /tf
+        float period;
         float a=0.08;//Base distance
         float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)

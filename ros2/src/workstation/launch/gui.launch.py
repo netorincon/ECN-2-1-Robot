@@ -13,7 +13,6 @@ def generate_launch_description():
         package = 'workstation',
         executable = 'gui.py',
         output = 'screen',
-        parameters=[path]
     )
 
     # Launch

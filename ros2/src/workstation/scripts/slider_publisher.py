@@ -21,7 +21,7 @@ class publisherNode(Node):
         self.velocity_publisher = self.create_publisher(ControlInput, 'control_cmd', 10)
         self.abort_publisher = self.create_publisher(JointState, 'motor_cmd', 10)
 
-        frequency=self.get_parameter('frequency').get_parameter_value()
+        frequency=self.get_parameter('frequency').value
         timer_period = 1/frequency
         self.timer = self.create_timer(timer_period, self.timer_callback)
 

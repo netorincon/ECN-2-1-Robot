@@ -91,8 +91,9 @@ class real_world : public rclcpp::Node
     public :
         real_world(rclcpp::NodeOptions options) : Node("real_world", options)
         {
-            // declare_parameter("frequency", 20);
-            // get_parameter("frequency", frequency);
+            declare_parameter("frequency", 20);
+            frequency = this->get_parameter("frequency").as_int();
+            period = 1.0/frequency; //Seconds
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
             
@@ -121,8 +122,8 @@ class real_world : public rclcpp::Node
 
         //We initialize all variables of the state vector at 0
         float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;
-        float frequency=20; // HZ, used for calculating positions via integrals
-        float period = 1/frequency; //Seconds
+        float frequency; // HZ, used for calculating positions via integrals
+        float period;
         
         Point ICRLocation;
         tf2::Quaternion rotation;
