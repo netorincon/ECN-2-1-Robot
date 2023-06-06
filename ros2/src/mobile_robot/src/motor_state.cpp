@@ -85,7 +85,10 @@ struct Point{
 class motor_state : public rclcpp::Node
 {
 	public :
-		motor_state() : Node("motor_state"){
+		motor_state(rclcpp::NodeOptions options) : Node("motor_state", options){
+            declare_parameter("frequency", 20);
+            frequency = this->get_parameter("frequency").as_int();
+            period = 1.0/frequency; //Seconds
             pid = getpid();
 			// Open port
 			if (portHandler->openPort()){
@@ -121,7 +124,7 @@ class motor_state : public rclcpp::Node
 					// Publisher for present joint states
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
-                    timer_ = this->create_wall_timer(std::chrono::milliseconds(PERIOD), std::bind(&motor_state::publishJointState,this));
+                    timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&motor_state::publishJointState,this));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -172,8 +175,8 @@ class motor_state : public rclcpp::Node
         //
         float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
-        float frequency = 20;                           // HZ, fréquence de publication des transformations sur le topic /tf
-        float period = 1/frequency;                     // Seconds
+        float frequency;                           // HZ, fréquence de publication des transformations sur le topic /tf
+        float period;                     // Seconds
         float a = 0.08;                                 // Base distance in meters
         float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
@@ -640,7 +643,7 @@ class motor_state : public rclcpp::Node
 int main(int argc, char** argv)
 {	
 	rclcpp::init(argc, argv);
-	auto node = std::make_shared<motor_state>();
+	auto node = std::make_shared<motor_state>(rclcpp::NodeOptions{});
 	rclcpp::spin(node);
 	
 	node->disableTorque(DXL1_ID);
