@@ -221,10 +221,9 @@ class motor_state : public rclcpp::Node
 	int velToPulse(float value){
 		return ((value * 60) / (2 * M_PI)) / 0.229; // Increments are of 0.229 rpm
 	}
-	
-	// TODO
-	int torToPulse(float value){
-		return value;
+
+    int torToPulse(float value){
+        return (((1.5862 * value) + 0.15) * 1000) / 2.69;
 	}
 	
 	// Conversion methods for joint states (DXL -> radians)
@@ -235,10 +234,9 @@ class motor_state : public rclcpp::Node
 	float pulseToVel(int value){
 		return ((value % 1024) * 0.229 * 2 * M_PI) / 60; // DXL range 0 - 1023
 	}
-	
-	// TODO
+
 	float pulseToTor(int value){
-		return value;
+        return (((value * 2.69) / 1000) - 0.15) / 1.5862;
 	}
 	
 	// Subscriber callback
