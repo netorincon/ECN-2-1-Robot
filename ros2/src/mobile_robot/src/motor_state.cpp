@@ -61,7 +61,7 @@
 #define VELOCITY_CONTROL				1
 #define TORQUE_CONTROL					0
 
-#define PERIOD                          50 // In milliseconds
+//#define PERIOD                          50 // In milliseconds
 #define TRIES                           10  // Tries before giving up in communication error
 
 struct MotorGoal{
