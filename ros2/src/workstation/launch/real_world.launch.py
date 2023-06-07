@@ -16,10 +16,11 @@ def generate_launch_description():
     # Check if we are told to use sim time
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_ros2_control = LaunchConfiguration('use_ros2_control')
-    mode=LaunchConfiguration('mode')
+    paramFile="~/ECN-1-2-Robot/ros2/src/global_params.yaml"
+    #period=LaunchConfiguration('period')
 
     # Process the URDF file
-    pkg_path = os.path.join(get_package_share_directory('mobile_robot'))
+    pkg_path = os.path.join(get_package_share_directory('workstation'))
     xacro_file = os.path.join(pkg_path,'description',"robot.urdf.xacro")
     robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
 
@@ -29,14 +30,14 @@ def generate_launch_description():
         package = 'robot_state_publisher',
         executable = 'robot_state_publisher',
         output = 'screen',
-        parameters = [params1]
+        
     )
-    nodeParams={"mode": mode}
+    #real_world_params={'period': period}
     real_world = Node(
-        package = 'mobile_robot',
+        package = 'workstation',
         executable = 'real_world',
         output = 'screen',
-        parameters=[nodeParams]
+        parameters=[paramFile]
     )
 
     rqt = Node(
@@ -46,10 +47,11 @@ def generate_launch_description():
     )
 
     controller =Node(
-        package='mobile_robot',
+        package='workstation',
         executable='controller',
         output='screen',
         condition=LaunchConfigurationEquals('mode', 'controller'),
+        parameters=[paramFile]
     )
     # Create Rviz node
     rviz = Node(
@@ -78,8 +80,8 @@ def generate_launch_description():
             description = 'Use manual velocity sliders as default'),
         
         #joint_state_publisher_gui,
-        #rqt,
-        robot_state_publisher,
+        rqt,
+        #robot_state_publisher,
         real_world,
         rviz,
         controller

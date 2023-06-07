@@ -26,51 +26,22 @@ find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
 
-add_executable(sim src/sim.cpp )
-ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
-
-add_executable(real_world src/real_world.cpp )
-ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input)
-
-ament_python_install_package(${PROJECT_NAME})
-
 add_executable(motor_state src/motor_state.cpp)
-ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input)
-
-add_executable(controller src/controller.cpp)
-ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input)
-
-install(TARGETS
-    sim
-    DESTINATION lib/${PROJECT_NAME}
-    )
-
-install(TARGETS
-    real_world
-    DESTINATION lib/${PROJECT_NAME}
-    )
-install(PROGRAMS
-    scripts/gui.py
-    DESTINATION lib/${PROJECT_NAME}
-    )
+ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros)
 
 install (TARGETS
 motor_state
     DESTINATION lib/${PROJECT_NAME}
     )
-install(TARGETS
-	controller
-	DESTINATION lib/${PROJECT_NAME}
-	)		
 
-if(BUILD_TESTING)
+    if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
 install(
-    DIRECTORY config description launch
+    DIRECTORY description launch
     DESTINATION share/${PROJECT_NAME}
     )
-
+    
 ament_package()

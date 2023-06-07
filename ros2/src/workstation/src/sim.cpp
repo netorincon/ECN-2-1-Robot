@@ -8,21 +8,30 @@ The command input should include [um, deltaDot1 and deltaDot2]
 
 */
 
-#include <algorithm>
+/*
+We subscribe to the topic cmd_robot via cmd_susbscriber 
+It receives the input vector which includes [um, delta1dot and delta2dot].
+qDot (derivative of the configuration vector) is estimated using the S matrix obtained in the Kinematic model calculations
+times the um input. 
+
+Then the values are integrated over time to obtain the current state vector.
+*/
+
+#include <chrono>
 #include <string>
 #include <math.h>
+#include <algorithm>
 #include <rclcpp/rclcpp.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <control_input/msg/slider_command.hpp>
-#include <control_input/msg/control_input.hpp>
-#include <control_input/msg/position_command.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <chrono>
+#include <tf2_ros/transform_broadcaster.h>
+#include <control_input/msg/state_vector.hpp>
+#include <control_input/msg/control_input.hpp>
+#include <control_input/msg/slider_command.hpp>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <control_input/msg/position_command.hpp>
 
 struct MotorState{
@@ -42,6 +51,19 @@ double limit_angle(double a){
     return a ;
 }
 
+float limit_phiSpeed(float a){
+    float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
+
+float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+    float max=(55.0/60.0)*(2*M_PI);
+    if( a >=  max) {a =max;}
+    else if(a<= -max) {a=-max;} 
+    return a;
+}
 
 class sim : public rclcpp::Node
 {
@@ -49,34 +71,24 @@ class sim : public rclcpp::Node
         
         sim(rclcpp::NodeOptions options) : Node("sim", options)
         {
-            declare_parameter("mode", "velocity");
-            get_parameter("mode", mode);
+            declare_parameter("frequency", 20);
+            frequency = this->get_parameter("frequency").as_int();
+            period = 1.0/frequency; //Seconds
             //Create transform broadcaster
             tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-            /*
-            We subscribe to the topic cmd_robot via cmd_susbscriber 
-            It receives the input vector which includes [um, delta1dot and delta2dot].
-            qDot (derivative of the configuration vector) is estimated using the S matrix obtained in the Kinematic model calculations
-            times the um input. 
+            position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
+                "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
 
-            Then the values are integrated over time to obtain the current state vector.
-            
-            */  
-            if(mode=="position"){
-                position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
-                    "position_cmd", 10, std::bind(&sim::calculatePoseFromPositionCmd, this, std::placeholders::_1));
-            }
-            if(mode=="velocity" || mode=="controller"){
-                control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
-                    "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
-            }
+            control_input_subscriber = this->create_subscription<control_input::msg::ControlInput>(
+                "control_cmd", 10, std::bind(&sim::calculatePoseFromControlCmd, this, std::placeholders::_1));
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+            state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             
         }
         //We initialize all variables of the state vector at 0
-        float tt, x, y, phi1, phi2, phi1d, phi2d, beta1, beta2, Um, dd1, dd2, d1, d2, tt_dot, x_dot, y_dot=0;
+        float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;
 
     private :
         geometry_msgs::msg::TransformStamped transform_stamped_;
@@ -84,15 +96,18 @@ class sim : public rclcpp::Node
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
 
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
+        control_input::msg::StateVector robot_state;
         tf2::Quaternion rotation;
-        float frequency = 50; // fréquence de publication des transformations sur le topic /tf
-        float period = 1/frequency;
+        float frequency; // fréquence de publication des transformations sur le topic /tf
+        float period;
         float a=0.08;//Base distance
         float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)
+
         Point ICRLocation;
 
         void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
@@ -107,12 +122,12 @@ class sim : public rclcpp::Node
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
-                dd1 = msg->delta1dot;
-                dd2 = msg->delta2dot;
+                d1 = msg->delta1; //limit_deltaSpeed(msg->delta1);
+                d2 = msg->delta2; //limit_deltaSpeed(msg->delta2);
 
                 //We calculate current robot speeds and orientation motor speeds
-                d1+=dd1*period; //Delta 1
-                d2+=dd2*period; //Delta 2
+                //d1+=dd1*period; //Delta 1
+                //d2+=dd2*period; //Delta 2
 
                 tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
                 tt+=tt_dot*period;
@@ -120,8 +135,8 @@ class sim : public rclcpp::Node
 
                 x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
                 y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
-                phi1d=2*cos(d2)*Um/R;
-                phi2d=2*cos(d1)*Um/R;
+                phi1d=limit_phiSpeed(2*cos(d2)*Um/R);
+                phi2d=limit_phiSpeed(2*cos(d1)*Um/R);
 
                 //We integrate the speeds over time (add each time we get a new value)
                 x+=x_dot*period;
@@ -167,12 +182,10 @@ class sim : public rclcpp::Node
 
             diff=alpha1-alpha2;
             //See PDF for detailed calculations
-            //RCLCPP_INFO(this->get_logger(), "Difference: '%f'", sin(diff));
             if(sin(diff)!=0){
                 ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
                 ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
             }
-
         }
 
 
@@ -186,8 +199,8 @@ class sim : public rclcpp::Node
            
 
             //Message that contains the chassis transform with respect to the world         
-            transform_stamped_.header.frame_id = "world"; // Nom du repère fixe
-            transform_stamped_.child_frame_id = "chassis"; // Nom du repère du robot
+            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
+            transform_stamped_.child_frame_id = "base_link"; // Nom du repère du robot
             transform_stamped_.transform.translation.x = x;
             transform_stamped_.transform.translation.y = y;
             transform_stamped_.transform.translation.z = 0;
@@ -199,7 +212,7 @@ class sim : public rclcpp::Node
             
             //Message that contains the position of the ICR with respect to the robot chassis
             calculateICR();        
-            icr.header.frame_id = "chassis"; // Nom du repère fixe
+            icr.header.frame_id = "base_link"; // Nom du repère fixe
             icr.child_frame_id = "icr"; // Nom du repère du robot
             icr.transform.translation.x = ICRLocation.x;
             icr.transform.translation.y = ICRLocation.y;
@@ -211,6 +224,15 @@ class sim : public rclcpp::Node
             tf_broadcaster_->sendTransform(transform_stamped_);
             icr.header.stamp = this->now();
             tf_broadcaster_->sendTransform(icr);
+
+            robot_state.x=x;
+            robot_state.y=y;
+            robot_state.theta=tt;
+            robot_state.delta1=d1;
+            robot_state.delta2=d2;
+            robot_state.phi1=phi1;
+            robot_state.phi2=phi2;
+            state_vector_publisher->publish(robot_state);
         }
 };
 

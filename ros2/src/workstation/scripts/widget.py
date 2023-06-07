@@ -2,12 +2,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from qwt.text import QwtTextLabel
 import os, signal
+import time
 
 windowHeight=680
 windowWidth=420
 
 
 class Ui_Form(object):
+    end=False
     def launchFile(self):
         #Check radio button state
         manual_speed_mode=self.manual_speed_mode_radio.isChecked()
@@ -26,9 +28,9 @@ class Ui_Form(object):
             self.launchP.waitForFinished(-1)
 
         if(self.simulation_radio.isChecked()):
-            self.launchP.start("ros2", ["launch", "mobile_robot", "simulation.launch.py", self.mode])
+            self.launchP.start("ros2", ["launch", "workstation", "simulation.launch.py", self.mode])
         else:
-            self.launchP.start("ros2", ["launch", "mobile_robot", "real_world.launch.py", self.mode])
+            self.launchP.start("ros2", ["launch", "workstation", "real_world.launch.py", self.mode])
 
         self.umSlider.setEnabled(manual_speed_mode)
         self.b1d_slider.setEnabled(manual_speed_mode)
@@ -49,9 +51,14 @@ class Ui_Form(object):
         return
     
     def endLaunch(self):
+        self.end=True
+        self.reset_pos_sliders()
+        self.reset_speed_sliders()
+        
         if(self.launchP.processId()!=0):
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
+        time.sleep(0.5)
         self.simulation_radio.setDisabled(False)
         self.real_world_radio.setDisabled(False)
         self.launch_button.setDisabled(False)
@@ -59,24 +66,28 @@ class Ui_Form(object):
         self.control_mode_radio.setEnabled(True)
         self.manual_speed_mode_radio.setEnabled(True)
         self.manual_pos_mode_radio.setEnabled(True)
+        self.end=False
+
         return
     
     def exit(self):
-        if(self.launchP.processId()!=0):
-            print("Trying to terminate the process ", self.launchP.processId())
-            os.kill(self.launchP.processId(), signal.SIGINT)
-            self.launchP.waitForFinished(-1)
+        self.endLaunch()
         return
     
     def reset_speed_sliders(self):
         self.umSlider.setProperty("value", 0)
+        self.um_sb.setValue(0)
         self.b1d_slider.setProperty("value", 0)
+        self.b1d_sb.setValue(0)
         self.b2d_slider.setProperty("value", 0)
+        self.b2d_sb.setValue(0)
         return
         
     def reset_pos_sliders(self):
         self.b1_slider.setProperty("value", 0)
+        self.beta1_sb.setValue(0)
         self.b2_slider.setProperty("value", 0)
+        self.beta2_sb.setValue(0)
         return
     
     def updateBeta1Slider(self):
@@ -104,19 +115,19 @@ class Ui_Form(object):
         return
     
     def updateB1dSlider(self):
-        self.b1d_slider.setValue(self.b1d_sb.value()*100)
+        self.b1d_slider.setValue(self.b1d_sb.value())
         return
     
     def updateB1dBox(self):
-        self.b1d_sb.setValue(self.b1d_slider.value()/100)
+        self.b1d_sb.setValue(self.b1d_slider.value())
         return
     
     def updateB2dSlider(self):
-        self.b2d_slider.setValue(self.b2d_sb.value()*100)
+        self.b2d_slider.setValue(self.b2d_sb.value())
         return
     
     def updateB2dBox(self):
-        self.b2d_sb.setValue(self.b2d_slider.value()/100)
+        self.b2d_sb.setValue(self.b2d_slider.value())
         return
     
     def switchToPositionMode(self):
@@ -218,7 +229,7 @@ class Ui_Form(object):
 
         self.beta1_control=QtWidgets.QHBoxLayout()
         self.beta1_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
-        self.beta1_sb.setRange(-180, 180)
+        self.beta1_sb.setRange(-180, 179)
         self.beta1_sb.setSingleStep(1)
         self.beta1_sb.setDisabled(True)
         self.beta1_control.addWidget(self.beta1_sb)
@@ -226,7 +237,7 @@ class Ui_Form(object):
         self.b1_slider = QtWidgets.QSlider(self.gridLayoutWidget)
         self.b1_slider.setEnabled(False)
         self.b1_slider.setMinimum(-180)
-        self.b1_slider.setMaximum(180)
+        self.b1_slider.setMaximum(179)
         self.b1_slider.setProperty("value", 0)
         self.b1_slider.setOrientation(QtCore.Qt.Horizontal)
         self.b1_slider.setObjectName("b1_slider")
@@ -240,14 +251,14 @@ class Ui_Form(object):
         self.beta2_control.setObjectName("beta2_control") 
         self.beta2_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
         self.beta2_sb.setObjectName("beta2_sb") 
-        self.beta2_sb.setRange(-180, 180)
+        self.beta2_sb.setRange(-180, 179)
         self.beta2_sb.setSingleStep(1)
         self.beta2_sb.setDisabled(True)
         self.beta2_control.addWidget(self.beta2_sb,)
         self.b2_slider = QtWidgets.QSlider(self.gridLayoutWidget)
         self.b2_slider.setEnabled(False)
         self.b2_slider.setMinimum(-180)
-        self.b2_slider.setMaximum(180)
+        self.b2_slider.setMaximum(179)
         self.b2_slider.setProperty("value", 0)
         self.b2_slider.setOrientation(QtCore.Qt.Horizontal)
         self.b2_slider.setObjectName("b2_slider")
@@ -279,7 +290,7 @@ class Ui_Form(object):
         self.um_control=QtWidgets.QHBoxLayout()
         self.um_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
         self.um_sb.setRange(-1, 1)
-        self.um_sb.setSingleStep(0.05)
+        self.um_sb.setSingleStep(0.01)
         self.um_sb.setDisabled(True)
         self.um_control.addWidget(self.um_sb)
 
@@ -298,14 +309,14 @@ class Ui_Form(object):
         self.manual_control_block.addWidget(self.beta1dot)
         self.b1d_control=QtWidgets.QHBoxLayout()
         self.b1d_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
-        self.b1d_sb.setRange(-1, 1)
-        self.b1d_sb.setSingleStep(0.05)
+        self.b1d_sb.setRange(-180, 179)
+        self.b1d_sb.setSingleStep(1)
         self.b1d_sb.setDisabled(True)
         self.b1d_control.addWidget(self.b1d_sb)
         self.b1d_slider = QtWidgets.QSlider(self.gridLayoutWidget)
         self.b1d_slider.setEnabled(False)
-        self.b1d_slider.setMinimum(-100)
-        self.b1d_slider.setMaximum(100)
+        self.b1d_slider.setMinimum(-180)
+        self.b1d_slider.setMaximum(179)
         self.b1d_slider.setPageStep(10)
         self.b1d_slider.setProperty("value", 0)
         self.b1d_slider.setOrientation(QtCore.Qt.Horizontal)
@@ -319,14 +330,14 @@ class Ui_Form(object):
         self.manual_control_block.addWidget(self.beta2dot)
         self.b2d_control=QtWidgets.QHBoxLayout()
         self.b2d_sb=QtWidgets.QDoubleSpinBox(self.gridLayoutWidget)
-        self.b2d_sb.setRange(-1, 1)
-        self.b2d_sb.setSingleStep(0.05)
+        self.b2d_sb.setRange(-180, 179)
+        self.b2d_sb.setSingleStep(1)
         self.b2d_sb.setDisabled(True)
         self.b2d_control.addWidget(self.b2d_sb)
         self.b2d_slider = QtWidgets.QSlider(self.gridLayoutWidget)
         self.b2d_slider.setEnabled(False)
-        self.b2d_slider.setMinimum(-100)
-        self.b2d_slider.setMaximum(100)
+        self.b2d_slider.setMinimum(-180)
+        self.b2d_slider.setMaximum(179)
         self.b2d_slider.setSliderPosition(0)
         self.b2d_slider.setOrientation(QtCore.Qt.Horizontal)
         self.b2d_slider.setObjectName("b2d_slider")
@@ -431,8 +442,8 @@ class Ui_Form(object):
         self.simulation_radio.setText(_translate("Form", "Simulation"))
         self.real_world_radio.setText(_translate("Form", "Real world"))
         self.TextLabel.setPlainText(_translate("Form", "Um control input"))
-        self.beta1dot.setPlainText(_translate("Form", "Delta dot 1"))
-        self.beta2dot.setPlainText(_translate("Form", "Delta 2 dot"))
+        self.beta1dot.setPlainText(_translate("Form", "Delta 1"))
+        self.beta2dot.setPlainText(_translate("Form", "Delta 2"))
         self.beta1text.setPlainText(_translate("Form", "Delta 1"))
         self.beta2text.setPlainText(_translate("Form", "Delta 2"))
         self.reset_speed_button.setText(_translate("Form", "Reset sliders"))

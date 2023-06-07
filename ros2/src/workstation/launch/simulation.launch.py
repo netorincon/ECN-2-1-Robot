@@ -6,21 +6,21 @@ from launch import LaunchDescription
 from launch.substitutions  import LaunchConfiguration, Command
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import LaunchConfigurationEquals
 
 import xacro
-
 
 def generate_launch_description():
 
     # Check if we are told to use sim time
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_ros2_control = LaunchConfiguration('use_ros2_control')
+    mode=LaunchConfiguration('mode')
 
     # Process the URDF file
-    pkg_path = os.path.join(get_package_share_directory('mobile_robot'))
+    pkg_path = os.path.join(get_package_share_directory('workstation'))
     xacro_file = os.path.join(pkg_path,'description',"robot.urdf.xacro")
-    robot_description_config = xacro.process_file(xacro_file).toxml()
-    #robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
+    robot_description_config = Command(['xacro ', xacro_file, " use_ros2_control:=", use_ros2_control, " sim_time:=", use_sim_time])
 
     # Create robot_state_publisher node
     params1 = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
@@ -31,50 +31,35 @@ def generate_launch_description():
         parameters = [params1]
     )
 
+    sim = Node(
+        package = 'workstation',
+        executable = 'sim',
+        output = 'screen',
+    )
+
+    rqt = Node(
+        package = 'rqt_gui',
+        executable = 'rqt_gui',
+        output = 'screen',
+    )
+    
+    controller =Node(
+        package='workstation',
+        executable='controller',
+        output='screen',
+        condition=LaunchConfigurationEquals('mode', 'controller'),
+    )
+
     # Create Rviz node
     rviz = Node(
         package = 'rviz2',
         executable = 'rviz2',
         output = 'screen',
+        arguments=['-d', [os.path.join(pkg_path, 'config', 'robot_sim.rviz')]]
     )
-
-    # Create joint_state_publisher_gui node
-    joint_state_publisher_gui = Node(
-        package = 'joint_state_publisher_gui',
-        executable = 'joint_state_publisher_gui',
-    )
-    
-
-			
-    # Create slider_publisher node
-    yaml_file = os.path.join(pkg_path,'launch','Twist.yaml')
-    slider_publisher = Node(
-		package = 'slider_publisher',
-		executable = 'slider_publisher',
-		name = 'slider_publisher',
-		output = 'screen',
-		arguments = [yaml_file],
-	)
-	
-	# Create driver node
-    driver = Node(
-        package = 'mobile_robot',
-        executable = 'driver',
-        output = 'screen',
-    )
-    
-    # Create transform_broadcaster node
-    transform_broadcaster = Node(
-        package = 'mobile_robot',
-        executable = 'transform_broadcaster',
-        output = 'screen',
-    )
-
     # Launch
     return LaunchDescription([
-    
-			
-			
+		
         DeclareLaunchArgument(
             "use_sim_time",
             default_value = "false",
@@ -84,15 +69,15 @@ def generate_launch_description():
             "use_ros2_control",
             default_value = "true",
             description = 'use ros2 control if true'),
-        
-        #joint_state_publisher_gui,
+        DeclareLaunchArgument(
+            "mode",
+            default_value = "velocity",
+            description = 'Use manual velocity sliders as default'),
+
         robot_state_publisher,
-        slider_publisher,
-        driver,
-        transform_broadcaster,
-        rviz
-        
-        
-        
+        sim,
+        rviz,
+        controller
+   
     ])
 
