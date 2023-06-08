@@ -86,6 +86,7 @@ class sim : public rclcpp::Node
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
             
+            
         }
         //We initialize all variables of the state vector at 0
         float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;

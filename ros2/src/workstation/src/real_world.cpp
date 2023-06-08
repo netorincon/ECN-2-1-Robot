@@ -108,8 +108,8 @@ class real_world : public rclcpp::Node
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
 
-            state_subscriber=this->create_subscription<control_input::msg::StateVector>(
-                            "state_vector", 10, std::bind(&real_world::updateState, this, std::placeholders::_1));
+            //state_subscriber=this->create_subscription<control_input::msg::StateVector>(
+            //                "state_vector", 10, std::bind(&real_world::updateState, this, std::placeholders::_1));
             //state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
 
         }
@@ -146,10 +146,10 @@ class real_world : public rclcpp::Node
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_command_publisher;
-        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
+        //rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
         
         //Defining subscribers
-        rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
+        //rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
@@ -171,6 +171,9 @@ class real_world : public rclcpp::Node
         phi2d=motor->velocity[phi2_index];
         phi1dd=(phi1d_prev-phi1d)/period;
         phi2dd=(phi2d_prev-phi2d)/period;
+        v1 = phi1d * R; //Tangent speed of wheel one
+        v2 = v1 * cos(d1) / cos(d2);
+        tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
 
     }
 
@@ -189,8 +192,8 @@ class real_world : public rclcpp::Node
     void jointCommandFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
 
         Um=msg->um;
-        d1Cmd=limit_deltaSpeed(msg->delta1);
-        d2Cmd=limit_deltaSpeed(msg->delta2);
+        d1Cmd=limit_angle(msg->delta1);
+        d2Cmd=limit_angle(msg->delta2);
 
         phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/R);
@@ -203,17 +206,17 @@ class real_world : public rclcpp::Node
         st=sin(tt);
         float aux1=0, aux2=0, aux3=0;
 
-        aux1 = 0.5*mass*(4*pow(R,2)*sd1*st*ct*dd1 -4*pow(R,2)*sd1*pow(st, 2)*cd1*dd1*phi1d + 4*pow(R,2)*sd1*cd1*pow(ct,2)*dd1*phi1d
-                        +4*pow(R,2)*sd2*pow(st,2)*cd1*phi2d*tt_dot - 4*pow(R,2)*sd2*st*cd1*ct*phi2dd -4*pow(R,2)*sd2*cd1*pow(ct,2)*phi2d*tt_dot
-                        +2*pow(R,2)*pow(st,2)*pow(cd1,2)*phi1dd - 4*pow(R,2)*st*cd1*cd2*ct*dd2*phi2d + 2*pow(R,2)*pow(cd1,2)*pow(ct,2)*phi1dd);
+        aux1 = mass*(4*pow(R,2)*sd1*st*ct*dd1 -4*pow(R,2)*sd1*pow(st, 2)*cd1*dd1*phi1dCmd + 4*pow(R,2)*sd1*cd1*pow(ct,2)*dd1*phi1dCmd
+                        +4*pow(R,2)*sd2*pow(st,2)*cd1*phi2dCmd*tt_dot - 4*pow(R,2)*sd2*st*cd1*ct*phi2dd -4*pow(R,2)*sd2*cd1*pow(ct,2)*phi2dCmd*tt_dot
+                        +2*pow(R,2)*pow(st,2)*pow(cd1,2)*phi1dd - 4*pow(R,2)*st*cd1*cd2*ct*dd2*phi2dCmd + 2*pow(R,2)*pow(cd1,2)*pow(ct,2)*phi1dd);
 
-        aux2 = (pow(R,2)*l1/(2*a))*(-2*pow(sd1,2)*ct*dd1*phi1d + sd1*sd2*ct*dd1*phi2d - 2*sd1*st*cd1*phi1d*tt_dot + 2*sd1*cd1*ct*phi1dd 
-                                    -pow(sd2,2)*st*phi2dd - pow(sd2,2)*ct*phi2d*tt_dot + sd2*st*cd1*phi2d*tt_dot - 2*sd2*st*cd2*dd2*phi2d
-                                    - sd2*cd1*ct*phi2dd + 2*pow(cd1,2)*ct*dd1*phi1d - cd1*cd2*ct*dd2*phi2d);
+        aux2 = (pow(R,2)*l1/(2*a))*(-2*pow(sd1,2)*ct*dd1*phi1dCmd + sd1*sd2*ct*dd1*phi2dCmd - 2*sd1*st*cd1*phi1dCmd*tt_dot + 2*sd1*cd1*ct*phi1dd 
+                                    -pow(sd2,2)*st*phi2dd - pow(sd2,2)*ct*phi2dCmd*tt_dot + sd2*st*cd1*phi2dCmd*tt_dot - 2*sd2*st*cd2*dd2*phi2dCmd
+                                    - sd2*cd1*ct*phi2dd + 2*pow(cd1,2)*ct*dd1*phi1dCmd - cd1*cd2*ct*dd2*phi2dCmd);
         
-        aux3 = (zz/pow(2*a, 2))*(pow(R,2)*pow(sd1,2)*phi1dd - pow(R,2)*sd1*sd2*phi2dd + 2*pow(R,2)*sd1*cd1*dd1*phi1d - pow(R,2)*sd1*cd2*dd2*phi2d - pow(R,2)*sd2*cd1*dd1*phi2d);
+        aux3 = (zz/pow(2*a, 2))*(pow(R,2)*pow(sd1,2)*phi1dd - pow(R,2)*sd1*sd2*phi2dd + 2*pow(R,2)*sd1*cd1*dd1*phi1dCmd - pow(R,2)*sd1*cd2*dd2*phi2dCmd - pow(R,2)*sd2*cd1*dd1*phi2dCmd);
 
-        t1Cmd=aux1+aux2+aux3;
+        t1Cmd=(aux1+aux2+aux3)*0.5;
 
         joint_cmd.name.push_back(names[0]);
         joint_cmd.name.push_back(names[2]);
