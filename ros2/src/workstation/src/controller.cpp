@@ -86,6 +86,9 @@ class controller : public rclcpp::Node
     void calculateControlInput(){
 
         //YOUR CODE SHOULD START HERE
+
+
+        
         //At the end you should be assignning a value to um, dd1 and dd2.
         //if(initialized){
             getNextPoint();
@@ -101,8 +104,10 @@ class controller : public rclcpp::Node
             um=u(0);
             dd1=limit_deltaSpeed(u(1));
             //dd2=-dd1;
-
             //YOUR CODE SHOULD END HERE
+
+
+
 
             // Change in position for d1 and d2
             d1Cmd = d1 + (dd1 * period);

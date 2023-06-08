@@ -58,6 +58,7 @@ class Ui_Form(object):
         if(self.launchP.processId()!=0):
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
+            os.system("ros2 service call /reset_robot_state")
         time.sleep(0.5)
         self.simulation_radio.setDisabled(False)
         self.real_world_radio.setDisabled(False)

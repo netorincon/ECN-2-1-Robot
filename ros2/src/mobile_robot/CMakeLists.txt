@@ -26,10 +26,6 @@ find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/ResetRobot.srv"
-)
-
 add_executable(motor_state src/motor_state.cpp)
 ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros)
 
