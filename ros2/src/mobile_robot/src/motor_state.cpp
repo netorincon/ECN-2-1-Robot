@@ -125,6 +125,7 @@ class motor_state : public rclcpp::Node
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
                     timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&motor_state::publishJointState,this));
+                    service = this->create_service<mobile_robot::srv::ResetRobot>("reset_robot_state", &resetRobot);
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -169,6 +170,7 @@ class motor_state : public rclcpp::Node
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr motor_command_subscriber;
         rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
+        rclcpp::Service<mobile_robot::srv::ResetRobot>::SharedPtr service;
 
         int pid; // Get process ID
 
@@ -343,6 +345,11 @@ class motor_state : public rclcpp::Node
         // Send odometry
         calculatePose();
 	}
+
+    // Service callback
+    void resetRobot(const std::shared_ptr<::Request> request, std::shared_ptr<::Response> response){
+
+    }
 	
 	float limitAngle(float value){
         while(value >= M_PI){
