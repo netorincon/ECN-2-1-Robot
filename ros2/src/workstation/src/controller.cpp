@@ -87,7 +87,7 @@ class controller : public rclcpp::Node
 
         //YOUR CODE SHOULD START HERE
         //At the end you should be assignning a value to um, dd1 and dd2.
-        if(initialized){
+        //if(initialized){
             getNextPoint();
             xp(0)=x+a*cos(theta)+e*cos(theta+d1);
             xp(1)=y+a*sin(theta)+e*sin(theta+d1);
@@ -125,7 +125,7 @@ class controller : public rclcpp::Node
             transform_stamped_.transform.rotation.w = 1;
             tf_broadcaster_->sendTransform(transform_stamped_);
             return;
-        }
+        //}
 
     }
 

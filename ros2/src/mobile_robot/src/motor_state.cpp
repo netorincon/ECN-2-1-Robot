@@ -175,7 +175,7 @@ class motor_state : public rclcpp::Node
         int pid; // Get process ID
 
         //
-        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float tt = 0, tt_dd=0, tt_dot_prev=0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
         float frequency;                           // HZ, fréquence de publication des transformations sur le topic /tf
         float period;                     // Seconds
@@ -559,7 +559,11 @@ class motor_state : public rclcpp::Node
         //tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
         //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
         //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
+        //tt_dot_prev=tt_dot;
         tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
+        //tt_dd = (tt_dot_prev - tt_dot)/period;
+        //printf("Theta dotdot: %f\n", tt_dd);
+
         tt += tt_dot * period;
 
         x_dot = v1 * cos(d1) * cos(tt) - v2 * sin(d2) * sin(tt);
@@ -588,6 +592,7 @@ class motor_state : public rclcpp::Node
         robot_state.theta=tt;
         robot_state.delta1=d1;
         robot_state.delta2=d2;
+        robot_state.delta3=0.0;
         robot_state.phi1=phi1;
         robot_state.phi2=phi2;
         state_vector_publisher->publish(robot_state);
