@@ -555,7 +555,7 @@ class motor_state : public rclcpp::Node
         tt_dot_prev=tt_dot;
         tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
         tt_dd = (tt_dot_prev - tt_dot)/period;
-        printf("Theta dotdot: %f\n", tt_dd);
+        //printf("Theta dotdot: %f\n", tt_dd);
 
         tt += tt_dot * period;
 
@@ -585,6 +585,7 @@ class motor_state : public rclcpp::Node
         robot_state.theta=tt;
         robot_state.delta1=d1;
         robot_state.delta2=d2;
+        robot_state.delta3=tt_dd;
         robot_state.phi1=phi1;
         robot_state.phi2=phi2;
         state_vector_publisher->publish(robot_state);
