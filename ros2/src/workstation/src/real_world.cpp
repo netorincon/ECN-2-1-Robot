@@ -226,12 +226,12 @@ class real_world : public rclcpp::Node
 
         joint_cmd.name.push_back(names[1]);
         //joint_cmd.velocity.push_back(phi1dCmd);
-        joint_cmd.effort.push_back(phi2dCmd);
+        joint_cmd.effort.push_back(phi1dCmd);
         //publishJointCommand();
 
         joint_cmd.name.push_back(names[3]);
         //joint_cmd.velocity.push_back(phi2dCmd);
-        joint_cmd.effort.push_back(phi1dCmd);
+        joint_cmd.effort.push_back(phi2dCmd);
         publishJointCommand();
     }
 
