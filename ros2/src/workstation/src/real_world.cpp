@@ -198,13 +198,13 @@ class real_world : public rclcpp::Node
         phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/R);
         phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/R);
 
-        cd1=cos(d1);
-        sd1=sin(d1);
-        cd2=cos(d2);
-        sd2=sin(d2);
-        ct=cos(tt);
-        st=sin(tt);
-        float aux1=0, aux2=0, aux3=0;
+        // cd1=cos(d1);
+        // sd1=sin(d1);
+        // cd2=cos(d2);
+        // sd2=sin(d2);
+        // ct=cos(tt);
+        // st=sin(tt);
+        // float aux1=0, aux2=0, aux3=0;
 
         // aux1 = mass*(4*pow(R,2)*sd1*st*ct*dd1 -4*pow(R,2)*sd1*pow(st, 2)*cd1*dd1*phi1dCmd + 4*pow(R,2)*sd1*cd1*pow(ct,2)*dd1*phi1dCmd
         //                 +4*pow(R,2)*sd2*pow(st,2)*cd1*phi2dCmd*tt_dot - 4*pow(R,2)*sd2*st*cd1*ct*phi2dd -4*pow(R,2)*sd2*cd1*pow(ct,2)*phi2dCmd*tt_dot
@@ -225,14 +225,17 @@ class real_world : public rclcpp::Node
         publishJointCommand();
 
         joint_cmd.name.push_back(names[1]);
-        //joint_cmd.velocity.push_back(phi1dCmd);
-        joint_cmd.effort.push_back(phi1dCmd);
+        joint_cmd.name.push_back(names[3]);
+        joint_cmd.velocity.push_back(phi1dCmd);
+        joint_cmd.velocity.push_back(phi2dCmd);
+        publishJointCommand();
+        
+        //joint_cmd.effort.push_back(phi1dCmd/10);
         //publishJointCommand();
 
-        joint_cmd.name.push_back(names[3]);
-        //joint_cmd.velocity.push_back(phi2dCmd);
-        joint_cmd.effort.push_back(phi2dCmd);
-        publishJointCommand();
+
+        //joint_cmd.effort.push_back(phi2dCmd/10);
+
     }
 
     void publishJointCommand(){
