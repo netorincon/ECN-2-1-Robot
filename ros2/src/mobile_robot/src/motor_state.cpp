@@ -223,7 +223,11 @@ class motor_state : public rclcpp::Node
 	}
 
     int torToPulse(float value){
-        return (((1.5862 * value) + 0.15) * 1000) / 2.69;
+        int tor = (((1.5862 * value) + 0.15) * 1000) / 2.69;
+        if(abs(value) < 0.1){
+            tor = 0;
+        }
+        return tor;
 	}
 	
 	// Conversion methods for joint states (DXL -> radians)
