@@ -21,6 +21,7 @@
 #include <chrono>
 #include "DynamixelSDK.h"
 #include <control_input/msg/state_vector.hpp>
+#include <control_input/srv/reset_robot.hpp>
 
 // Control table address
 // EEPROM Area
@@ -125,6 +126,7 @@ class motor_state : public rclcpp::Node
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
                     timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&motor_state::publishJointState,this));
+                    service = this->create_service<control_input::srv::ResetRobot>("reset_robot_state", std::bind(&motor_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -169,6 +171,7 @@ class motor_state : public rclcpp::Node
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr motor_command_subscriber;
         rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
+        rclcpp::Service<control_input::srv::ResetRobot>::SharedPtr service;
 
         int pid; // Get process ID
 
@@ -343,6 +346,89 @@ class motor_state : public rclcpp::Node
         // Send odometry
         calculatePose();
 	}
+
+    //sensor_msgs::msg::JointState::SharedPtr
+    // Service callback
+    void resetRobot(control_input::srv::ResetRobot::Request::SharedPtr request, control_input::srv::ResetRobot::Response::SharedPtr response){
+        int type = request->type;
+        if(type == 0){
+            // Reset odom and motors to 0
+            for(int i = 0; i < 4; i++){
+                int counter = TRIES;
+                changeMode(i+1,3);
+
+                command[i].mode = POSITION_CONTROL;
+                addressGoal[i] = ADDR_GOAL_POSITION;
+                lenSize[i] = LEN_PV;
+                command[i].value = 0;
+
+                param_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(command[i].value));
+                param_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(command[i].value));
+                param_goal_state[2] = DXL_LOBYTE(DXL_HIWORD(command[i].value));
+                param_goal_state[3] = DXL_HIBYTE(DXL_HIWORD(command[i].value));
+
+                // Add parameter storage for Dynamixels goal
+                do{
+                    exitParam = false;
+                    counter--;
+                    paramStorageWrite(i+1, addressGoal[i], lenSize[i], param_goal_state);
+                }while(exitParam && (counter > 0));
+
+                // Last try and still error
+                if((counter <= 0) && exitParam){
+                    //THIS NODE SHOULD END
+                    exitNode();
+                }
+            }
+
+            // Bulkwrite goal joint states
+            dxl_comm_result = commandPacket.txPacket();
+            if (dxl_comm_result != COMM_SUCCESS){
+                printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+            }
+
+            // Clear bulkwrite parameter storage
+            commandPacket.clearParam();
+
+            assignReadParam();
+
+            x = 0;
+            y = 0;
+            tt = 0;
+            beta1 = stateArray[2].position;
+            d1 = beta1;
+            phi1 = stateArray[1].position;
+
+            beta2 = stateArray[3].position;
+            d2 = limitAngle(beta2 - M_PI);
+            phi2 = stateArray[0].position;
+
+            transform_stamped_.header.stamp = this->now();
+            transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
+            transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
+            transform_stamped_.transform.translation.x = x;
+            transform_stamped_.transform.translation.y = y;
+            transform_stamped_.transform.translation.z = 0;
+            rotation.setRPY(0,0,tt);
+            transform_stamped_.transform.rotation.x = rotation.getX();
+            transform_stamped_.transform.rotation.y = rotation.getY();
+            transform_stamped_.transform.rotation.z = rotation.getZ();
+            transform_stamped_.transform.rotation.w = rotation.getW();
+            tf_broadcaster_->sendTransform(transform_stamped_);
+
+            robot_state.x=x;
+            robot_state.y=y;
+            robot_state.theta=tt;
+            robot_state.delta1=d1;
+            robot_state.delta2=d2;
+            robot_state.delta3=0.0;
+            robot_state.phi1=phi1;
+            robot_state.phi2=phi2;
+            state_vector_publisher->publish(robot_state);
+
+            response->status = 1;
+        }
+    }
 	
 	float limitAngle(float value){
         while(value >= M_PI){
