@@ -83,10 +83,10 @@ struct Point{
     float y;
 };
 
-class motor_state : public rclcpp::Node
+class robot_state : public rclcpp::Node
 {
 	public :
-		motor_state(rclcpp::NodeOptions options) : Node("motor_state", options){
+        robot_state(rclcpp::NodeOptions options) : Node("robot_state", options){
             declare_parameter("frequency", 20);
             frequency = this->get_parameter("frequency").as_int();
             period = 1.0/frequency; //Seconds
@@ -120,13 +120,13 @@ class motor_state : public rclcpp::Node
 						
 					// Subscriber for desired joint states		
 					motor_command_subscriber = this->create_subscription<sensor_msgs::msg::JointState>(
-								"motor_cmd",10,std::bind(&motor_state::goalJoints,this,std::placeholders::_1));
+                                "motor_cmd",10,std::bind(&robot_state::goalJoints,this,std::placeholders::_1));
 					
 					// Publisher for present joint states
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
-                    timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&motor_state::publishJointState,this));
-                    service = this->create_service<control_input::srv::ResetRobot>("reset_robot_state", std::bind(&motor_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
+                    timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&robot_state::publishJointState,this));
+                    service = this->create_service<control_input::srv::ResetRobot>("robot_state/reset_robot_state", std::bind(&robot_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -165,7 +165,7 @@ class motor_state : public rclcpp::Node
         geometry_msgs::msg::TransformStamped transform_stamped_;
         tf2::Quaternion rotation;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-        control_input::msg::StateVector robot_state;
+        control_input::msg::StateVector robot_state_vector;
         geometry_msgs::msg::TransformStamped icr;
         
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
@@ -175,15 +175,13 @@ class motor_state : public rclcpp::Node
 
         int pid; // Get process ID
 
-        //
-        float tt = 0, tt_dd=0, tt_dot_prev=0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float tt = 0, tt_dd = 0, tt_dot_prev = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
         float frequency;                           // HZ, fréquence de publication des transformations sur le topic /tf
         float period;                     // Seconds
         float a = 0.08;                                 // Base distance in meters
         float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
-        //
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
@@ -416,15 +414,15 @@ class motor_state : public rclcpp::Node
             transform_stamped_.transform.rotation.w = rotation.getW();
             tf_broadcaster_->sendTransform(transform_stamped_);
 
-            robot_state.x=x;
-            robot_state.y=y;
-            robot_state.theta=tt;
-            robot_state.delta1=d1;
-            robot_state.delta2=d2;
-            robot_state.delta3=0.0;
-            robot_state.phi1=phi1;
-            robot_state.phi2=phi2;
-            state_vector_publisher->publish(robot_state);
+            robot_state_vector.x=x;
+            robot_state_vector.y=y;
+            robot_state_vector.theta=tt;
+            robot_state_vector.delta1=d1;
+            robot_state_vector.delta2=d2;
+            robot_state_vector.delta3=0.0;
+            robot_state_vector.phi1=phi1;
+            robot_state_vector.phi2=phi2;
+            state_vector_publisher->publish(robot_state_vector);
 
             response->status = 1;
         }
@@ -666,15 +664,15 @@ class motor_state : public rclcpp::Node
         tf_broadcaster_->sendTransform(transform_stamped_);
 
         //We publish the current state vector to be read by the controller
-        robot_state.x=x;
-        robot_state.y=y;
-        robot_state.theta=tt;
-        robot_state.delta1=d1;
-        robot_state.delta2=d2;
-        robot_state.delta3=0.0;
-        robot_state.phi1=phi1;
-        robot_state.phi2=phi2;
-        state_vector_publisher->publish(robot_state);
+        robot_state_vector.x=x;
+        robot_state_vector.y=y;
+        robot_state_vector.theta=tt;
+        robot_state_vector.delta1=d1;
+        robot_state_vector.delta2=d2;
+        robot_state_vector.delta3=0.0;
+        robot_state_vector.phi1=phi1;
+        robot_state_vector.phi2=phi2;
+        state_vector_publisher->publish(robot_state_vector);
 
         calculateICR();
         icr.header.frame_id = "base_link"; // Nom du repère fixe
@@ -736,7 +734,7 @@ class motor_state : public rclcpp::Node
 int main(int argc, char** argv)
 {	
 	rclcpp::init(argc, argv);
-	auto node = std::make_shared<motor_state>(rclcpp::NodeOptions{});
+    auto node = std::make_shared<robot_state>(rclcpp::NodeOptions{});
 	rclcpp::spin(node);
 	
 	node->disableTorque(DXL1_ID);
