@@ -22,6 +22,7 @@
 #include "DynamixelSDK.h"
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/srv/reset_robot.hpp>
+#include <robot.h>
 
 // Control table address
 // EEPROM Area
