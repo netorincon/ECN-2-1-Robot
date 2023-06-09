@@ -23,46 +23,32 @@ Then the values are integrated over time to obtain the current state vector.
 #include <algorithm>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <tf2/LinearMath/Quaternion.h>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/msg/control_input.hpp>
-#include <control_input/msg/slider_command.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <control_input/msg/position_command.hpp>
+#include <robot_library/robot.h>
 
-struct MotorState{
-    std::string id;
-    float position;
-    float speed;
-};
-
-struct Point{
-    float x;
-    float y;
-};
-
-double limit_angle(double a){
-    while( a >=  2*M_PI ) a -= 2*M_PI ;
-    while( a <  0 ) a += 2*M_PI ;
-    return a ;
+double limit_angle(double angle){
+    while( angle >=  2*M_PI ) angle -= 2*M_PI ;
+    while( angle <  0 ) angle += 2*M_PI ;
+    return angle ;
 }
 
-float limit_phiSpeed(float a){
+float limit_phiSpeed(float angle){
     float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
-    if( a >=  max) {a =max;}
-    else if(a<= -max) {a=-max;} 
-    return a;
+    if( angle >=  max) {angle =max;}
+    else if(angle<= -max) {angle=-max;} 
+    return angle;
 }
 
-float limit_deltaSpeed(float a){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+float limit_deltaSpeed(float angle){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
     float max=(55.0/60.0)*(2*M_PI);
-    if( a >=  max) {a =max;}
-    else if(a<= -max) {a=-max;} 
-    return a;
+    if( angle >=  max) {angle =max;}
+    else if(angle<= -max) {angle=-max;} 
+    return angle;
 }
 
 class sim : public rclcpp::Node
@@ -85,13 +71,15 @@ class sim : public rclcpp::Node
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
-            
+            turtle4=Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
             
         }
         //We initialize all variables of the state vector at 0
-        float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0, tt_dot=0, x_dot=0, y_dot=0;
+        float Um=0;
 
     private :
+
+        Robot turtle4;
         geometry_msgs::msg::TransformStamped transform_stamped_;
         geometry_msgs::msg::TransformStamped icr;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
@@ -102,138 +90,63 @@ class sim : public rclcpp::Node
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
         control_input::msg::StateVector robot_state;
-        tf2::Quaternion rotation;
         float frequency; // fréquence de publication des transformations sur le topic /tf
         float period;
-        float a=0.08;//Base distance
-        float R=0.033; //Radius of the wheels
         std::string mode; //Operating mode (position/velocity)
 
-        Point ICRLocation;
-
         void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
-                beta1=msg->d1;
-                beta2=msg->d2+M_PI;
-                d1=msg->d1;
-                d2=msg->d2;
-                phi1=0;
-                phi2=0;
+                turtle4.delta1.position=msg->d1;
+                turtle4.delta2.position=msg->d2;
+                turtle4.phi1.position=0;
+                turtle4.phi2.position=0;
                 publishTransforms(); 
             }
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
                 Um = msg->um;
-                d1 = msg->delta1; //limit_deltaSpeed(msg->delta1);
-                d2 = msg->delta2; //limit_deltaSpeed(msg->delta2);
+                turtle4.delta1.position = msg->delta1; //limit_deltaSpeed(msg->delta1);
+                turtle4.delta2.position = msg->delta2; //limit_deltaSpeed(msg->delta2);
 
-                //We calculate current robot speeds and orientation motor speeds
-                //d1+=dd1*period; //Delta 1
-                //d2+=dd2*period; //Delta 2
+                turtle4.twist.angular.z=Um*sin(turtle4.delta1.position-turtle4.delta2.position)/(turtle4.wheel_distance/2); //sin(d1-d2)/a
+                turtle4.pose.theta+=turtle4.twist.angular.z*period;
+                turtle4.pose.theta=limit_angle(turtle4.pose.theta);
 
-                tt_dot=Um*sin(d1-d2)/a; //sin(d1-d2)/a
-                tt+=tt_dot*period;
-                tt=limit_angle(tt);
-
-                x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*Um;
-                y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*Um;
-                phi1d=limit_phiSpeed(2*cos(d2)*Um/R);
-                phi2d=limit_phiSpeed(2*cos(d1)*Um/R);
+                turtle4.twist.linear.x=Um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*cos(turtle4.pose.theta) - sin(turtle4.delta1.position+turtle4.delta2.position)*sin(turtle4.pose.theta));
+                turtle4.twist.linear.y=Um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*sin(turtle4.pose.theta) + sin(turtle4.delta1.position+turtle4.delta2.position)*cos(turtle4.pose.theta));
+                turtle4.phi1.velocity=limit_phiSpeed(2*cos(turtle4.delta2.position)*Um/turtle4.wheel_radius);
+                turtle4.phi2.velocity=limit_phiSpeed(2*cos(turtle4.delta1.position)*Um/turtle4.wheel_radius);
 
                 //We integrate the speeds over time (add each time we get a new value)
-                x+=x_dot*period;
-                y+=y_dot*period;
+                turtle4.pose.x+=turtle4.twist.linear.x*period;
+                turtle4.pose.y+=turtle4.twist.linear.y*period;
 
-                beta1=d1;
-                beta2=d2+M_PI;
-
-                phi1+=phi1d*period;
-                phi2+=phi2d*period;
+                turtle4.phi1.position+=turtle4.phi1.velocity*period;
+                turtle4.phi2.position+=turtle4.phi2.velocity*period;
                 
                 //We limit the angles to 2pi
-                phi1=limit_angle(phi1);
-                phi2=limit_angle(phi2);
+                turtle4.phi1.position=limit_angle(turtle4.phi1.position);
+                turtle4.phi2.position=limit_angle(turtle4.phi2.position);
                 publishTransforms(); 
         }
-
-        void calculateICR(){
-            //We define alpha1 and alpha2 as temporary angles for ICR calculation
-            float alpha1=d1+M_PI/2;
-            float alpha2=d2+M_PI/2;
-            alpha1=limit_angle(alpha1);
-            alpha2=limit_angle(alpha2);
-
-            float diff=alpha1-alpha2;
-            float diffAbs=abs(diff);
-            if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
-                alpha2+=M_PI;
-            }
-            else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
-                alpha1-=M_PI;
-            }
-            else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
-                alpha1+=M_PI;
-                alpha2+=M_PI;
-            }
-            else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
-                alpha2-=M_PI;
-            }
-            else if((diff<0) && (diffAbs>=M_PI)){
-                alpha1+=M_PI;
-            }
-
-            diff=alpha1-alpha2;
-            //See PDF for detailed calculations
-            if(sin(diff)!=0){
-                ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
-                ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
-            }
-        }
-
-
         void publishTransforms(){
+
             //We now publish the joint states
-            std::vector<std::string> names={"left_wheel_base_joint", "right_wheel_base_joint", "left_wheel_joint", "right_wheel_joint"};
-            std::vector<double> posValues={beta2, beta1, phi2, phi1};
-            std::vector<double> velValues={dd2, dd1, phi2d, phi1d};
-            joint_state.name=names;
-            joint_state.position = posValues;
-           
-
-            //Message that contains the chassis transform with respect to the world         
-            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
-            transform_stamped_.child_frame_id = "base_link"; // Nom du repère du robot
-            transform_stamped_.transform.translation.x = x;
-            transform_stamped_.transform.translation.y = y;
-            transform_stamped_.transform.translation.z = 0;
-            rotation.setRPY(0,0,tt);
-            transform_stamped_.transform.rotation.x = rotation.getX();
-            transform_stamped_.transform.rotation.y = rotation.getY();
-            transform_stamped_.transform.rotation.z = rotation.getZ();
-            transform_stamped_.transform.rotation.w = rotation.getW();
-            
-            //Message that contains the position of the ICR with respect to the robot chassis
-            calculateICR();        
-            icr.header.frame_id = "base_link"; // Nom du repère fixe
-            icr.child_frame_id = "icr"; // Nom du repère du robot
-            icr.transform.translation.x = ICRLocation.x;
-            icr.transform.translation.y = ICRLocation.y;
-            icr.transform.translation.z = 0;
-
+            joint_state = turtle4.getJointStates();
             joint_state.header.stamp=this->now();
             joint_publisher->publish(joint_state);
+
+
+            //Transform that contains the chassis transform with respect to the odom frame  
+            transform_stamped_=turtle4.getOdometry();
             transform_stamped_.header.stamp = this->now();
             tf_broadcaster_->sendTransform(transform_stamped_);
+
+            //Transform that contains the position of the ICR with respect to the robot chassis
+            icr=turtle4.getICRTransform();
             icr.header.stamp = this->now();
             tf_broadcaster_->sendTransform(icr);
 
-            robot_state.x=x;
-            robot_state.y=y;
-            robot_state.theta=tt;
-            robot_state.delta1=d1;
-            robot_state.delta2=d2;
-            robot_state.phi1=phi1;
-            robot_state.phi2=phi2;
-            state_vector_publisher->publish(robot_state);
+            state_vector_publisher->publish(turtle4.getStateVector());
         }
 };
 

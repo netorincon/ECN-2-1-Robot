@@ -61,8 +61,8 @@ class Ui_Form(object):
         if(self.launchP.processId()!=0):
             if(self.real_world_radio.isChecked()):
                 os.system("ros2 service call /robot_state/reset_robot_state control_input/srv/ResetRobot")
-            elif(self.simulation_radio.isChecked()):
-                os.system("ros2 service call /sim/reset_robot_state control_input/srv/ResetRobot")
+            # elif(self.simulation_radio.isChecked()):
+            #     os.system("ros2 service call /sim/reset_robot_state control_input/srv/ResetRobot")
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
 

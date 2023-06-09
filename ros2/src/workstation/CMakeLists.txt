@@ -28,7 +28,7 @@ find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3)
 find_package(robot_library REQUIRED)
 add_executable(sim src/sim.cpp )
-ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
+ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input robot_library)
 
 add_executable(real_world src/real_world.cpp )
 ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input robot_library)

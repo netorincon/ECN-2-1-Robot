@@ -1,5 +1,8 @@
 #include <string>
 #include <math.h>
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <control_input/msg/state_vector.hpp>
 
 struct Point{
     float x=0;
@@ -59,4 +62,9 @@ class Robot {
         void setPose(float _x, float _y, float _theta);
         void setMotorPositions(float _phi1, float _phi2, float _delta1, float _delta2);
         void setMotorVelocities(float _phi1, float _phi2, float _delta1, float _delta2);
+        sensor_msgs::msg::JointState getJointStates();
+        geometry_msgs::msg::TransformStamped getOdometry();
+        geometry_msgs::msg::TransformStamped getICRTransform();
+        control_input::msg::StateVector getStateVector();
+        float limit_angle(float angle);
 };

@@ -48,18 +48,14 @@
 #include <algorithm>
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
-#include <control_input/msg/slider_command.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
-#include "../include/robot_library/robot.h"
+#include <robot_library/robot.h>
 
 
 using namespace std::chrono_literals;

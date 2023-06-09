@@ -17,6 +17,8 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(control_input REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -25,6 +27,8 @@ include_directories(
 )
 
 add_library(robot_library SHARED src/robot.cpp) 
+ament_target_dependencies(robot_library sensor_msgs control_input)
+
 
 install(
   DIRECTORY include/
