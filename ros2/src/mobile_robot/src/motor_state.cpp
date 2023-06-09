@@ -360,7 +360,7 @@ class motor_state : public rclcpp::Node
                 command[i].mode = POSITION_CONTROL;
                 addressGoal[i] = ADDR_GOAL_POSITION;
                 lenSize[i] = LEN_PV;
-                command[i].value = 0;
+                command[i].value = posToPulse(0);
 
                 param_goal_state[0] = DXL_LOBYTE(DXL_LOWORD(command[i].value));
                 param_goal_state[1] = DXL_HIBYTE(DXL_LOWORD(command[i].value));
