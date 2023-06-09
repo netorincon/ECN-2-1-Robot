@@ -7,6 +7,8 @@ from launch.substitutions  import LaunchConfiguration, Command
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import LaunchConfigurationEquals
+import launch
+import launch_ros.actions
 
 import xacro
 
@@ -40,6 +42,7 @@ def generate_launch_description():
         package='mobile_robot',
         executable='motor_state',
         output='screen',
+
     )
     # Launch
     return LaunchDescription([
@@ -55,7 +58,15 @@ def generate_launch_description():
             description = 'use ros2 control if true'),
 
         robot_state_publisher,
-        motor_state
+        motor_state,
+        launch.actions.RegisterEventHandler(
+            event_handler=launch.event_handlers.OnProcessExit(
+            target_action=motor_state,
+        on_exit=[
+            launch.actions.LogInfo(
+                msg="Motor_state killed, shutting down Robot state publisher."),
+            launch.actions.EmitEvent(
+                event=launch.events.Shutdown())]))
    
     ])
 

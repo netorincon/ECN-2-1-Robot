@@ -28,19 +28,15 @@ class publisherNode(Node):
     def timer_callback(self):
         
         if(self.ui.end):
-            msg=JointState()
-            msg.name={ "right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"}
-            msg.position={0.0,0.0,0.0,0.0}
-            self.abort_publisher.publish(msg)
             return
-        if(self.ui.manual_speed_mode_radio.isChecked()):   
+        if(self.ui.manual_speed_mode_radio.isChecked() and self.ui.publish):   
             msg=ControlInput()
             msg.um=float(self.ui.um_sb.value())
             msg.delta1=self.ui.b1d_sb.value()*math.pi/180
             msg.delta2=self.ui.b2d_sb.value()*math.pi/180 
             self.velocity_publisher.publish(msg)
             
-        elif(self.ui.manual_pos_mode_radio.isChecked()):
+        elif(self.ui.manual_pos_mode_radio.isChecked() and self.ui.publish):
             msg=PositionCommand()
             msg.d1=self.ui.beta1_sb.value()*math.pi/180
             msg.d2=self.ui.beta2_sb.value()*math.pi/180 

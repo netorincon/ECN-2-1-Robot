@@ -88,7 +88,7 @@ class controller : public rclcpp::Node
         //YOUR CODE SHOULD START HERE
 
 
-        
+
         //At the end you should be assignning a value to um, dd1 and dd2.
         //if(initialized){
             getNextPoint();
@@ -99,7 +99,6 @@ class controller : public rclcpp::Node
             sumError+= Error;
             prevError=Error;
             u=K_inv*(xrdot+kp*(xr-xp)+((ki/period)*sumError)+kp*(deltaError));
-            //printf("%f", u(0));
 
             um=u(0);
             dd1=limit_deltaSpeed(u(1));

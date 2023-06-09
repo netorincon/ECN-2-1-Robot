@@ -10,6 +10,7 @@ windowWidth=420
 
 class Ui_Form(object):
     end=False
+    publish=False
     def launchFile(self):
         #Check radio button state
         manual_speed_mode=self.manual_speed_mode_radio.isChecked()
@@ -48,17 +49,22 @@ class Ui_Form(object):
         self.manual_speed_mode_radio.setDisabled(True)
         self.manual_pos_mode_radio.setDisabled(True)
         self.end_button.setEnabled(True)
+        self.publish=True
         return
     
     def endLaunch(self):
         self.end=True
+        self.publish=False
         self.reset_pos_sliders()
         self.reset_speed_sliders()
         
         if(self.launchP.processId()!=0):
             os.kill(self.launchP.processId(), signal.SIGINT)
             self.launchP.waitForFinished(-1)
-            os.system("ros2 service call /reset_robot_state")
+            if(self.real_world_radio.isChecked()):
+                os.system("ros2 service call /motor_state/reset_robot_state control_input/srv/ResetRobot")
+            elif(self.simulation_radio.isChecked()):
+                os.system("ros2 service call /sim/reset_robot_state control_input/srv/ResetRobot")
         time.sleep(0.5)
         self.simulation_radio.setDisabled(False)
         self.real_world_radio.setDisabled(False)
