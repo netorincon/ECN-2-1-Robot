@@ -59,7 +59,8 @@
 #include <control_input/msg/slider_command.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
-#include <robot.h>
+#include "../include/robot_library/robot.h"
+
 
 using namespace std::chrono_literals;
 
