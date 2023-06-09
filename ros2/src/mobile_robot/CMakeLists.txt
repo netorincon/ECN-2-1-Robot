@@ -25,9 +25,10 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
+find_package(workstation REQUIRED)
 
 add_executable(robot_state src/robot_state.cpp)
-ament_target_dependencies(robot_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros)
+ament_target_dependencies(robot_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros workstation)
 
 install (TARGETS
 robot_state
