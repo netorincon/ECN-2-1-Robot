@@ -9,6 +9,17 @@ Robot::Robot(float x, float y, float theta, float wheel_radius, float chassis_le
             chassis_width=chassis_width;
             wheel_distance=wheel_distance;
             mass=mass;
+            phi1.id=2;
+            phi1.name="right_wheel_joint";
+
+            phi2.id=1;
+            phi2.name="left_wheel_joint";
+
+            delta1.id=3;
+            delta1.name="right_wheel_base_joint";
+
+            delta2.id=4;
+            delta2.name="left_wheel_base_joint";
 }
 
 void Robot::resetPose(){
@@ -30,7 +41,7 @@ void Robot::resetPose(){
             phi2.acceleration=0;
             v1=0;
             v2=0;
-        };
+        }
 
 void Robot::setMotorPositions(float _phi1, float _phi2, float _delta1, float _delta2){
     phi1.position=_phi1;

@@ -28,6 +28,8 @@ struct Motor{
     float velocity=0;
     float acceleration=0;
     float effort=0;
+    int id;
+    std::string name;
 };
 
 class Robot {

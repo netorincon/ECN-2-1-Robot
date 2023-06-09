@@ -140,10 +140,10 @@ class real_world : public rclcpp::Node
 
     void motorStates(const sensor_msgs::msg::JointState::SharedPtr motor){
         auto start = motor->name.begin();
-        auto d1_index = std::find(motor->name.begin(), motor->name.end(), "right_wheel_base_joint") - start;
-        auto d2_index = std::find(motor->name.begin(), motor->name.end(), "left_wheel_base_joint") - start;
-        auto phi1_index = std::find(motor->name.begin(), motor->name.end(), "right_wheel_joint") - start;
-        auto phi2_index = std::find(motor->name.begin(), motor->name.end(), "left_wheel_joint") - start;
+        auto d1_index = std::find(motor->name.begin(), motor->name.end(), turtle4.delta1.name) - start;
+        auto d2_index = std::find(motor->name.begin(), motor->name.end(), turtle4.delta2.name) - start;
+        auto phi1_index = std::find(motor->name.begin(), motor->name.end(), turtle4.phi1.name) - start;
+        auto phi2_index = std::find(motor->name.begin(), motor->name.end(), turtle4.phi2.name) - start;
 
         turtle4.setMotorPositions(motor->position[phi1_index],motor->position[phi2_index], motor->position[d1_index], limit_angle(motor->position[d2_index] - M_PI));
         turtle4.setMotorVelocities(motor->velocity[phi1_index], motor->velocity[phi2_index], motor->velocity[d1_index], motor->velocity[d2_index]);
