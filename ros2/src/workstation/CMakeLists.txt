@@ -67,12 +67,14 @@ install(TARGETS
 	DESTINATION lib/${PROJECT_NAME}
 	)		
 
-install(TARGETS robot
-        EXPORT robot
-        LIBRARY DESTINATION lib
-        INCLUDES DESTINATION include
-  
-  )
+install(
+  TARGETS robot
+  EXPORT robot
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
