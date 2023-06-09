@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <map>
+#include <chrono>
 #include <algorithm>
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
@@ -18,7 +19,6 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <chrono>
 #include "DynamixelSDK.h"
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/srv/reset_robot.hpp>
@@ -44,7 +44,6 @@
 // Protocol version
 #define PROTOCOL_VERSION                2.0
 
-// Default setting
 // Spinning motors
 #define DXL1_ID                         1
 #define DXL2_ID                         2
@@ -62,7 +61,6 @@
 #define VELOCITY_CONTROL				1
 #define TORQUE_CONTROL					0
 
-//#define PERIOD                          50 // In milliseconds
 #define TRIES                           10  // Tries before giving up in communication error
 
 struct MotorGoal{
@@ -126,21 +124,23 @@ class robot_state : public rclcpp::Node
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
                     timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&robot_state::publishJointState,this));
-                    service = this->create_service<control_input::srv::ResetRobot>("robot_state/reset_robot_state", std::bind(&robot_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
+
+                    // Service for reset
+                    service = this->create_service<control_input::srv::ResetRobot>("robot_state/reset_robot_state",
+                                std::bind(&robot_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
+                    exitNode();
 					printf("Press CTRL + C terminate...\n");
 				}
 			}
 			else{
 				printf("Failed to open the port!\n");
+                exitNode();
 				printf("Press CTRL + C terminate...\n");
 			}
         }
-        
-        MotorGoal command[4];		// Goal
-        MotorState stateArray[4];	// Present
         
         // Initialize PortHandler instance
 		// Set the port path
@@ -174,11 +174,13 @@ class robot_state : public rclcpp::Node
         rclcpp::Service<control_input::srv::ResetRobot>::SharedPtr service;
 
         int pid; // Get process ID
+        MotorGoal command[4];		// Goal
+        MotorState stateArray[4];	// Present
 
-        float tt = 0, tt_dd = 0, tt_dot_prev = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
-        float frequency;                           // HZ, fréquence de publication des transformations sur le topic /tf
-        float period;                     // Seconds
+        float frequency;                                // HZ, fréquence de publication des transformations sur le topic /tf
+        float period;                                   // Seconds
         float a = 0.08;                                 // Base distance in meters
         float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
@@ -241,13 +243,18 @@ class robot_state : public rclcpp::Node
 	}
 
 	float pulseToTor(int value){
-        return (((value * 2.69) / 1000) - 0.15) / 1.5862;
+        int tor = (((value * 2.69) / 1000) - 0.15) / 1.5862;
+        if(value == 0){
+            tor = 0;
+        }
+        return tor;
 	}
 	
 	// Subscriber callback
 	void goalJoints(const sensor_msgs::msg::JointState::SharedPtr cmd){
         int id, counter;
-		bool validation; // Avoid sending empty data to motors
+        bool validation; // Avoid assigning empty data to motors
+        bool complete = true; // Avoid this reading if imcomplete
 		
 		for(int i = 0; i < (int)cmd->name.size(); i++){
 			validation = true;
@@ -284,6 +291,7 @@ class robot_state : public rclcpp::Node
 			else{
 				printf("Motor command topic could not be read for motor ID : %d\n",id);
 				validation = false;
+                complete = false;
 			}
 			
 			if(validation){
@@ -307,11 +315,13 @@ class robot_state : public rclcpp::Node
 			}
 		}
 		
-		// Bulkwrite goal joint states
-		dxl_comm_result = commandPacket.txPacket();
-		if (dxl_comm_result != COMM_SUCCESS){
-			printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
-		}
+        if(complete){
+            // Bulkwrite goal joint states
+            dxl_comm_result = commandPacket.txPacket();
+            if (dxl_comm_result != COMM_SUCCESS){
+                printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+            }
+        }
 		
 		// Clear bulkwrite parameter storage
 		commandPacket.clearParam();
@@ -332,12 +342,7 @@ class robot_state : public rclcpp::Node
 			jointState.name.push_back(stateArray[i].id);
             jointState.position.push_back(stateArray[i].position);
             jointState.velocity.push_back(stateArray[i].velocity);
-			if(MotorNames.at(stateArray[i].id) != DXL3_ID && MotorNames.at(stateArray[i].id) != DXL4_ID){
-                jointState.effort.push_back(stateArray[i].torque);
-			}
-            else{
-                jointState.effort.push_back(0);
-            }
+            jointState.effort.push_back(stateArray[i].torque);
 		}
 		joint_state_publisher->publish(jointState);
 
@@ -349,11 +354,12 @@ class robot_state : public rclcpp::Node
     // Service callback
     void resetRobot(control_input::srv::ResetRobot::Request::SharedPtr request, control_input::srv::ResetRobot::Response::SharedPtr response){
         int type = request->type;
+        int counter;
         if(type == 0){
             // Reset odom and motors to 0
             for(int i = 0; i < 4; i++){
-                int counter = TRIES;
-                changeMode(i+1,3);
+                counter = TRIES;
+                changeMode(i+1,POSITION_CONTROL);
 
                 command[i].mode = POSITION_CONTROL;
                 addressGoal[i] = ADDR_GOAL_POSITION;
@@ -393,6 +399,7 @@ class robot_state : public rclcpp::Node
             x = 0;
             y = 0;
             tt = 0;
+
             beta1 = stateArray[2].position;
             d1 = beta1;
             phi1 = stateArray[1].position;
@@ -401,28 +408,9 @@ class robot_state : public rclcpp::Node
             d2 = limitAngle(beta2 - M_PI);
             phi2 = stateArray[0].position;
 
-            transform_stamped_.header.stamp = this->now();
-            transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
-            transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
-            transform_stamped_.transform.translation.x = x;
-            transform_stamped_.transform.translation.y = y;
-            transform_stamped_.transform.translation.z = 0;
-            rotation.setRPY(0,0,tt);
-            transform_stamped_.transform.rotation.x = rotation.getX();
-            transform_stamped_.transform.rotation.y = rotation.getY();
-            transform_stamped_.transform.rotation.z = rotation.getZ();
-            transform_stamped_.transform.rotation.w = rotation.getW();
-            tf_broadcaster_->sendTransform(transform_stamped_);
+            sendTransformBroadcaster();
 
-            robot_state_vector.x=x;
-            robot_state_vector.y=y;
-            robot_state_vector.theta=tt;
-            robot_state_vector.delta1=d1;
-            robot_state_vector.delta2=d2;
-            robot_state_vector.delta3=0.0;
-            robot_state_vector.phi1=phi1;
-            robot_state_vector.phi2=phi2;
-            state_vector_publisher->publish(robot_state_vector);
+            publishStateVectorOdom();
 
             response->status = 1;
         }
@@ -548,6 +536,10 @@ class robot_state : public rclcpp::Node
                 stateArray[id2 - 1].torque = pulseToTor(torquePacket.getData(id2, ADDR_PRESENT_CURRENT, LEN_CURRENT));
             }
         }
+        else{
+            stateArray[id1 - 1].torque = 0;
+            stateArray[id2 - 1].torque = 0;
+        }
 
         if(positionError || velocityError || torqueError){
             exitParam = true;
@@ -629,17 +621,9 @@ class robot_state : public rclcpp::Node
 
         v1 = phi1d * R; //Tangent speed of wheel one
         v2 = v1 * cos(d1) / cos(d2);
-        //Now we solve for um using the equation for phi1 or phi2 from S(q) matrix
-        //float U=phi1d*R/(2*cos(d2));
 
         //We calculate current robot speeds and orientation motor
-        //tt_dot=U*sin(d1-d2)/a; //sin(d1-d2)/a
-        //x_dot=(2*cos(d1)*cos(d2)*cos(tt) - sin(d1+d2)*sin(tt))*U;
-        //y_dot=(2*cos(d1)*cos(d2)*sin(tt) + sin(d1+d2)*cos(tt))*U;
-        //tt_dot_prev=tt_dot;
         tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
-        //tt_dd = (tt_dot_prev - tt_dot)/period;
-        //printf("Theta dotdot: %f\n", tt_dd);
 
         tt += tt_dot * period;
 
@@ -650,6 +634,22 @@ class robot_state : public rclcpp::Node
         y += y_dot * period;
         tt = limitAngle(tt);
 
+        sendTransformBroadcaster();
+
+        //We publish the current state vector to be read by the controller
+        publishStateVectorOdom();
+
+        calculateICR();
+        icr.header.frame_id = "base_link"; // Nom du repère fixe
+        icr.child_frame_id = "icr"; // Nom du repère du robot
+        icr.transform.translation.x = ICRLocation.x;
+        icr.transform.translation.y = ICRLocation.y;
+        icr.transform.translation.z = 0;
+        icr.header.stamp = this->now();
+        tf_broadcaster_->sendTransform(icr);
+    }
+
+    void sendTransformBroadcaster(){
         transform_stamped_.header.stamp = this->now();
         transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
         transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
@@ -662,8 +662,9 @@ class robot_state : public rclcpp::Node
         transform_stamped_.transform.rotation.z = rotation.getZ();
         transform_stamped_.transform.rotation.w = rotation.getW();
         tf_broadcaster_->sendTransform(transform_stamped_);
+    }
 
-        //We publish the current state vector to be read by the controller
+    void publishStateVectorOdom(){
         robot_state_vector.x=x;
         robot_state_vector.y=y;
         robot_state_vector.theta=tt;
@@ -673,16 +674,6 @@ class robot_state : public rclcpp::Node
         robot_state_vector.phi1=phi1;
         robot_state_vector.phi2=phi2;
         state_vector_publisher->publish(robot_state_vector);
-
-        calculateICR();
-        icr.header.frame_id = "base_link"; // Nom du repère fixe
-        icr.child_frame_id = "icr"; // Nom du repère du robot
-        icr.transform.translation.x = ICRLocation.x;
-        icr.transform.translation.y = ICRLocation.y;
-        icr.transform.translation.z = 0;
-        icr.header.stamp = this->now();
-        tf_broadcaster_->sendTransform(icr);
-        return;
     }
 
     void calculateICR(){
@@ -719,12 +710,12 @@ class robot_state : public rclcpp::Node
         }
     }
 
-	void printMotorState(){
-        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
-        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
-        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
-        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
-	}
+//	void printMotorState(){
+//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
+//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
+//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
+//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
+//	}
 
     void exitNode(){
         kill(pid,SIGINT);
