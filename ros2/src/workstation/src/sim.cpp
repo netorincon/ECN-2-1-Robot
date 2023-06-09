@@ -17,12 +17,8 @@ times the um input.
 Then the values are integrated over time to obtain the current state vector.
 */
 
-#include <chrono>
-#include <string>
 #include <math.h>
-#include <algorithm>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <control_input/msg/state_vector.hpp>
@@ -71,28 +67,27 @@ class sim : public rclcpp::Node
 
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
+
             turtle4=Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
             
         }
         //We initialize all variables of the state vector at 0
-        float Um=0;
 
     private :
 
+        float period;
+        float frequency;
         Robot turtle4;
-        geometry_msgs::msg::TransformStamped transform_stamped_;
         geometry_msgs::msg::TransformStamped icr;
-        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
-        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
-        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
-        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
-
-        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         sensor_msgs::msg::JointState joint_state;
         control_input::msg::StateVector robot_state;
-        float frequency; // fréquence de publication des transformations sur le topic /tf
-        float period;
-        std::string mode; //Operating mode (position/velocity)
+        geometry_msgs::msg::TransformStamped transform_stamped_;
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
+        rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
+        rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
+        rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
 
         void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
                 turtle4.delta1.position=msg->d1;
@@ -103,18 +98,17 @@ class sim : public rclcpp::Node
             }
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
-                Um = msg->um;
                 turtle4.delta1.position = msg->delta1; //limit_deltaSpeed(msg->delta1);
                 turtle4.delta2.position = msg->delta2; //limit_deltaSpeed(msg->delta2);
 
-                turtle4.twist.angular.z=Um*sin(turtle4.delta1.position-turtle4.delta2.position)/(turtle4.wheel_distance/2); //sin(d1-d2)/a
+                turtle4.twist.angular.z=msg->um*sin(turtle4.delta1.position-turtle4.delta2.position)/(turtle4.wheel_distance/2); //sin(d1-d2)/a
                 turtle4.pose.theta+=turtle4.twist.angular.z*period;
                 turtle4.pose.theta=limit_angle(turtle4.pose.theta);
 
-                turtle4.twist.linear.x=Um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*cos(turtle4.pose.theta) - sin(turtle4.delta1.position+turtle4.delta2.position)*sin(turtle4.pose.theta));
-                turtle4.twist.linear.y=Um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*sin(turtle4.pose.theta) + sin(turtle4.delta1.position+turtle4.delta2.position)*cos(turtle4.pose.theta));
-                turtle4.phi1.velocity=limit_phiSpeed(2*cos(turtle4.delta2.position)*Um/turtle4.wheel_radius);
-                turtle4.phi2.velocity=limit_phiSpeed(2*cos(turtle4.delta1.position)*Um/turtle4.wheel_radius);
+                turtle4.twist.linear.x=msg->um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*cos(turtle4.pose.theta) - sin(turtle4.delta1.position+turtle4.delta2.position)*sin(turtle4.pose.theta));
+                turtle4.twist.linear.y=msg->um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*sin(turtle4.pose.theta) + sin(turtle4.delta1.position+turtle4.delta2.position)*cos(turtle4.pose.theta));
+                turtle4.phi1.velocity=limit_phiSpeed(2*cos(turtle4.delta2.position)*msg->um/turtle4.wheel_radius);
+                turtle4.phi2.velocity=limit_phiSpeed(2*cos(turtle4.delta1.position)*msg->um/turtle4.wheel_radius);
 
                 //We integrate the speeds over time (add each time we get a new value)
                 turtle4.pose.x+=turtle4.twist.linear.x*period;
