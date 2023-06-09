@@ -29,6 +29,7 @@ find_package(Eigen3)
 
 include_directories(include)
 add_library(robot SHARED src/robot.cpp include/robot.h)
+ament_export_targets(robot HAS_LIBRARY_TARGET)
 
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
@@ -66,10 +67,12 @@ install(TARGETS
 	DESTINATION lib/${PROJECT_NAME}
 	)		
 
-install(TARGETS
-  robot
-  DESTINATION lib/${PROJECT_NAME}
-)
+install(TARGETS robot
+        EXPORT robot
+        LIBRARY DESTINATION lib
+        INCLUDES DESTINATION include
+  
+  )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

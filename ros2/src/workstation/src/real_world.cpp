@@ -91,7 +91,6 @@ class real_world : public rclcpp::Node
             frequency = this->get_parameter("frequency").as_int();
             period = 1.0/frequency; //Seconds
             //Create transform broadcaster
-            tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
             position_subscriber = this->create_subscription<control_input::msg::PositionCommand>(
                 "position_cmd", 10, std::bind(&real_world::jointCommandFromPositionCmd, this, std::placeholders::_1));
@@ -119,16 +118,11 @@ class real_world : public rclcpp::Node
         float period;
         float l1 = 0.08; //Meters
         float zz= turtle4.mass*(pow(turtle4.chassis_width, 2)+ pow(turtle4.chassis_length, 2))/12;
-        tf2::Quaternion rotation;
-        rclcpp::TimerBase::SharedPtr timer_;
         sensor_msgs::msg::JointState joint_cmd;
-        sensor_msgs::msg::JointState joint_state;
         std::vector<std::string> names={"right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"};
 
 
         //Defining publishers
-        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher;
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_command_publisher;
         //rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
         

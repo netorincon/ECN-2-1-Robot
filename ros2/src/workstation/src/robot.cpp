@@ -1,14 +1,15 @@
 #include <robot.h>
 
-Robot::Robot(float x, float y, float theta, float wheel_radius, float chassis_length, float chassis_width, float wheel_distance, float mass){
-            pose.x=x;
-            pose.y=y;
-            pose.theta=theta;
-            wheel_radius=wheel_radius;
-            chassis_length=chassis_length;
-            chassis_width=chassis_width;
-            wheel_distance=wheel_distance;
-            mass=mass;
+Robot::Robot(float _x, float _y, float _theta, float _wheel_radius, float _chassis_length, float _chassis_width, float _wheel_distance, float _mass){
+            pose.x=_x;
+            pose.y=_y;
+            pose.theta=_theta;
+            wheel_radius=_wheel_radius;
+            chassis_length=_chassis_length;
+            chassis_width=_chassis_width;
+            wheel_distance=_wheel_distance;
+            mass=_mass;
+            
             phi1.id=2;
             phi1.name="right_wheel_joint";
 
