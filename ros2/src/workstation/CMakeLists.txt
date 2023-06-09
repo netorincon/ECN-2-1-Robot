@@ -27,11 +27,15 @@ find_package(control_input REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3)
 
+include_directories(include)
+add_library(robot SHARED src/robot.cpp include/robot.h)
+
 add_executable(sim src/sim.cpp )
 ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
 
 add_executable(real_world src/real_world.cpp )
 ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input)
+target_link_libraries(real_world robot)
 
 ament_python_install_package(${PROJECT_NAME})
 
@@ -40,6 +44,8 @@ ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input E
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 #target_link_libraries(controller Eigen3::Eigen)
+
+
 
 install(TARGETS
     sim
@@ -59,6 +65,11 @@ install(TARGETS
 	controller
 	DESTINATION lib/${PROJECT_NAME}
 	)		
+
+install(TARGETS
+  robot
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

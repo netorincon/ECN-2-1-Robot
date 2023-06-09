@@ -59,6 +59,7 @@
 #include <control_input/msg/slider_command.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <robot.h>
 
 using namespace std::chrono_literals;
 
@@ -81,11 +82,6 @@ double limit_angle(double a){
     while( a <  -M_PI ) a += 2*M_PI ;
     return a ;
 }
-
-struct Point{
-    float x;
-    float y;
-};
 class real_world : public rclcpp::Node
 {
     public :
@@ -108,37 +104,25 @@ class real_world : public rclcpp::Node
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
 
-            //state_subscriber=this->create_subscription<control_input::msg::StateVector>(
-            //                "state_vector", 10, std::bind(&real_world::updateState, this, std::placeholders::_1));
-            //state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
-
+            turtle4=Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
         }
 
     private :
-
-        float a=0.08;//Base distance in meters
-        float R=0.033; //Radius of the wheels in meters
-        float v1=0, v2=0; //Tangent velocities of the wheels
+        Robot turtle4;
         float dd1Cmd=0, dd2Cmd=0, phi1dCmd=0, phi2dCmd=0, d1Cmd=0, d2Cmd=0, t1Cmd=0, t2Cmd=0;
-
         //We initialize all variables of the state vector at 0
-        float tt=0, x=0, y=0, phi1=0, phi2=0, phi1d=0, phi2d=0, beta1=0, beta2=0, Um=0, dd1=0, dd2=0, d1=0, d2=0;
-        float tt_dot=0, x_dot=0, y_dot=0, cd1=0,sd1=0,cd2=0, sd2=0, ct=0, st=0, phi1dd=0, phi2dd, phi1d_prev=0, phi2d_prev=0;
+
+        float beta1=0, beta2=0, Um=0;
+        float cd1=0,sd1=0,cd2=0, sd2=0, ct=0, st=0,phi1d_prev=0, phi2d_prev=0;
+
         float frequency; // HZ, used for calculating positions via integrals
         float period;
-        float mass=2.0; //KG
         float l1 = 0.08; //Meters
-        float width=0.3; // Robot width in meters
-        float length=0.33; //Robot length in meters
-        float zz= mass*(pow(width, 2)+ pow(length, 2))/12;
-        Point ICRLocation;
+        float zz= turtle4.mass*(pow(turtle4.chassis_width, 2)+ pow(turtle4.chassis_length, 2))/12;
         tf2::Quaternion rotation;
         rclcpp::TimerBase::SharedPtr timer_;
         sensor_msgs::msg::JointState joint_cmd;
-        geometry_msgs::msg::TransformStamped icr;
         sensor_msgs::msg::JointState joint_state;
-        control_input::msg::StateVector robot_state;
-        geometry_msgs::msg::TransformStamped transform_stamped_;
         std::vector<std::string> names={"right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"};
 
 
@@ -161,19 +145,14 @@ class real_world : public rclcpp::Node
         auto phi1_index = std::find(motor->name.begin(), motor->name.end(), "right_wheel_joint") - start;
         auto phi2_index = std::find(motor->name.begin(), motor->name.end(), "left_wheel_joint") - start;
 
-        d1 = motor->position[d1_index];
-        d2 = limit_angle(motor->position[d2_index] - M_PI);
-        dd1 = motor->velocity[d1_index];
-        dd2 = motor->velocity[d2_index];
-        phi1d_prev=phi1d;
-        phi1d_prev=phi2d;
-        phi1d=motor->velocity[phi1_index];
-        phi2d=motor->velocity[phi2_index];
-        phi1dd=(phi1d_prev-phi1d)/period;
-        phi2dd=(phi2d_prev-phi2d)/period;
-        v1 = phi1d * R; //Tangent speed of wheel one
-        v2 = v1 * cos(d1) / cos(d2);
-        tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
+        turtle4.setMotorPositions(motor->position[phi1_index],motor->position[phi2_index], motor->position[d1_index], limit_angle(motor->position[d2_index] - M_PI));
+        turtle4.setMotorVelocities(motor->velocity[phi1_index], motor->velocity[phi2_index], motor->velocity[d1_index], motor->velocity[d2_index]);
+
+        //phi1d_prev=turtle4.phi1.velocity;
+        //phi1d_prev=turtle4.phi2.velocity;
+        //turtle4.phi1.acceleration=(phi1d_prev-turtle4.phi1.velocity)/period;
+        //turtle4.phi2.acceleration=(phi2d_prev-turtle4.phi2.velocity)/period;
+
 
     }
 
@@ -195,26 +174,26 @@ class real_world : public rclcpp::Node
         d1Cmd=limit_angle(msg->delta1);
         d2Cmd=limit_angle(msg->delta2);
 
-        phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/R);
-        phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/R);
+        phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/turtle4.wheel_radius);
+        phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/turtle4.wheel_radius);
 
-        // cd1=cos(d1);
-        // sd1=sin(d1);
-        // cd2=cos(d2);
-        // sd2=sin(d2);
-        // ct=cos(tt);
-        // st=sin(tt);
+        // cd1=cos(turtle4.delta1.position);
+        // sd1=sin(turtle4.delta1.position);
+        // cd2=cos(turtle4.delta2.position);
+        // sd2=sin(turtle4.delta2.position);
+        // ct=cos(turtle4.pose.theta);
+        // st=sin(turtle4.pose.theta);
         // float aux1=0, aux2=0, aux3=0;
 
-        // aux1 = mass*(4*pow(R,2)*sd1*st*ct*dd1 -4*pow(R,2)*sd1*pow(st, 2)*cd1*dd1*phi1dCmd + 4*pow(R,2)*sd1*cd1*pow(ct,2)*dd1*phi1dCmd
-        //                 +4*pow(R,2)*sd2*pow(st,2)*cd1*phi2dCmd*tt_dot - 4*pow(R,2)*sd2*st*cd1*ct*phi2dd -4*pow(R,2)*sd2*cd1*pow(ct,2)*phi2dCmd*tt_dot
-        //                 +2*pow(R,2)*pow(st,2)*pow(cd1,2)*phi1dd - 4*pow(R,2)*st*cd1*cd2*ct*dd2*phi2dCmd + 2*pow(R,2)*pow(cd1,2)*pow(ct,2)*phi1dd);
+        // aux1 = turtle4.mass*(4*pow(turtle4.wheel_radius,2)*sd1*st*ct*turtle4.delta1.velocity -4*pow(turtle4.wheel_radius,2)*sd1*pow(st, 2)*cd1*turtle4.delta1.velocity*phi1dCmd + 4*pow(turtle4.wheel_radius,2)*sd1*cd1*pow(ct,2)*turtle4.delta1.velocity*phi1dCmd
+        //                 +4*pow(turtle4.wheel_radius,2)*sd2*pow(st,2)*cd1*phi2dCmd*turtle4.twist.angular.z - 4*pow(turtle4.wheel_radius,2)*sd2*st*cd1*ct*turtle4.phi2.acceleration -4*pow(turtle4.wheel_radius,2)*sd2*cd1*pow(ct,2)*phi2dCmd*turtle4.twist.angular.z
+        //                 +2*pow(turtle4.wheel_radius,2)*pow(st,2)*pow(cd1,2)*turtle4.phi1.acceleration - 4*pow(turtle4.wheel_radius,2)*st*cd1*cd2*ct*turtle4.delta2.velocity*phi2dCmd + 2*pow(turtle4.wheel_radius,2)*pow(cd1,2)*pow(ct,2)*turtle4.phi1.acceleration);
 
-        // aux2 = (pow(R,2)*l1/(2*a))*(-2*pow(sd1,2)*ct*dd1*phi1dCmd + sd1*sd2*ct*dd1*phi2dCmd - 2*sd1*st*cd1*phi1dCmd*tt_dot + 2*sd1*cd1*ct*phi1dd 
-        //                             -pow(sd2,2)*st*phi2dd - pow(sd2,2)*ct*phi2dCmd*tt_dot + sd2*st*cd1*phi2dCmd*tt_dot - 2*sd2*st*cd2*dd2*phi2dCmd
-        //                             - sd2*cd1*ct*phi2dd + 2*pow(cd1,2)*ct*dd1*phi1dCmd - cd1*cd2*ct*dd2*phi2dCmd);
+        // aux2 = (pow(turtle4.wheel_radius,2)*l1/(turtle4.wheel_distance))*(-2*pow(sd1,2)*ct*turtle4.delta1.velocity*phi1dCmd + sd1*sd2*ct*turtle4.delta1.velocity*phi2dCmd - 2*sd1*st*cd1*phi1dCmd*turtle4.twist.angular.z + 2*sd1*cd1*ct*turtle4.phi1.acceleration 
+        //                             -pow(sd2,2)*st*turtle4.phi2.acceleration - pow(sd2,2)*ct*phi2dCmd*turtle4.twist.angular.z + sd2*st*cd1*phi2dCmd*turtle4.twist.angular.z - 2*sd2*st*cd2*turtle4.delta2.velocity*phi2dCmd
+        //                             - sd2*cd1*ct*turtle4.phi2.acceleration + 2*pow(cd1,2)*ct*turtle4.delta1.velocity*phi1dCmd - cd1*cd2*ct*turtle4.delta2.velocity*phi2dCmd);
         
-        // aux3 = (zz/pow(2*a, 2))*(pow(R,2)*pow(sd1,2)*phi1dd - pow(R,2)*sd1*sd2*phi2dd + 2*pow(R,2)*sd1*cd1*dd1*phi1dCmd - pow(R,2)*sd1*cd2*dd2*phi2dCmd - pow(R,2)*sd2*cd1*dd1*phi2dCmd);
+        // aux3 = (zz/pow(turtle4.wheel_distance, 2))*(pow(turtle4.wheel_radius,2)*pow(sd1,2)*turtle4.phi1.acceleration - pow(turtle4.wheel_radius,2)*sd1*sd2*turtle4.phi2.acceleration + 2*pow(turtle4.wheel_radius,2)*sd1*cd1*turtle4.delta1.velocity*phi1dCmd - pow(turtle4.wheel_radius,2)*sd1*cd2*turtle4.delta2.velocity*phi2dCmd - pow(turtle4.wheel_radius,2)*sd2*cd1*turtle4.delta1.velocity*phi2dCmd);
 
         // t1Cmd=(aux1+aux2+aux3)*0.5;
 
@@ -229,12 +208,6 @@ class real_world : public rclcpp::Node
         joint_cmd.velocity.push_back(phi1dCmd);
         joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
-        
-        //joint_cmd.effort.push_back(phi1dCmd/10);
-        //publishJointCommand();
-
-
-        //joint_cmd.effort.push_back(phi2dCmd/10);
 
     }
 
@@ -247,20 +220,6 @@ class real_world : public rclcpp::Node
         joint_cmd.position.clear();
         joint_cmd.effort.clear();
         joint_cmd.name.clear();
-    }
-
-    void updateState(const control_input::msg::StateVector::SharedPtr msg){
-        x=msg->x;
-        y=msg->y;
-        tt=msg->theta;
-        d1=msg->delta1;
-        d2=msg->delta2;
-        phi1=msg->phi1;
-        phi2=msg->phi2;
-        v1 = phi1d * R; //Tangent speed of wheel one
-        v2 = v1 * cos(d1) / cos(d2);
-        tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
-        return;
     }
 
 };

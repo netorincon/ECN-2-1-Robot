@@ -38,9 +38,9 @@ def generate_launch_description():
         output = 'screen',
     )
 
-    motor_state =Node(
+    robot_state =Node(
         package='mobile_robot',
-        executable='motor_state',
+        executable='robot_state',
         output='screen',
 
     )
@@ -58,13 +58,13 @@ def generate_launch_description():
             description = 'use ros2 control if true'),
 
         robot_state_publisher,
-        motor_state,
+        robot_state,
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
-            target_action=motor_state,
+            target_action=robot_state,
         on_exit=[
             launch.actions.LogInfo(
-                msg="Motor_state killed, shutting down Robot state publisher."),
+                msg="Robot_state killed, shutting down Robot state publisher."),
             launch.actions.EmitEvent(
                 event=launch.events.Shutdown())]))
    
