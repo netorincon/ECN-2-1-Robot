@@ -126,7 +126,7 @@ class motor_state : public rclcpp::Node
 					joint_state_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states",10);
                     state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
                     timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&motor_state::publishJointState,this));
-                    service = this->create_service<control_input::srv::ResetRobot>("reset_robot_state", std::bind(&motor_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
+                    service = this->create_service<control_input::srv::ResetRobot>("motor_state/reset_robot_state", std::bind(&motor_state::resetRobot,this,std::placeholders::_1,std::placeholders::_2));
 				}
 				else{
 					printf("Failed to change the baudrate!\n");
@@ -175,15 +175,13 @@ class motor_state : public rclcpp::Node
 
         int pid; // Get process ID
 
-        //
-        float tt = 0, tt_dd=0, tt_dot_prev=0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
+        float tt = 0, tt_dd = 0, tt_dot_prev = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
         float v1 = 0, v2 = 0;
         float frequency;                           // HZ, fréquence de publication des transformations sur le topic /tf
         float period;                     // Seconds
         float a = 0.08;                                 // Base distance in meters
         float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
-        //
 
 		// Initialize PacketHandler instance
 		// Set the protocol version
