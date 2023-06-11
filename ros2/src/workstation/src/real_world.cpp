@@ -1,28 +1,30 @@
-/*Real world node
-
-
-################### BEGIN EXPLANATION ######################
-
-    The objective of this node is to convert the control_input command into joint_state commands which are then published in the motor_cmd topic
-    It also obtains the joint states of the real robot
-    We subscribe to control_cmd and position_cmd, normally only one should be publishing. 
-
----Subscriptions:
-    /position_cmd
-    /control_cmd
-    /joint_states
-    
----Publishers
-    /joint_cmd
-
-    ---To calculate the desired joint speeds---
-    We obtain the control_cmd (or position_cmd in case of manual position mode)
-    We multiply by UM the corresponding rows of S(q) in case of control_cmd
-    Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
-
-#################### END EXPLANATION #####################
-*/
-
+/**
+ * @file real_world.cpp
+ * @brief The objective of this node is to convert the control_input command into joint_state commands which are then published in the motor_cmd topic.
+ * It also obtains the joint states of the real robot.
+ * 
+ *
+ * -Subscriptions:
+ * 
+ * 1. control_input::PositionCommand /position_cmd
+ * 
+ * 2. control_input::ControlInput /control_cmd
+ * 
+ * 3. sensor_msgs::JointState /joint_states
+ *     
+ * -Publishers:
+ * 1. sensor_msgs::JointState/joint_cmd
+ *
+ * -To calculate the desired joint speeds:
+ * 
+ * 1. We obtain the control_cmd (or position_cmd in case of manual position mode)
+ * 
+ * 2. We multiply by UM the corresponding rows of S(q) in case of control_cmd
+ * 
+ * 3. Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
+ *
+ *
+ */
 
 #include <math.h>
 #include <rclcpp/rclcpp.hpp>
@@ -57,6 +59,8 @@ double limit_angle(double a){
     while( a <  -M_PI ) a += 2*M_PI ;
     return a ;
 }
+
+
 class real_world : public rclcpp::Node
 {
     public :
@@ -101,7 +105,6 @@ class real_world : public rclcpp::Node
         //rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
         
         //Defining subscribers
-        //rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;

@@ -118,8 +118,8 @@ class controller : public rclcpp::Node
             command_publisher->publish(command);
 
             transform_stamped_.header.stamp = this->now();
-            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
-            transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
+            transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
+            transform_stamped_.child_frame_id = "target"; // Target frame
             transform_stamped_.transform.translation.x = xr(0);
             transform_stamped_.transform.translation.y = xr(1);
             transform_stamped_.transform.translation.z = 0;

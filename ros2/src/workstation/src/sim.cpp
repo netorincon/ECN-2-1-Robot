@@ -27,26 +27,6 @@ Then the values are integrated over time to obtain the current state vector.
 #include <control_input/msg/position_command.hpp>
 #include <robot_library/robot.h>
 
-double limit_angle(double angle){
-    while( angle >=  2*M_PI ) angle -= 2*M_PI ;
-    while( angle <  0 ) angle += 2*M_PI ;
-    return angle ;
-}
-
-float limit_phiSpeed(float angle){
-    float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
-    if( angle >=  max) {angle =max;}
-    else if(angle<= -max) {angle=-max;} 
-    return angle;
-}
-
-float limit_deltaSpeed(float angle){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
-    float max=(55.0/60.0)*(2*M_PI);
-    if( angle >=  max) {angle =max;}
-    else if(angle<= -max) {angle=-max;} 
-    return angle;
-}
-
 class sim : public rclcpp::Node
 {
     public :
@@ -90,37 +70,13 @@ class sim : public rclcpp::Node
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
 
         void calculatePoseFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
-                turtle4.delta1.position=msg->d1;
-                turtle4.delta2.position=msg->d2;
-                turtle4.phi1.position=0;
-                turtle4.phi2.position=0;
-                publishTransforms(); 
-            }
+            turtle4.setMotorPositions(0,0,msg->d1, msg->d2);
+            publishTransforms(); 
+        }
 
         void calculatePoseFromControlCmd(const control_input::msg::ControlInput::SharedPtr msg){
-                turtle4.delta1.position = msg->delta1; //limit_deltaSpeed(msg->delta1);
-                turtle4.delta2.position = msg->delta2; //limit_deltaSpeed(msg->delta2);
-
-                turtle4.twist.angular.z=msg->um*sin(turtle4.delta1.position-turtle4.delta2.position)/(turtle4.wheel_distance/2); //sin(d1-d2)/a
-                turtle4.pose.theta+=turtle4.twist.angular.z*period;
-                turtle4.pose.theta=limit_angle(turtle4.pose.theta);
-
-                turtle4.twist.linear.x=msg->um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*cos(turtle4.pose.theta) - sin(turtle4.delta1.position+turtle4.delta2.position)*sin(turtle4.pose.theta));
-                turtle4.twist.linear.y=msg->um*(2*cos(turtle4.delta1.position)*cos(turtle4.delta2.position)*sin(turtle4.pose.theta) + sin(turtle4.delta1.position+turtle4.delta2.position)*cos(turtle4.pose.theta));
-                turtle4.phi1.velocity=limit_phiSpeed(2*cos(turtle4.delta2.position)*msg->um/turtle4.wheel_radius);
-                turtle4.phi2.velocity=limit_phiSpeed(2*cos(turtle4.delta1.position)*msg->um/turtle4.wheel_radius);
-
-                //We integrate the speeds over time (add each time we get a new value)
-                turtle4.pose.x+=turtle4.twist.linear.x*period;
-                turtle4.pose.y+=turtle4.twist.linear.y*period;
-
-                turtle4.phi1.position+=turtle4.phi1.velocity*period;
-                turtle4.phi2.position+=turtle4.phi2.velocity*period;
-                
-                //We limit the angles to 2pi
-                turtle4.phi1.position=limit_angle(turtle4.phi1.position);
-                turtle4.phi2.position=limit_angle(turtle4.phi2.position);
-                publishTransforms(); 
+            turtle4.applyControlInput(msg->um, msg->delta1, msg->delta2, period);
+            publishTransforms();
         }
         void publishTransforms(){
 

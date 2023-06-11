@@ -68,6 +68,26 @@ void Robot::setPose(float _x, float _y, float _theta){
     pose.y=_y;
     pose.theta=_theta;
 }
+void Robot::applyControlInput(float um, float _delta1, float _delta2, float _period){
+    delta1.setPosition(_delta1); //limit_deltaSpeed(msg->delta1);
+    delta2.setPosition(_delta2); //limit_deltaSpeed(msg->delta2);
+
+    twist.angular.z=um*sin(delta1.position-delta2.position)/(wheel_distance/2); //sin(d1-d2)/a
+    pose.theta+=twist.angular.z*_period;
+    pose.theta=limit_angle(pose.theta);
+
+    twist.linear.x=um*(2*cos(delta1.position)*cos(delta2.position)*cos(pose.theta) - sin(delta1.position+delta2.position)*sin(pose.theta));
+    twist.linear.y=um*(2*cos(delta1.position)*cos(delta2.position)*sin(pose.theta) + sin(delta1.position+delta2.position)*cos(pose.theta));
+    phi1.velocity=limit_phiSpeed(2*cos(delta2.position)*um/wheel_radius);
+    phi2.velocity=limit_phiSpeed(2*cos(delta1.position)*um/wheel_radius);
+
+    //We integrate the speeds over time (add each time we get a new value)
+    pose.x+=twist.linear.x*_period;
+    pose.y+=twist.linear.y*_period;
+
+    phi1.setPosition(phi1.position + phi1.velocity*_period);
+    phi2.setPosition(phi2.position + phi2.velocity*_period);
+}
 
 float Robot::limit_angle(float angle){
     while( angle >=  2*M_PI ) angle -= 2*M_PI ;
@@ -173,4 +193,18 @@ control_input::msg::StateVector Robot::getStateVector(){
     msg.phi2=phi2.position;
 
     return msg;
+}
+
+float Robot::limit_phiSpeed(float speed){
+    float max=(75.0/60.0)*(2*M_PI); //Limit phi rotation speeds to +-75rpm(The dynamixel XM430-W210 MAXIMUM speed)
+    if( speed >=  max) {speed =max;}
+    else if(speed<= -max) {speed=-max;} 
+    return speed;
+}
+
+float limit_deltaSpeed(float speed){ //Limit delta rotation speeds to +-55rpm (The dynamixel MX28 MAXIMUM speed)
+    float max=(55.0/60.0)*(2*M_PI);
+    if( speed >=  max) {speed =max;}
+    else if(speed<= -max) {speed=-max;} 
+    return speed;
 }

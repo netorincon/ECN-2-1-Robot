@@ -33,6 +33,14 @@ struct Motor{
     float effort=0;
     int id;
     std::string name;
+    void setPosition(float angle){
+        while( angle >=  M_PI ) angle -= 2*M_PI ;
+        while( angle <  -M_PI  ) angle += 2*M_PI ;
+        position=angle;
+        return;
+    }
+    void setVelocity(float speed);
+    void setEffort(float torque);
 };
 
 class Robot {
@@ -62,9 +70,12 @@ class Robot {
         void setPose(float _x, float _y, float _theta);
         void setMotorPositions(float _phi1, float _phi2, float _delta1, float _delta2);
         void setMotorVelocities(float _phi1, float _phi2, float _delta1, float _delta2);
+        void applyControlInput(float um, float _delta1, float _delta2, float _period);
         sensor_msgs::msg::JointState getJointStates();
         geometry_msgs::msg::TransformStamped getOdometry();
         geometry_msgs::msg::TransformStamped getICRTransform();
         control_input::msg::StateVector getStateVector();
         float limit_angle(float angle);
+        float limit_phiSpeed(float speed);
+        float limit_deltaSpeed(float speed);
 };
