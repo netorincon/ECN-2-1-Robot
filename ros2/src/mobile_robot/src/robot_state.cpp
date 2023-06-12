@@ -24,6 +24,7 @@
 #include <control_input/srv/reset_robot.hpp>
 //#include <robot.h>
 
+
 // Control table address
 // EEPROM Area
 // Data in EEPROM area can only be written when torque value (ADDR_TORQUE_ENABLE) is 0
