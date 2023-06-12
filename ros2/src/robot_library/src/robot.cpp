@@ -2,6 +2,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <control_input/msg/state_vector.hpp>
+#include <Eigen/Dense>
 
 Robot::Robot(float _x, float _y, float _theta, float _wheel_radius, float _chassis_length, float _chassis_width, float _wheel_distance, float _mass){
             pose.x=_x;
@@ -12,7 +13,7 @@ Robot::Robot(float _x, float _y, float _theta, float _wheel_radius, float _chass
             chassis_width=_chassis_width;
             wheel_distance=_wheel_distance;
             mass=_mass;
-            
+           
             phi1.id=2;
             phi1.name="right_wheel_joint";
 
@@ -87,6 +88,16 @@ void Robot::applyControlInput(float um, float _delta1, float _delta2, float _per
 
     phi1.setPosition(phi1.position + phi1.velocity*_period);
     phi2.setPosition(phi2.position + phi2.velocity*_period);
+}
+
+Eigen::Matrix2f Robot::getKInv(float e){
+
+        K_inv(0,0)=cos(delta1.position + pose.theta)/(2*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(0,1)=sin(delta1.position + pose.theta)/(2*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(1,0)=(-2*(wheel_distance/2)*sin(delta2.position + pose.theta)*cos(delta1.position) - e*sin(delta1.position - delta2.position)*cos(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(1,1)=(2*(wheel_distance/2)*cos(delta2.position)*cos(delta1.position + pose.theta) - e*sin(delta1.position - delta2.position)*sin(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+
+        return K_inv;
 }
 
 float Robot::limit_angle(float angle){

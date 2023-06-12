@@ -3,6 +3,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <control_input/msg/state_vector.hpp>
+#include <Eigen/Dense>
 
 struct Point{
     float x=0;
@@ -62,7 +63,8 @@ class Robot {
         float chassis_length;
         float chassis_width;
         float wheel_distance;
-        float mass;
+        float mass; 
+        Eigen::Matrix2f K_inv;
 
         Robot(float x, float y, float theta, float wheel_radius, float chassis_length, float chassis_width, float wheel_distance, float mass);
         Robot() = default;
@@ -78,4 +80,5 @@ class Robot {
         float limit_angle(float angle);
         float limit_phiSpeed(float speed);
         float limit_deltaSpeed(float speed);
+        Eigen::Matrix2f getKInv(float e);
 };
