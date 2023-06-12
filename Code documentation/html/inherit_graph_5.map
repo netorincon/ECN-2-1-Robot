@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classdynamixel_1_1_packet_handler.html" title="The class that inherits Protocol1PacketHandler class or Protocol2PacketHandler class." alt="" coords="5,46,199,73"/>
+<area shape="rect" id="node2" href="$classdynamixel_1_1_protocol1_packet_handler.html" title="The class for control Dynamixel by using Protocol1.0." alt="" coords="247,5,449,47"/>
+<area shape="rect" id="node3" href="$classdynamixel_1_1_protocol2_packet_handler.html" title="The class for control Dynamixel by using Protocol2.0." alt="" coords="247,71,449,112"/>
+</map>
