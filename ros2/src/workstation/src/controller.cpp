@@ -26,6 +26,8 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <control_input/msg/state_vector.hpp>
+#include <robot_library/robot.h>
+
 using namespace std::chrono_literals;
 using Eigen::MatrixXd;
 
@@ -51,11 +53,13 @@ class controller : public rclcpp::Node
                             "state_vector", 10, std::bind(&controller::updateState, this, std::placeholders::_1));
 
             timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&controller::calculateControlInput, this));
-            updateK();
+            //updateK();
+
+            turtle4 = Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
         }
     private:
         rclcpp::TimerBase::SharedPtr timer_;
-        float um, dd1, dd2, x, y, theta, d1, d2, phi1, phi2=0, d1Cmd = 0, d2Cmd = 0;
+        float um, dd1, dd2, x, y, phi1, phi2=0, d1Cmd = 0, d2Cmd = 0;
         float a=0.08;
         float e=0.1;
         float kp=0.7;
@@ -82,6 +86,7 @@ class controller : public rclcpp::Node
         Eigen::Vector2f deltaError{0,0};
         Eigen::Vector2f Error{0,0};
 
+        Robot turtle4;
 
     void calculateControlInput(){
 
@@ -91,67 +96,59 @@ class controller : public rclcpp::Node
 
         //At the end you should be assignning a value to um, dd1 and dd2.
         //if(initialized){
-            getNextPoint();
-            xp(0)=x+a*cos(theta)+e*cos(theta+d1);
-            xp(1)=y+a*sin(theta)+e*sin(theta+d1);
-            Error=(xr-xp)*period;
-            deltaError=prevError-Error;
-            sumError+= Error;
-            prevError=Error;
-            u=K_inv*(xrdot+kp*(xr-xp)+((ki/period)*sumError)+kp*(deltaError));
+        getNextPoint();
+        xp(0)=turtle4.pose.x+(turtle4.wheel_distance/2)*cos(turtle4.pose.theta)+e*cos(turtle4.pose.theta+turtle4.delta1.position);
+        xp(1)=turtle4.pose.y+(turtle4.wheel_distance/2)*sin(turtle4.pose.theta)+e*sin(turtle4.pose.theta+turtle4.delta1.position);
+        Error=(xr-xp)*period;
+        deltaError=prevError-Error;
+        sumError+= Error;
+        prevError=Error;
+        u=turtle4.getKInv(e)*(xrdot+kp*(xr-xp)+((ki/period)*sumError)+kp*(deltaError));
 
-            um=u(0);
-            dd1=limit_deltaSpeed(u(1));
-            //dd2=-dd1;
-            //YOUR CODE SHOULD END HERE
-
-
+        um=u(0);
+        dd1=limit_deltaSpeed(u(1));
+        //dd2=-dd1;
+        //YOUR CODE SHOULD END HERE
 
 
-            // Change in position for d1 and d2
-            d1Cmd = d1 + (dd1 * period);
-            d2Cmd = -d1Cmd;
 
-            command.um=um;
-            command.delta1 = d1Cmd;
-            command.delta2 = d2Cmd;
-            command_publisher->publish(command);
 
-            transform_stamped_.header.stamp = this->now();
-            transform_stamped_.header.frame_id = "odom"; // Nom du repère fixe
-            transform_stamped_.child_frame_id = "target"; // Nom du repère du robot
-            transform_stamped_.transform.translation.x = xr(0);
-            transform_stamped_.transform.translation.y = xr(1);
-            transform_stamped_.transform.translation.z = 0;
-            transform_stamped_.transform.rotation.x = 0;
-            transform_stamped_.transform.rotation.y = 0;
-            transform_stamped_.transform.rotation.z = 0;
-            transform_stamped_.transform.rotation.w = 1;
-            tf_broadcaster_->sendTransform(transform_stamped_);
-            return;
+        // Change in position for turtle4.delta1.position and turtle4.delta2.position
+        d1Cmd = turtle4.delta1.position + (dd1 * period);
+        d2Cmd = -d1Cmd;
+
+        command.um=um;
+        command.delta1 = d1Cmd;
+        command.delta2 = d2Cmd;
+        command_publisher->publish(command);
+
+        transform_stamped_.header.stamp = this->now();
+        transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
+        transform_stamped_.child_frame_id = "target"; // Target frame
+        transform_stamped_.transform.translation.x = xr(0);
+        transform_stamped_.transform.translation.y = xr(1);
+        transform_stamped_.transform.translation.z = 0;
+        transform_stamped_.transform.rotation.x = 0;
+        transform_stamped_.transform.rotation.y = 0;
+        transform_stamped_.transform.rotation.z = 0;
+        transform_stamped_.transform.rotation.w = 1;
+        tf_broadcaster_->sendTransform(transform_stamped_);
+        return;
         //}
 
     }
 
     void updateState(const control_input::msg::StateVector::SharedPtr msg){
-        x=msg->x;
-        y=msg->y;
-        theta=msg->theta;
-        d1=msg->delta1;
-        d2=msg->delta2;
-        phi1=msg->phi1;
-        phi2=msg->phi2;
-        updateK();
+        turtle4.pose.x=msg->x;
+        turtle4.pose.y=msg->y;
+        turtle4.pose.theta=msg->theta;
+        turtle4.delta1.position=msg->delta1;
+        turtle4.delta2.position=msg->delta2;
+        turtle4.phi1.position=msg->phi1;
+        turtle4.phi2.position=msg->phi2;
+        //updateK();
         initialized=true;
         return;
-    }
-
-    void updateK(){
-        K_inv(0,0)=cos(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*cos(d2)*pow(cos(d1 + theta),2));
-        K_inv(0,1)=sin(d1 + theta)/(2*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*cos(d2)*pow(cos(d1 + theta),2));
-        K_inv(1,0)=(-2*a*sin(d2 + theta)*cos(d1) - e*sin(d1 - d2)*cos(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*a*e*cos(d2)*pow(cos(d1 + theta),2));
-        K_inv(1,1)=(2*a*cos(d2)*cos(d1 + theta) - e*sin(d1 - d2)*sin(d1 + theta))/(2*a*e*sin(d1 + theta)*sin(d2 + theta)*cos(d1) + 2*a*e*cos(d2)*pow(cos(d1 + theta),2));
-        //K_inv=K.inverse();
     }
 
     void getNextPoint(){
