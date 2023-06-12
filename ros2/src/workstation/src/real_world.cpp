@@ -1,52 +1,32 @@
-/*Real world node
+/**
+ * @file real_world.cpp
+ * @brief The objective of this node is to convert the control_input command into joint_state commands which are then published in the motor_cmd topic.
+ * It also obtains the joint states of the real robot.
+ * 
+ *
+ * -Subscriptions:
+ * 
+ * 1. control_input::PositionCommand /position_cmd
+ * 
+ * 2. control_input::ControlInput /control_cmd
+ * 
+ * 3. sensor_msgs::JointState /joint_states
+ *     
+ * -Publishers:
+ * 1. sensor_msgs::JointState/joint_cmd
+ *
+ * -To calculate the desired joint speeds:
+ * 
+ * 1. We obtain the control_cmd (or position_cmd in case of manual position mode)
+ * 
+ * 2. We multiply by UM the corresponding rows of S(q) in case of control_cmd
+ * 
+ * 3. Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
+ *
+ *
+ */
 
-
-################### BEGIN EXPLANATION ######################
-
-    The objective of this node is to convert the control input command into joint commands which are then published in the motor_cmd topic
-
-    It also obtains the joint speeds of the real robot and calculates its pose with respect to the odom frame
-    Then it assembles a transform and publishes it to /tf to be able to see the robot's motion in rviz
-
-    We subscribe to control_cmd or position_cmd depending on the value of the "mode" argument sent to this node.
-
-    if mode="position", The node will subscribe to position_cmd and forward the value to the motor_cmd topic
-    if mode="velocity" or "controller", the node will subscribe to control_cmd and generate the desired joint speeds to be sent to motor_cmd from a control input. 
-     
-
----Subscriptions:
-    /position_cmd
-    /control_cmd
-    /joint_states
-    
----Publishers
-    /joint_cmd
-    /state_vector
-
-    To convert joint states into tf2 transform:
-
-    We subscribe to the topic joint_states via state_susbscriber 
-    This subscriber will receive a JointState type message, which will include a list of the states of each of the four motors. 
-    (position, speed, and torque)
-    To calculate current pose, we obtain (solve from the rows corresponding to PHI in the S(q) matrix. 
-    We calculate the current twist using the motor speeds and then integrate over time to obtain the current pose.
-    
-
-    ---To calculate the desired joint speeds---
-    We obtain the control_cmd (or position_cmd in case of manual position mode)
-    We multiply by UM the corresponding rows of S(q) in case of control_cmd
-    Finally we publish the list of obtained values as a jointState message in the joint_cmd topic
-
-#################### END EXPLANATION #####################
-*/
-
-
-#include <string>
 #include <math.h>
-#include <chrono>
-#include <cstring>
-#include <algorithm>
-#include <functional>
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <sensor_msgs/msg/joint_state.hpp>
@@ -79,6 +59,8 @@ double limit_angle(double a){
     while( a <  -M_PI ) a += 2*M_PI ;
     return a ;
 }
+
+
 class real_world : public rclcpp::Node
 {
     public :
@@ -116,7 +98,6 @@ class real_world : public rclcpp::Node
         float l1 = 0.08; //Meters
         float zz= turtle4.mass*(pow(turtle4.chassis_width, 2)+ pow(turtle4.chassis_length, 2))/12;
         sensor_msgs::msg::JointState joint_cmd;
-        std::vector<std::string> names={"right_wheel_base_joint", "right_wheel_joint", "left_wheel_base_joint", "left_wheel_joint"};
 
 
         //Defining publishers
@@ -124,7 +105,6 @@ class real_world : public rclcpp::Node
         //rclcpp::Publisher<control_input::msg::StateVector>::SharedPtr state_vector_publisher;
         
         //Defining subscribers
-        //rclcpp::Subscription<control_input::msg::StateVector>::SharedPtr state_subscriber;
         rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber;
         rclcpp::Subscription<control_input::msg::PositionCommand>::SharedPtr position_subscriber;
         rclcpp::Subscription<control_input::msg::ControlInput>::SharedPtr control_input_subscriber;
@@ -148,14 +128,17 @@ class real_world : public rclcpp::Node
     }
 
     void jointCommandFromPositionCmd(const control_input::msg::PositionCommand::SharedPtr msg){
-        for(uint i=0;i<names.size(); i++){
-            joint_cmd.name.push_back(names[i]);
-        }
+
+        joint_cmd.name.push_back(turtle4.delta1.name);
+        joint_cmd.name.push_back(turtle4.delta2.name);
+        joint_cmd.name.push_back(turtle4.phi1.name);
+        joint_cmd.name.push_back(turtle4.phi2.name);
 
         joint_cmd.position.push_back(msg->d1);
-        joint_cmd.position.push_back(msg->phi1);
         joint_cmd.position.push_back(msg->d2);
+        joint_cmd.position.push_back(msg->phi1);
         joint_cmd.position.push_back(msg->phi2); 
+
         publishJointCommand();  
     }
 
@@ -188,14 +171,17 @@ class real_world : public rclcpp::Node
 
         // t1Cmd=(aux1+aux2+aux3)*0.5;
 
-        joint_cmd.name.push_back(names[0]);
-        joint_cmd.name.push_back(names[2]);
+        //We publish two separate messages to differenciate position for delta1 and delta2
+        //from velocities for phi1 and phi2
+
+        joint_cmd.name.push_back(turtle4.delta1.name);
+        joint_cmd.name.push_back(turtle4.delta2.name);
         joint_cmd.position.push_back(d1Cmd);
         joint_cmd.position.push_back(d2Cmd);
         publishJointCommand();
 
-        joint_cmd.name.push_back(names[1]);
-        joint_cmd.name.push_back(names[3]);
+        joint_cmd.name.push_back(turtle4.phi1.name);
+        joint_cmd.name.push_back(turtle4.phi2.name);
         joint_cmd.velocity.push_back(phi1dCmd);
         joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
