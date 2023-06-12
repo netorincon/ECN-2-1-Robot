@@ -26,27 +26,20 @@ find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3)
-
-include_directories(include)
-add_library(robot SHARED src/robot.cpp include/robot.h)
-ament_export_targets(robot HAS_LIBRARY_TARGET)
-
+find_package(robot_library REQUIRED)
 add_executable(sim src/sim.cpp )
-ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input)
+ament_target_dependencies(sim tf2_ros rclcpp sensor_msgs std_msgs control_input robot_library)
 
 add_executable(real_world src/real_world.cpp )
-ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input)
-target_link_libraries(real_world robot)
+ament_target_dependencies(real_world tf2_ros rclcpp sensor_msgs std_msgs control_input robot_library)
 
 ament_python_install_package(${PROJECT_NAME})
 
 add_executable(controller src/controller.cpp)
-ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input Eigen3 tf2_ros)
+ament_target_dependencies(controller rclcpp sensor_msgs std_msgs control_input Eigen3 tf2_ros robot_library)
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 #target_link_libraries(controller Eigen3::Eigen)
-
-
 
 install(TARGETS
     sim
@@ -66,15 +59,6 @@ install(TARGETS
 	controller
 	DESTINATION lib/${PROJECT_NAME}
 	)		
-
-install(
-  TARGETS robot
-  EXPORT robot
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
