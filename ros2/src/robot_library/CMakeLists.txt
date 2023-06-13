@@ -21,6 +21,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(control_input REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(tf2_ros REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -29,7 +30,7 @@ include_directories(
 )
 
 add_library(robot_library SHARED src/robot.cpp) 
-ament_target_dependencies(robot_library sensor_msgs control_input Eigen3)
+ament_target_dependencies(robot_library sensor_msgs control_input Eigen3 tf2_ros)
 ament_export_dependencies(eigen3_cmake_module)
 ament_export_dependencies(Eigen3)
 
