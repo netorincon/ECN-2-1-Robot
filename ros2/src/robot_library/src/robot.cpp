@@ -101,8 +101,8 @@ Eigen::Matrix2f Robot::getKInv(float e){
 }
 
 float Robot::limit_angle(float angle){
-    while( angle >=  2*M_PI ) angle -= 2*M_PI ;
-    while( angle <  0 ) angle += 2*M_PI ;
+    while( angle >=  M_PI ) angle -= 2*M_PI ;
+    while( angle <  -M_PI ) angle += 2*M_PI ;
     return angle;
 }
 
@@ -116,7 +116,7 @@ sensor_msgs::msg::JointState Robot::getJointStates(){
     msg.position.push_back(phi1.position);
     msg.position.push_back(phi2.position);
     msg.position.push_back(delta1.position);
-    msg.position.push_back(delta2.position);
+    msg.position.push_back(limit_angle(delta2.position + M_PI));
 
     msg.velocity.push_back(phi1.velocity);
     msg.velocity.push_back(phi2.velocity);
