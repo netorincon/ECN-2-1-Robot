@@ -22,7 +22,7 @@
 #include "DynamixelSDK.h"
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/srv/reset_robot.hpp>
-//#include <robot.h>
+#include <robot_library/robot.h>
 
 // Control table address
 // EEPROM Area
@@ -77,11 +77,6 @@ struct MotorState{
     float torque = 0;
 };
 
-struct Point{
-    float x;
-    float y;
-};
-
 class robot_state : public rclcpp::Node
 {
 	public :
@@ -97,6 +92,9 @@ class robot_state : public rclcpp::Node
 				// Set port baudrate
 				if (portHandler->setBaudRate(BAUDRATE)){
 					printf("Succeeded to change the baudrate!\n");
+
+                    // Create robot object
+                    turtle4 = Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
 					
 					// Enable Torque
 					enableTorque(DXL1_ID);
@@ -133,13 +131,11 @@ class robot_state : public rclcpp::Node
 				else{
 					printf("Failed to change the baudrate!\n");
                     exitNode();
-					printf("Press CTRL + C terminate...\n");
 				}
 			}
 			else{
 				printf("Failed to open the port!\n");
                 exitNode();
-				printf("Press CTRL + C terminate...\n");
 			}
         }
         
@@ -160,6 +156,7 @@ class robot_state : public rclcpp::Node
 		}
 
     private :
+        Robot turtle4;
 		rclcpp::TimerBase::SharedPtr timer_;
 		sensor_msgs::msg::JointState jointState;
 
@@ -178,12 +175,9 @@ class robot_state : public rclcpp::Node
         MotorGoal command[4];		// Goal
         MotorState stateArray[4];	// Present
 
-        float tt = 0, x = 0, y = 0, phi1 = 0, phi2 = 0, phi1d = 0, phi2d = 0, beta1 = 0, beta2 = 0, dd1 = 0, dd2 = 0, d1 = 0, d2 = 0, tt_dot = 0, x_dot = 0, y_dot = 0;
-        float v1 = 0, v2 = 0;
+        float tt_dot = 0, x_dot = 0, y_dot = 0;
         float frequency;                                // HZ, fréquence de publication des transformations sur le topic /tf
         float period;                                   // Seconds
-        float a = 0.08;                                 // Base distance in meters
-        float R = 0.033;                                // Radius of the wheels in meters
         Point ICRLocation;
 
 		// Initialize PacketHandler instance
@@ -333,19 +327,9 @@ class robot_state : public rclcpp::Node
 		// Check present states
 		assignReadParam();
 		
-		jointState.header.stamp = this->now();
-		jointState.name.clear();
-		jointState.position.clear();
-		jointState.velocity.clear();
-		jointState.effort.clear();
-		
-		for(int i=0;i<4;i++){
-			jointState.name.push_back(stateArray[i].id);
-            jointState.position.push_back(stateArray[i].position);
-            jointState.velocity.push_back(stateArray[i].velocity);
-            jointState.effort.push_back(stateArray[i].torque);
-		}
-		joint_state_publisher->publish(jointState);
+        jointState = turtle4.getJointStates();
+        jointState.header.stamp = this->now();
+        joint_state_publisher->publish(jointState);
 
         // Send odometry
         calculatePose();
@@ -396,22 +380,15 @@ class robot_state : public rclcpp::Node
             commandPacket.clearParam();
 
             assignReadParam();
+            updateMotorValues();
 
-            x = 0;
-            y = 0;
-            tt = 0;
+            turtle4.resetPose();
 
-            beta1 = stateArray[2].position;
-            d1 = beta1;
-            phi1 = stateArray[1].position;
+            transform_stamped_=turtle4.getOdometry();
+            transform_stamped_.header.stamp = this->now();
+            tf_broadcaster_->sendTransform(transform_stamped_);
 
-            beta2 = stateArray[3].position;
-            d2 = limitAngle(beta2 - M_PI);
-            phi2 = stateArray[0].position;
-
-            sendTransformBroadcaster();
-
-            publishStateVectorOdom();
+            state_vector_publisher->publish(turtle4.getStateVector());
 
             response->status = 1;
         }
@@ -569,6 +546,19 @@ class robot_state : public rclcpp::Node
             }
         }
     }
+
+    void updateMotorValues(){
+        turtle4.setMotorPositions(stateArray[turtle4.phi1.id - 1].position, stateArray[turtle4.phi2.id - 1].position,
+                stateArray[turtle4.delta1.id - 1].position, limitAngle(stateArray[turtle4.delta2.id - 1].position - M_PI));
+
+        turtle4.setMotorVelocities(stateArray[turtle4.phi1.id - 1].velocity, stateArray[turtle4.phi2.id - 1].velocity,
+                stateArray[turtle4.delta1.id - 1].velocity, stateArray[turtle4.delta2.id - 1].velocity);
+
+        turtle4.phi1.effort = stateArray[turtle4.phi1.id - 1].torque;
+        turtle4.phi2.effort = stateArray[turtle4.phi2.id - 1].torque;
+        turtle4.delta1.effort = stateArray[turtle4.delta1.id - 1].torque;
+        turtle4.delta2.effort = stateArray[turtle4.delta2.id - 1].torque;
+    }
 	
 	void assignReadParam(){
         int counter = TRIES;
@@ -602,121 +592,35 @@ class robot_state : public rclcpp::Node
             //THIS NODE SHOULD END
             exitNode();
         }
+
+        updateMotorValues();
 	}
 	
     // Odom
     void calculatePose(){
-        //Get the current position and velocity of the motors
-        beta1 = stateArray[2].position;
-        d1 = beta1;
-        phi1 = stateArray[1].position;
-
-        beta2 = stateArray[3].position;
-        d2 = limitAngle(beta2 - M_PI);
-        phi2 = stateArray[0].position;
-
-        dd1 = stateArray[2].velocity;
-        phi1d = stateArray[1].velocity;
-        dd2 = stateArray[3].velocity;
-        phi2d = stateArray[0].velocity;
-
-        v1 = phi1d * R; //Tangent speed of wheel one
-        v2 = v1 * cos(d1) / cos(d2);
-
         //We calculate current robot speeds and orientation motor
-        tt_dot = (1 / (2*a)) * (v1 * sin(d1) - v2 * sin(d2));
+        tt_dot = (1 / turtle4.wheel_distance) * (turtle4.v1 * sin(turtle4.delta1.position) - turtle4.v2 * sin(turtle4.delta2.position));
 
-        tt += tt_dot * period;
+        turtle4.pose.theta += tt_dot * period;
 
-        x_dot = v1 * cos(d1) * cos(tt) - v2 * sin(d2) * sin(tt);
-        y_dot = v1 * cos(d1) * sin(tt) + v2 * sin(d2) * cos(tt);
+        x_dot = turtle4.v1 * cos(turtle4.delta1.position) * cos(turtle4.pose.theta) - turtle4.v2 * sin(turtle4.delta2.position) * sin(turtle4.pose.theta);
+        y_dot = turtle4.v1 * cos(turtle4.delta1.position) * sin(turtle4.pose.theta) + turtle4.v2 * sin(turtle4.delta2.position) * cos(turtle4.pose.theta);
         //We integrate the speeds over time (add each time we get a new value)
-        x += x_dot * period;
-        y += y_dot * period;
-        tt = limitAngle(tt);
+        turtle4.pose.x += x_dot * period;
+        turtle4.pose.y += y_dot * period;
+        turtle4.pose.theta = limitAngle(turtle4.pose.theta);
 
-        sendTransformBroadcaster();
+        transform_stamped_=turtle4.getOdometry();
+        transform_stamped_.header.stamp = this->now();
+        tf_broadcaster_->sendTransform(transform_stamped_);
 
         //We publish the current state vector to be read by the controller
-        publishStateVectorOdom();
+        state_vector_publisher->publish(turtle4.getStateVector());
 
-        calculateICR();
-        icr.header.frame_id = "base_link"; // Nom du repère fixe
-        icr.child_frame_id = "icr"; // Nom du repère du robot
-        icr.transform.translation.x = ICRLocation.x;
-        icr.transform.translation.y = ICRLocation.y;
-        icr.transform.translation.z = 0;
+        icr = turtle4.getICRTransform();
         icr.header.stamp = this->now();
         tf_broadcaster_->sendTransform(icr);
     }
-
-    void sendTransformBroadcaster(){
-        transform_stamped_.header.stamp = this->now();
-        transform_stamped_.header.frame_id = "odom"; // Name of the fixed frame
-        transform_stamped_.child_frame_id = "base_link"; // Name of the robot's frame
-        transform_stamped_.transform.translation.x = x;
-        transform_stamped_.transform.translation.y = y;
-        transform_stamped_.transform.translation.z = 0;
-        rotation.setRPY(0,0,tt);
-        transform_stamped_.transform.rotation.x = rotation.getX();
-        transform_stamped_.transform.rotation.y = rotation.getY();
-        transform_stamped_.transform.rotation.z = rotation.getZ();
-        transform_stamped_.transform.rotation.w = rotation.getW();
-        tf_broadcaster_->sendTransform(transform_stamped_);
-    }
-
-    void publishStateVectorOdom(){
-        robot_state_vector.x=x;
-        robot_state_vector.y=y;
-        robot_state_vector.theta=tt;
-        robot_state_vector.delta1=d1;
-        robot_state_vector.delta2=d2;
-        robot_state_vector.delta3=0.0;
-        robot_state_vector.phi1=phi1;
-        robot_state_vector.phi2=phi2;
-        state_vector_publisher->publish(robot_state_vector);
-    }
-
-    void calculateICR(){
-        //We define alpha1 and alpha2 as temporary angles for ICR calculation
-        float alpha1 = d1+M_PI/2;
-        float alpha2 = d2+M_PI/2;
-        alpha1 = limitAngle(alpha1);
-        alpha2 = limitAngle(alpha2);
-
-        float diff = alpha1 - alpha2;
-        float diffAbs = abs(diff);
-        if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
-            alpha2+=M_PI;
-        }
-        else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
-            alpha1-=M_PI;
-        }
-        else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
-            alpha1+=M_PI;
-            alpha2+=M_PI;
-        }
-        else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
-            alpha2-=M_PI;
-        }
-        else if((diff<0) && (diffAbs>=M_PI)){
-            alpha1+=M_PI;
-        }
-
-        diff=alpha1-alpha2;
-        //See PDF for detailed calculations
-        if(sin(diff)!=0){
-            ICRLocation.x=a+2*a*(sin(alpha2)*cos(alpha1)/sin(diff));
-            ICRLocation.y=2*a*(sin(alpha1)*sin(alpha2)/sin(diff));
-        }
-    }
-
-//	void printMotorState(){
-//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL1_ID, stateArray[0].position, stateArray[0].velocity, stateArray[0].torque);
-//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \t Present Torque : %0.2f \n", DXL2_ID, stateArray[1].position, stateArray[1].velocity, stateArray[1].torque);
-//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL3_ID, stateArray[2].position, stateArray[2].velocity);
-//        printf("[ID:%03d] \n Present Position : %0.2f \t Present Velocity : %0.2f \n", DXL4_ID, stateArray[3].position, stateArray[3].velocity);
-//	}
 
     void exitNode(){
         kill(pid,SIGINT);
