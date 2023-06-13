@@ -116,7 +116,7 @@ sensor_msgs::msg::JointState Robot::getJointStates(){
     msg.position.push_back(phi1.position);
     msg.position.push_back(phi2.position);
     msg.position.push_back(delta1.position);
-    msg.position.push_back(delta2.position);
+    msg.position.push_back(limit_angle(delta2.position + M_PI));
 
     msg.velocity.push_back(phi1.velocity);
     msg.velocity.push_back(phi2.velocity);
