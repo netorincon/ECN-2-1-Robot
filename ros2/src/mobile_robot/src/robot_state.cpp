@@ -19,7 +19,7 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include "DynamixelSDK.h"
+#include "dynamixel_sdk/dynamixel_sdk.h"
 #include <control_input/msg/state_vector.hpp>
 #include <control_input/srv/reset_robot.hpp>
 #include <robot_library/robot.h>
