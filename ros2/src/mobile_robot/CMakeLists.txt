@@ -14,7 +14,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-
+include_directories(include)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
@@ -25,12 +25,13 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(control_input REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
+find_package(robot_library REQUIRED)
 
-add_executable(motor_state src/motor_state.cpp)
-ament_target_dependencies(motor_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros)
+add_executable(robot_state src/robot_state.cpp)
+ament_target_dependencies(robot_state rclcpp sensor_msgs std_msgs dynamixel_sdk control_input tf2_ros robot_library)
 
 install (TARGETS
-motor_state
+robot_state
     DESTINATION lib/${PROJECT_NAME}
     )
 
