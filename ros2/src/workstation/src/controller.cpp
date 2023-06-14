@@ -110,9 +110,6 @@ class controller : public rclcpp::Node
         //dd2=-dd1;
         //YOUR CODE SHOULD END HERE
 
-
-
-
         // Change in position for turtle4.delta1.position and turtle4.delta2.position
         d1Cmd = turtle4.delta1.position + (dd1 * period);
         d2Cmd = -d1Cmd;
