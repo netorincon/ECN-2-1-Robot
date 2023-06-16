@@ -238,7 +238,7 @@ class robot_state : public rclcpp::Node
 		return ((value % 1024) * 0.229 * 2 * M_PI) / 60; // DXL range 0 - 1023
 	}
 
-	float pulseToTor(int value){
+    float pulseToTor(int16_t value){
         float tor = (((value * 2.69) / 1000) - 0.15) / 1.5862;
         if(value == 0){
             tor = 0;
