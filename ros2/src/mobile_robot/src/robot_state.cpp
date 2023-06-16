@@ -222,10 +222,10 @@ class robot_state : public rclcpp::Node
 	}
 
     int torToPulse(float value){
-        int tor = (((1.5862 * value) + 0.15) * 1000) / 2.69;
-        if(abs(value) < 0.1){
-            tor = 0;
-        }
+        int tor = (((1.5862 * value)) * 1000) / 2.69;
+        // if(abs(value) < 0.1){
+        //     tor = 0;
+        // }
         return tor;
 	}
 	
@@ -239,7 +239,7 @@ class robot_state : public rclcpp::Node
 	}
 
     float pulseToTor(int16_t value){
-        float tor = (((value * 2.69) / 1000) - 0.15) / 1.5862;
+        float tor = (((value * 2.69) / 1000)) / 1.5862;
         if(value == 0){
             tor = 0;
         }
