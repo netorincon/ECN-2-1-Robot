@@ -55,7 +55,7 @@ class controller : public rclcpp::Node
             timer_ = this->create_wall_timer(std::chrono::milliseconds(int(period*1000)), std::bind(&controller::calculateControlInput, this));
             //updateK();
 
-            turtle4 = Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
+            turtle4 = Robot();
         }
     private:
         rclcpp::TimerBase::SharedPtr timer_;

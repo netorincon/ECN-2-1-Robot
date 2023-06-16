@@ -82,7 +82,7 @@ class real_world : public rclcpp::Node
 
             joint_command_publisher = this->create_publisher<sensor_msgs::msg::JointState>("motor_cmd", 10);
 
-            turtle4=Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
+            turtle4=Robot();
         }
 
     private :
@@ -118,6 +118,8 @@ class real_world : public rclcpp::Node
 
         turtle4.setMotorPositions(motor->position[phi1_index],motor->position[phi2_index], motor->position[d1_index], limit_angle(motor->position[d2_index] - M_PI));
         turtle4.setMotorVelocities(motor->velocity[phi1_index], motor->velocity[phi2_index], motor->velocity[d1_index], motor->velocity[d2_index]);
+        
+        turtle4.phi2.effort=motor->effort[phi1_index];
 
         //phi1d_prev=turtle4.phi1.velocity;
         //phi1d_prev=turtle4.phi2.velocity;
@@ -148,8 +150,8 @@ class real_world : public rclcpp::Node
         d1Cmd=limit_angle(msg->delta1);
         d2Cmd=limit_angle(msg->delta2);
 
-        phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/turtle4.wheel_radius);
-        phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/turtle4.wheel_radius);
+        phi1dCmd=limit_phiSpeed(2*cos(d2Cmd)*Um/turtle4.wheel1_radius);
+        phi2dCmd=limit_phiSpeed(2*cos(d1Cmd)*Um/turtle4.wheel2_radius);
 
         // cd1=cos(turtle4.delta1.position);
         // sd1=sin(turtle4.delta1.position);
@@ -181,10 +183,15 @@ class real_world : public rclcpp::Node
         publishJointCommand();
 
         joint_cmd.name.push_back(turtle4.phi1.name);
-        joint_cmd.name.push_back(turtle4.phi2.name);
+        //joint_cmd.name.push_back(turtle4.phi2.name);
         joint_cmd.velocity.push_back(phi1dCmd);
-        joint_cmd.velocity.push_back(phi2dCmd);
+        //joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
+
+        joint_cmd.name.push_back(turtle4.phi2.name);
+        joint_cmd.effort.push_back(turtle4.phi2.effort);
+        publishJointCommand();
+
 
     }
 

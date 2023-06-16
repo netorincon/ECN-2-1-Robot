@@ -48,7 +48,7 @@ class sim : public rclcpp::Node
             joint_publisher = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
             state_vector_publisher=this->create_publisher<control_input::msg::StateVector>("state_vector", 10);
 
-            turtle4=Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
+            turtle4=Robot();
             
         }
         //We initialize all variables of the state vector at 0
