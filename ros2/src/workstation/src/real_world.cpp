@@ -119,7 +119,7 @@ class real_world : public rclcpp::Node
         turtle4.setMotorPositions(motor->position[phi1_index],motor->position[phi2_index], motor->position[d1_index], limit_angle(motor->position[d2_index] - M_PI));
         turtle4.setMotorVelocities(motor->velocity[phi1_index], motor->velocity[phi2_index], motor->velocity[d1_index], motor->velocity[d2_index]);
         
-        turtle4.phi2.effort=motor->effort[phi1_index];
+        //turtle4.phi2.effort=motor->effort[phi1_index];
 
         //phi1d_prev=turtle4.phi1.velocity;
         //phi1d_prev=turtle4.phi2.velocity;
@@ -183,14 +183,14 @@ class real_world : public rclcpp::Node
         publishJointCommand();
 
         joint_cmd.name.push_back(turtle4.phi1.name);
-        //joint_cmd.name.push_back(turtle4.phi2.name);
+        joint_cmd.name.push_back(turtle4.phi2.name);
         joint_cmd.velocity.push_back(phi1dCmd);
-        //joint_cmd.velocity.push_back(phi2dCmd);
+        joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
 
-        joint_cmd.name.push_back(turtle4.phi2.name);
-        joint_cmd.effort.push_back(turtle4.phi2.effort);
-        publishJointCommand();
+        // joint_cmd.name.push_back(turtle4.phi2.name);
+        // joint_cmd.effort.push_back(turtle4.phi2.effort);
+        // publishJointCommand();
 
 
     }
