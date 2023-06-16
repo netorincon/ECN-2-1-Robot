@@ -4,11 +4,12 @@
 #include <control_input/msg/state_vector.hpp>
 #include <Eigen/Dense>
 
-Robot::Robot(float _x, float _y, float _theta, float _wheel_radius, float _chassis_length, float _chassis_width, float _wheel_distance, float _mass){
+Robot::Robot(float _x, float _y, float _theta, float _wheel1_radius, float _wheel2_radius, float _chassis_length, float _chassis_width, float _wheel_distance, float _mass){
             pose.x=_x;
             pose.y=_y;
             pose.theta=_theta;
-            wheel_radius=_wheel_radius;
+            wheel1_radius=_wheel1_radius;
+            wheel2_radius=_wheel2_radius;
             chassis_length=_chassis_length;
             chassis_width=_chassis_width;
             wheel_distance=_wheel_distance;
@@ -25,6 +26,42 @@ Robot::Robot(float _x, float _y, float _theta, float _wheel_radius, float _chass
 
             delta2.id=4;
             delta2.name="left_wheel_base_joint";
+
+            wheel1_origin.x=wheel_distance/2;
+            wheel1_origin.y=0;
+
+            wheel2_origin.x=-wheel_distance/2;
+            wheel2_origin.y=0;
+}
+
+Robot::Robot(){
+            pose.x=0;
+            pose.y=0;
+            pose.theta=0;
+            wheel1_radius=0.033;
+            wheel2_radius=0.033;
+            chassis_length=0.33;
+            chassis_width=0.3;
+            wheel_distance=0.16;
+            mass=2;
+           
+            phi1.id=2;
+            phi1.name="right_wheel_joint";
+
+            phi2.id=1;
+            phi2.name="left_wheel_joint";
+
+            delta1.id=3;
+            delta1.name="right_wheel_base_joint";
+
+            delta2.id=4;
+            delta2.name="left_wheel_base_joint";
+
+            wheel1_origin.x=wheel_distance/2;
+            wheel1_origin.y=0;
+
+            wheel2_origin.x=-wheel_distance/2;
+            wheel2_origin.y=0;
 }
 
 void Robot::resetPose(){
@@ -59,8 +96,8 @@ void Robot::setMotorVelocities(float _phi1, float _phi2, float _delta1, float _d
     phi2.velocity=_phi2;
     delta1.velocity=_delta1;
     delta2.velocity=_delta2;
-    v1 = phi1.velocity * wheel_radius; //Tangent speed of wheel one
-    v2 = phi2.velocity * wheel_radius; //v1 * cos(delta1.position) / cos(delta2.position);
+    v1 = phi1.velocity * wheel1_radius; //Tangent speed of wheel one
+    v2 = phi2.velocity * wheel2_radius; //v1 * cos(delta1.position) / cos(delta2.position);
     twist.angular.z = sin(delta1.position - delta2.position)/(wheel_distance/2);//(1 / (wheel_distance)) * (v1 * sin(delta1.position) - v2 * sin(delta2.position));
 }
 
@@ -79,8 +116,8 @@ void Robot::applyControlInput(float um, float _delta1, float _delta2, float _per
 
     twist.linear.x=um*(2*cos(delta1.position)*cos(delta2.position)*cos(pose.theta) - sin(delta1.position+delta2.position)*sin(pose.theta));
     twist.linear.y=um*(2*cos(delta1.position)*cos(delta2.position)*sin(pose.theta) + sin(delta1.position+delta2.position)*cos(pose.theta));
-    phi1.velocity=limit_phiSpeed(2*cos(delta2.position)*um/wheel_radius);
-    phi2.velocity=limit_phiSpeed(2*cos(delta1.position)*um/wheel_radius);
+    phi1.velocity=limit_phiSpeed(2*cos(delta2.position)*um/wheel1_radius);
+    phi2.velocity=limit_phiSpeed(2*cos(delta1.position)*um/wheel2_radius);
 
     //We integrate the speeds over time (add each time we get a new value)
     pose.x+=twist.linear.x*_period;
@@ -151,37 +188,28 @@ geometry_msgs::msg::TransformStamped Robot::getOdometry(){
 
 geometry_msgs::msg::TransformStamped Robot::getICRTransform(){
 
-    float alpha1=delta1.position+M_PI/2;
-    float alpha2=delta2.position+M_PI/2;
-    alpha1=limit_angle(alpha1);
-    alpha2=limit_angle(alpha2);
+    auto alpha1=delta1.position+M_PI/2;
+    auto alpha2=delta2.position+M_PI/2;
 
-    float diff=alpha1-alpha2;
-    float diffAbs=abs(diff);
-    if((diff>0) && (diffAbs<M_PI) && alpha1>=M_PI){
-        alpha2+=M_PI;
-    }
-    else if((diff>0) && (diffAbs>=M_PI) && alpha1>=M_PI){
-        alpha1-=M_PI;
-    }
-    else if((diff<0) && (diffAbs<M_PI) && (alpha2<M_PI)){
-        alpha1+=M_PI;
-        alpha2+=M_PI;
-    }
-    else if((diff<0) && (diffAbs<M_PI) && (alpha2>=M_PI)){
-        alpha2-=M_PI;
-    }
-    else if((diff<0) && (diffAbs>=M_PI)){
-        alpha1+=M_PI;
+    auto c = tan(alpha1);
+    auto d = tan(alpha2);
+
+    float diff=tan(alpha1)-tan(alpha2);
+        if(diff != 0){
+            if((alpha1 != M_PI/2) && (alpha2 != M_PI/2)){
+                ICRLocation.x=(wheel1_origin.y-wheel2_origin.y-(wheel_distance/2)*(c+d))/(d-c);
+            }
+
+            else if(alpha1==M_PI/2){
+                ICRLocation.x=wheel_distance/2;
+            }
+            else if(alpha2==M_PI/2){
+                ICRLocation.x=-wheel_distance/2;
+            }
+            ICRLocation.y=wheel1_origin.y - c*(wheel_distance/2) + c*ICRLocation.x;
     }
 
-    diff=alpha1-alpha2;
-    //See PDF for detailed calculations
-    if(sin(diff)!=0){
-        ICRLocation.x=(wheel_distance/2)+wheel_distance*(sin(alpha2)*cos(alpha1)/sin(diff));
-        ICRLocation.y=wheel_distance*(sin(alpha1)*sin(alpha2)/sin(diff));
-    }
-
+    // //See PDF for detailed calculations
     geometry_msgs::msg::TransformStamped icr;
     icr.header.frame_id = "base_link"; // Nom du repère fixe
     icr.child_frame_id = "icr"; // Nom du repère du robot

@@ -94,7 +94,8 @@ class robot_state : public rclcpp::Node
 					printf("Succeeded to change the baudrate!\n");
 
                     // Create robot object
-                    turtle4 = Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
+                    //turtle4 = Robot(0.0, 0, 0, 0.033, 0.33, 0.3, 0.16, 2);
+                    turtle4=Robot();
 					
 					// Enable Torque
 					enableTorque(DXL1_ID);
@@ -221,10 +222,10 @@ class robot_state : public rclcpp::Node
 	}
 
     int torToPulse(float value){
-        int tor = (((1.5862 * value) + 0.15) * 1000) / 2.69;
-        if(abs(value) < 0.1){
-            tor = 0;
-        }
+        int tor = (((1.5862 * value)) * 1000) / 2.69;
+        // if(abs(value) < 0.1){
+        //     tor = 0;
+        // }
         return tor;
 	}
 	
@@ -237,8 +238,8 @@ class robot_state : public rclcpp::Node
 		return ((value % 1024) * 0.229 * 2 * M_PI) / 60; // DXL range 0 - 1023
 	}
 
-	float pulseToTor(int value){
-        int tor = (((value * 2.69) / 1000) - 0.15) / 1.5862;
+    float pulseToTor(int16_t value){
+        float tor = (((value * 2.69) / 1000)) / 1.5862;
         if(value == 0){
             tor = 0;
         }

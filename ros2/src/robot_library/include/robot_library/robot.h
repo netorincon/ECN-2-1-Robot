@@ -59,15 +59,20 @@ class Robot {
         float v1;
         float v2;
 
-        float wheel_radius;
+        float wheel1_radius;
+        float wheel2_radius;
         float chassis_length;
         float chassis_width;
         float wheel_distance;
         float mass; 
-        Eigen::Matrix2f K_inv;
 
-        Robot(float x, float y, float theta, float wheel_radius, float chassis_length, float chassis_width, float wheel_distance, float mass);
-        Robot() = default;
+        Point wheel1_origin;
+        Point wheel2_origin;
+
+        Eigen::Matrix2f K_inv;
+        Robot();
+        Robot(float x, float y, float theta, float wheel1_radius, float wheel2_radius, float chassis_length, float chassis_width, float wheel_distance, float mass);
+
         void resetPose();
         void setPose(float _x, float _y, float _theta);
         void setMotorPositions(float _phi1, float _phi2, float _delta1, float _delta2);
