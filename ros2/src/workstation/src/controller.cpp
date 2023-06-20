@@ -103,7 +103,7 @@ class controller : public rclcpp::Node
         deltaError=prevError-Error;
         sumError+= Error;
         prevError=Error;
-        u=turtle4.getKInv(e)*(xrdot+kp*(xr-xp)+((ki/period)*sumError)+kp*(deltaError));
+        u=turtle4.getKInv(e)*(xrdot+kp*(xr-xp));
 
         um=u(0);
         dd1=limit_deltaSpeed(u(1));
@@ -129,6 +129,12 @@ class controller : public rclcpp::Node
         transform_stamped_.transform.rotation.y = 0;
         transform_stamped_.transform.rotation.z = 0;
         transform_stamped_.transform.rotation.w = 1;
+        tf_broadcaster_->sendTransform(transform_stamped_);
+
+        transform_stamped_.header.frame_id="odom";
+        transform_stamped_.child_frame_id="controlled_point";
+        transform_stamped_.transform.translation.x=xp(0);
+        transform_stamped_.transform.translation.y=xp(1);
         tf_broadcaster_->sendTransform(transform_stamped_);
         return;
         //}

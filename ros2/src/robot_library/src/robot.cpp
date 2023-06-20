@@ -129,10 +129,10 @@ void Robot::applyControlInput(float um, float _delta1, float _delta2, float _per
 
 Eigen::Matrix2f Robot::getKInv(float e){
 
-        K_inv(0,0)=cos(delta1.position + pose.theta)/(2*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
-        K_inv(0,1)=sin(delta1.position + pose.theta)/(2*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
-        K_inv(1,0)=(-2*(wheel_distance/2)*sin(delta2.position + pose.theta)*cos(delta1.position) - e*sin(delta1.position - delta2.position)*cos(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
-        K_inv(1,1)=(2*(wheel_distance/2)*cos(delta2.position)*cos(delta1.position + pose.theta) - e*sin(delta1.position - delta2.position)*sin(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*sin(delta1.position + pose.theta)*sin(delta2.position + pose.theta)*cos(delta1.position) + 2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(0,0)=cos(delta1.position + pose.theta)/(2*pow(sin(delta1.position + pose.theta),2)*cos(delta2.position)+2*cos(delta2.position)*pow(cos(delta1.position+pose.theta),2));   //sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(0,1)=sin(delta1.position + pose.theta)/(2*pow(sin(delta1.position + pose.theta),2)*cos(delta2.position)+2*cos(delta2.position)*pow(cos(delta1.position+pose.theta),2)); //sin(delta2.position + pose.theta)*cos(delta1.position) + 2*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));
+        K_inv(1,0)=(-2*(wheel_distance/2)*sin(delta1.position + pose.theta)*cos(delta2.position) - e*sin(delta1.position - delta2.position)*cos(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*pow(sin(delta1.position + pose.theta),2)*cos(delta2.position)+2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));//sin(delta2.position + pose.theta)*cos(delta1.position) +);
+        K_inv(1,1)=(2*(wheel_distance/2)*cos(delta2.position)*cos(delta1.position + pose.theta) - e*sin(delta1.position - delta2.position)*sin(delta1.position + pose.theta))/(2*(wheel_distance/2)*e*pow(sin(delta1.position + pose.theta),2)*cos(delta2.position)+2*(wheel_distance/2)*e*cos(delta2.position)*pow(cos(delta1.position + pose.theta),2));//sin(delta2.position + pose.theta)*cos(delta1.position) + );
 
         return K_inv;
 }
