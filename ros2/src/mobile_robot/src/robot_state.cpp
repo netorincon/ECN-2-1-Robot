@@ -176,7 +176,7 @@ class robot_state : public rclcpp::Node
         MotorGoal command[4];		// Goal
         MotorState stateArray[4];	// Present
 
-        float tt_dot = 0, x_dot = 0, y_dot = 0;
+        float x_dot = 0, y_dot = 0;
         float frequency;                                // HZ, fréquence de publication des transformations sur le topic /tf
         float period;                                   // Seconds
         Point ICRLocation;
@@ -600,9 +600,9 @@ class robot_state : public rclcpp::Node
     // Odom
     void calculatePose(){
         //We calculate current robot speeds and orientation motor
-        tt_dot = (1 / turtle4.wheel_distance) * (turtle4.v1 * sin(turtle4.delta1.position) - turtle4.v2 * sin(turtle4.delta2.position));
+        turtle4.twist.angular.z = (1 / turtle4.wheel_distance) * (turtle4.v1 * sin(turtle4.delta1.position) - turtle4.v2 * sin(turtle4.delta2.position));
 
-        turtle4.pose.theta += tt_dot * period;
+        turtle4.pose.theta += turtle4.twist.angular.z * period;
 
         x_dot = turtle4.v1 * cos(turtle4.delta1.position) * cos(turtle4.pose.theta) - 0.5*(turtle4.v2 * sin(turtle4.delta2.position) * sin(turtle4.pose.theta)) - 0.5*(turtle4.v1 * sin(turtle4.delta1.position) * sin(turtle4.pose.theta));
         y_dot = turtle4.v1 * cos(turtle4.delta1.position) * sin(turtle4.pose.theta) + 0.5*(turtle4.v2 * sin(turtle4.delta2.position) * cos(turtle4.pose.theta)) + 0.5*(turtle4.v1 * sin(turtle4.delta1.position) * cos(turtle4.pose.theta));

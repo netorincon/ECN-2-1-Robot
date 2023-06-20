@@ -98,7 +98,7 @@ void Robot::setMotorVelocities(float _phi1, float _phi2, float _delta1, float _d
     delta2.velocity=_delta2;
     v1 = phi1.velocity * wheel1_radius; //Tangent speed of wheel one
     v2 = phi2.velocity * wheel2_radius; //v1 * cos(delta1.position) / cos(delta2.position);
-    twist.angular.z = sin(delta1.position - delta2.position)/(wheel_distance/2);//(1 / (wheel_distance)) * (v1 * sin(delta1.position) - v2 * sin(delta2.position));
+    twist.angular.z = (1 / (wheel_distance)) * (v1 * sin(delta1.position) - v2 * sin(delta2.position));
 }
 
 void Robot::setPose(float _x, float _y, float _theta){

@@ -91,28 +91,21 @@ class controller : public rclcpp::Node
     void calculateControlInput(){
 
         //YOUR CODE SHOULD START HERE
+        //At the end you should be assignning a value to um, d1Cmd and d2Cmd.
 
-
-
-        //At the end you should be assignning a value to um, dd1 and dd2.
-        //if(initialized){
         getNextPoint();
         xp(0)=turtle4.pose.x+(turtle4.wheel_distance/2)*cos(turtle4.pose.theta)+e*cos(turtle4.pose.theta+turtle4.delta1.position);
         xp(1)=turtle4.pose.y+(turtle4.wheel_distance/2)*sin(turtle4.pose.theta)+e*sin(turtle4.pose.theta+turtle4.delta1.position);
-        Error=(xr-xp)*period;
-        deltaError=prevError-Error;
-        sumError+= Error;
-        prevError=Error;
         u=turtle4.getKInv(e)*(xrdot+kp*(xr-xp));
 
         um=u(0);
         dd1=limit_deltaSpeed(u(1));
-        //dd2=-dd1;
+        // Change in position for d1 and d2
+        d1Cmd = turtle4.delta1.position + (dd1 * period); 
+        d2Cmd = -d1Cmd;
+
         //YOUR CODE SHOULD END HERE
 
-        // Change in position for turtle4.delta1.position and turtle4.delta2.position
-        d1Cmd = turtle4.delta1.position + (dd1 * period);
-        d2Cmd = -d1Cmd;
 
         command.um=um;
         command.delta1 = d1Cmd;
@@ -132,12 +125,12 @@ class controller : public rclcpp::Node
         tf_broadcaster_->sendTransform(transform_stamped_);
 
         transform_stamped_.header.frame_id="odom";
-        transform_stamped_.child_frame_id="controlled_point";
+        transform_stamped_.child_frame_id="p";
         transform_stamped_.transform.translation.x=xp(0);
         transform_stamped_.transform.translation.y=xp(1);
         tf_broadcaster_->sendTransform(transform_stamped_);
         return;
-        //}
+
 
     }
 
