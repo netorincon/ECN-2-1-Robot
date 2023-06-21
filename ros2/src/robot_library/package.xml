@@ -4,7 +4,8 @@
   <name>robot_library</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="netorincon2@hotmail.com">netorincon</maintainer>
+  <maintainer email="kevingaitan0798@gmail.com">Kevin Gaitan</maintainer>
+  <maintainer email="netorincon2@hotmail.com">Ernesto Rincon Marquez</maintainer>
   <license>BSD-3-Clause</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
