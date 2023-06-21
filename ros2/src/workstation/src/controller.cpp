@@ -21,8 +21,6 @@ The command input should include [um, deltaDot1 and deltaDot2]
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <control_input/msg/slider_command.hpp>
-#include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <control_input/msg/state_vector.hpp>

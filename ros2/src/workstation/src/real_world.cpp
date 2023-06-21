@@ -31,7 +31,6 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <control_input/msg/state_vector.hpp>
-#include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
