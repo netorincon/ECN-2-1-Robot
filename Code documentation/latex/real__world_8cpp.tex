@@ -1,0 +1,93 @@
+\doxysection{workstation/src/real\+\_\+world.cpp File Reference}
+\label{real__world_8cpp}\index{workstation/src/real\_world.cpp@{workstation/src/real\_world.cpp}}
+
+
+The objective of this node is to convert the control\+\_\+input command into joint\+\_\+state commands which are then published in the motor\+\_\+cmd topic. It also obtains the joint states of the real robot.  
+
+
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$rclcpp/rclcpp.\+hpp$>$}\newline
+{\ttfamily \#include $<$tf2\+\_\+ros/transform\+\_\+broadcaster.\+h$>$}\newline
+{\ttfamily \#include $<$sensor\+\_\+msgs/msg/joint\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$control\+\_\+input/msg/state\+\_\+vector.\+hpp$>$}\newline
+{\ttfamily \#include $<$control\+\_\+input/msg/motor\+\_\+command.\+hpp$>$}\newline
+{\ttfamily \#include $<$control\+\_\+input/msg/control\+\_\+input.\+hpp$>$}\newline
+{\ttfamily \#include $<$control\+\_\+input/msg/position\+\_\+command.\+hpp$>$}\newline
+{\ttfamily \#include $<$geometry\+\_\+msgs/msg/transform\+\_\+stamped.\+hpp$>$}\newline
+{\ttfamily \#include $<$robot\+\_\+library/robot.\+h$>$}\newline
+Include dependency graph for real\+\_\+world.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{real__world_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \textbf{ real\+\_\+world}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+float \textbf{ limit\+\_\+phi\+Speed} (float a)
+\item 
+float \textbf{ limit\+\_\+delta\+Speed} (float a)
+\item 
+double \textbf{ limit\+\_\+angle} (double a)
+\item 
+int \textbf{ main} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The objective of this node is to convert the control\+\_\+input command into joint\+\_\+state commands which are then published in the motor\+\_\+cmd topic. It also obtains the joint states of the real robot. 
+
+-\/Subscriptions\+:
+
+
+\begin{DoxyEnumerate}
+\item control\+\_\+input\+::\+Position\+Command /position\+\_\+cmd
+\item control\+\_\+input\+::\+Control\+Input /control\+\_\+cmd
+\item sensor\+\_\+msgs\+::\+Joint\+State /joint\+\_\+states
+\end{DoxyEnumerate}
+
+-\/Publishers\+:
+\begin{DoxyEnumerate}
+\item sensor\+\_\+msgs\+::\+Joint\+State/joint\+\_\+cmd
+\end{DoxyEnumerate}
+
+-\/To calculate the desired joint speeds\+:
+
+
+\begin{DoxyEnumerate}
+\item We obtain the control\+\_\+cmd (or position\+\_\+cmd in case of manual position mode)
+\item We multiply by UM the corresponding rows of S(q) in case of control\+\_\+cmd
+\item Finally we publish the list of obtained values as a joint\+State message in the joint\+\_\+cmd topic 
+\end{DoxyEnumerate}
+
+\doxysubsection{Function Documentation}
+\mbox{\label{real__world_8cpp_ab88ca0f27e84c5ceb74a13bf7230a092}} 
+\index{real\_world.cpp@{real\_world.cpp}!limit\_angle@{limit\_angle}}
+\index{limit\_angle@{limit\_angle}!real\_world.cpp@{real\_world.cpp}}
+\doxysubsubsection{limit\_angle()}
+{\footnotesize\ttfamily double limit\+\_\+angle (\begin{DoxyParamCaption}\item[{double}]{a }\end{DoxyParamCaption})}
+
+\mbox{\label{real__world_8cpp_aeda88968db66c5732f28b1d9f1a69301}} 
+\index{real\_world.cpp@{real\_world.cpp}!limit\_deltaSpeed@{limit\_deltaSpeed}}
+\index{limit\_deltaSpeed@{limit\_deltaSpeed}!real\_world.cpp@{real\_world.cpp}}
+\doxysubsubsection{limit\_deltaSpeed()}
+{\footnotesize\ttfamily float limit\+\_\+delta\+Speed (\begin{DoxyParamCaption}\item[{float}]{a }\end{DoxyParamCaption})}
+
+\mbox{\label{real__world_8cpp_a9bf97bab469413bce4e6b9ea04517843}} 
+\index{real\_world.cpp@{real\_world.cpp}!limit\_phiSpeed@{limit\_phiSpeed}}
+\index{limit\_phiSpeed@{limit\_phiSpeed}!real\_world.cpp@{real\_world.cpp}}
+\doxysubsubsection{limit\_phiSpeed()}
+{\footnotesize\ttfamily float limit\+\_\+phi\+Speed (\begin{DoxyParamCaption}\item[{float}]{a }\end{DoxyParamCaption})}
+
+\mbox{\label{real__world_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{real\_world.cpp@{real\_world.cpp}!main@{main}}
+\index{main@{main}!real\_world.cpp@{real\_world.cpp}}
+\doxysubsubsection{main()}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+

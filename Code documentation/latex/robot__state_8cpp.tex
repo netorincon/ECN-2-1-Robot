@@ -1,0 +1,238 @@
+\doxysection{mobile\+\_\+robot/src/robot\+\_\+state.cpp File Reference}
+\label{robot__state_8cpp}\index{mobile\_robot/src/robot\_state.cpp@{mobile\_robot/src/robot\_state.cpp}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$rclcpp/rclcpp.\+hpp$>$}\newline
+{\ttfamily \#include $<$geometry\+\_\+msgs/msg/twist.\+hpp$>$}\newline
+{\ttfamily \#include $<$tf2/\+Linear\+Math/\+Quaternion.\+h$>$}\newline
+{\ttfamily \#include $<$tf2\+\_\+ros/transform\+\_\+broadcaster.\+h$>$}\newline
+{\ttfamily \#include $<$geometry\+\_\+msgs/msg/transform\+\_\+stamped.\+hpp$>$}\newline
+{\ttfamily \#include $<$std\+\_\+msgs/msg/float64\+\_\+multi\+\_\+array.\+hpp$>$}\newline
+{\ttfamily \#include $<$sensor\+\_\+msgs/msg/joint\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include \char`\"{}dynamixel\+\_\+sdk/dynamixel\+\_\+sdk.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$control\+\_\+input/msg/state\+\_\+vector.\+hpp$>$}\newline
+{\ttfamily \#include $<$control\+\_\+input/srv/reset\+\_\+robot.\+hpp$>$}\newline
+{\ttfamily \#include $<$robot\+\_\+library/robot.\+h$>$}\newline
+Include dependency graph for robot\+\_\+state.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{robot__state_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \textbf{ Motor\+Goal}
+\item 
+struct \textbf{ Motor\+State}
+\item 
+class \textbf{ robot\+\_\+state}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+N\+G\+\_\+\+M\+O\+DE}~11
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+T\+O\+R\+Q\+U\+E\+\_\+\+E\+N\+A\+B\+LE}~64
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+C\+U\+R\+R\+E\+NT}~102
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+V\+E\+L\+O\+C\+I\+TY}~104
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+P\+O\+S\+I\+T\+I\+ON}~116
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+C\+U\+R\+R\+E\+NT}~126
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+V\+E\+L\+O\+C\+I\+TY}~128
+\item 
+\#define \textbf{ A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+P\+O\+S\+I\+T\+I\+ON}~132
+\item 
+\#define \textbf{ L\+E\+N\+\_\+\+C\+U\+R\+R\+E\+NT}~2
+\item 
+\#define \textbf{ L\+E\+N\+\_\+\+PV}~4
+\item 
+\#define \textbf{ P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+V\+E\+R\+S\+I\+ON}~2.\+0
+\item 
+\#define \textbf{ D\+X\+L1\+\_\+\+ID}~1
+\item 
+\#define \textbf{ D\+X\+L2\+\_\+\+ID}~2
+\item 
+\#define \textbf{ D\+X\+L3\+\_\+\+ID}~3
+\item 
+\#define \textbf{ D\+X\+L4\+\_\+\+ID}~4
+\item 
+\#define \textbf{ B\+A\+U\+D\+R\+A\+TE}~1000000
+\item 
+\#define \textbf{ D\+E\+V\+I\+C\+E\+N\+A\+ME}~\char`\"{}/dev/tty\+A\+C\+M0\char`\"{}
+\item 
+\#define \textbf{ T\+O\+R\+Q\+U\+E\+\_\+\+E\+N\+A\+B\+LE}~1
+\item 
+\#define \textbf{ T\+O\+R\+Q\+U\+E\+\_\+\+D\+I\+S\+A\+B\+LE}~0
+\item 
+\#define \textbf{ P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+C\+O\+N\+T\+R\+OL}~3
+\item 
+\#define \textbf{ V\+E\+L\+O\+C\+I\+T\+Y\+\_\+\+C\+O\+N\+T\+R\+OL}~1
+\item 
+\#define \textbf{ T\+O\+R\+Q\+U\+E\+\_\+\+C\+O\+N\+T\+R\+OL}~0
+\item 
+\#define \textbf{ T\+R\+I\+ES}~10
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \textbf{ main} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\label{robot__state_8cpp_a335a7f72a47a5e0463806e47317aaf1d}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_GOAL\_CURRENT@{ADDR\_GOAL\_CURRENT}}
+\index{ADDR\_GOAL\_CURRENT@{ADDR\_GOAL\_CURRENT}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_GOAL\_CURRENT}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+C\+U\+R\+R\+E\+NT~102}
+
+\mbox{\label{robot__state_8cpp_a80a2a110c1e2e7bdb3801e202f7a19f4}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_GOAL\_POSITION@{ADDR\_GOAL\_POSITION}}
+\index{ADDR\_GOAL\_POSITION@{ADDR\_GOAL\_POSITION}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_GOAL\_POSITION}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+P\+O\+S\+I\+T\+I\+ON~116}
+
+\mbox{\label{robot__state_8cpp_a4c0331ab1bb3e213234924cd82a6b4cc}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_GOAL\_VELOCITY@{ADDR\_GOAL\_VELOCITY}}
+\index{ADDR\_GOAL\_VELOCITY@{ADDR\_GOAL\_VELOCITY}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_GOAL\_VELOCITY}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+G\+O\+A\+L\+\_\+\+V\+E\+L\+O\+C\+I\+TY~104}
+
+\mbox{\label{robot__state_8cpp_a4fd7bfdb3915aed84a6b5f9e4b8fd8cc}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_OPERATING\_MODE@{ADDR\_OPERATING\_MODE}}
+\index{ADDR\_OPERATING\_MODE@{ADDR\_OPERATING\_MODE}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_OPERATING\_MODE}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+N\+G\+\_\+\+M\+O\+DE~11}
+
+\mbox{\label{robot__state_8cpp_aae4a554bda52a421c8bba9686e36573e}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_PRESENT\_CURRENT@{ADDR\_PRESENT\_CURRENT}}
+\index{ADDR\_PRESENT\_CURRENT@{ADDR\_PRESENT\_CURRENT}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_PRESENT\_CURRENT}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+C\+U\+R\+R\+E\+NT~126}
+
+\mbox{\label{robot__state_8cpp_a24f4c4378a16111c88ef8959c8acd870}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_PRESENT\_POSITION@{ADDR\_PRESENT\_POSITION}}
+\index{ADDR\_PRESENT\_POSITION@{ADDR\_PRESENT\_POSITION}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_PRESENT\_POSITION}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+P\+O\+S\+I\+T\+I\+ON~132}
+
+\mbox{\label{robot__state_8cpp_ab797cc460c2dc4061d7a4bccea76276c}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_PRESENT\_VELOCITY@{ADDR\_PRESENT\_VELOCITY}}
+\index{ADDR\_PRESENT\_VELOCITY@{ADDR\_PRESENT\_VELOCITY}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_PRESENT\_VELOCITY}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+P\+R\+E\+S\+E\+N\+T\+\_\+\+V\+E\+L\+O\+C\+I\+TY~128}
+
+\mbox{\label{robot__state_8cpp_aef64d6079bb9a1830c1e2cc268b2d70a}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!ADDR\_TORQUE\_ENABLE@{ADDR\_TORQUE\_ENABLE}}
+\index{ADDR\_TORQUE\_ENABLE@{ADDR\_TORQUE\_ENABLE}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{ADDR\_TORQUE\_ENABLE}
+{\footnotesize\ttfamily \#define A\+D\+D\+R\+\_\+\+T\+O\+R\+Q\+U\+E\+\_\+\+E\+N\+A\+B\+LE~64}
+
+\mbox{\label{robot__state_8cpp_a734bbab06e1a9fd2e5522db0221ff6e3}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!BAUDRATE@{BAUDRATE}}
+\index{BAUDRATE@{BAUDRATE}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{BAUDRATE}
+{\footnotesize\ttfamily \#define B\+A\+U\+D\+R\+A\+TE~1000000}
+
+\mbox{\label{robot__state_8cpp_abca33c097566d788d5163e433fc84150}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!DEVICENAME@{DEVICENAME}}
+\index{DEVICENAME@{DEVICENAME}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{DEVICENAME}
+{\footnotesize\ttfamily \#define D\+E\+V\+I\+C\+E\+N\+A\+ME~\char`\"{}/dev/tty\+A\+C\+M0\char`\"{}}
+
+\mbox{\label{robot__state_8cpp_a108db925bcd0bd1831d6a6f7a56880ec}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!DXL1\_ID@{DXL1\_ID}}
+\index{DXL1\_ID@{DXL1\_ID}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{DXL1\_ID}
+{\footnotesize\ttfamily \#define D\+X\+L1\+\_\+\+ID~1}
+
+\mbox{\label{robot__state_8cpp_a8a55497c018550b501a7c9430aa6a126}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!DXL2\_ID@{DXL2\_ID}}
+\index{DXL2\_ID@{DXL2\_ID}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{DXL2\_ID}
+{\footnotesize\ttfamily \#define D\+X\+L2\+\_\+\+ID~2}
+
+\mbox{\label{robot__state_8cpp_a7b80c6e1158c330883638551cb0b4bcf}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!DXL3\_ID@{DXL3\_ID}}
+\index{DXL3\_ID@{DXL3\_ID}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{DXL3\_ID}
+{\footnotesize\ttfamily \#define D\+X\+L3\+\_\+\+ID~3}
+
+\mbox{\label{robot__state_8cpp_a0d1c601d7fa2d360b1c71e99eca50be2}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!DXL4\_ID@{DXL4\_ID}}
+\index{DXL4\_ID@{DXL4\_ID}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{DXL4\_ID}
+{\footnotesize\ttfamily \#define D\+X\+L4\+\_\+\+ID~4}
+
+\mbox{\label{robot__state_8cpp_a6e23d2bf1f4367287c1327179c637148}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!LEN\_CURRENT@{LEN\_CURRENT}}
+\index{LEN\_CURRENT@{LEN\_CURRENT}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{LEN\_CURRENT}
+{\footnotesize\ttfamily \#define L\+E\+N\+\_\+\+C\+U\+R\+R\+E\+NT~2}
+
+\mbox{\label{robot__state_8cpp_a3cb7670445d6d96bfcf8b4521f451113}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!LEN\_PV@{LEN\_PV}}
+\index{LEN\_PV@{LEN\_PV}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{LEN\_PV}
+{\footnotesize\ttfamily \#define L\+E\+N\+\_\+\+PV~4}
+
+\mbox{\label{robot__state_8cpp_a2560cd2e6840a02f6828745cb058c2f4}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!POSITION\_CONTROL@{POSITION\_CONTROL}}
+\index{POSITION\_CONTROL@{POSITION\_CONTROL}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{POSITION\_CONTROL}
+{\footnotesize\ttfamily \#define P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+C\+O\+N\+T\+R\+OL~3}
+
+\mbox{\label{robot__state_8cpp_a277f7abca2044f354abe265252cb9252}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!PROTOCOL\_VERSION@{PROTOCOL\_VERSION}}
+\index{PROTOCOL\_VERSION@{PROTOCOL\_VERSION}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{PROTOCOL\_VERSION}
+{\footnotesize\ttfamily \#define P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+V\+E\+R\+S\+I\+ON~2.\+0}
+
+\mbox{\label{robot__state_8cpp_a27ad7015b5ad449c1fb7c80e2d490b60}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!TORQUE\_CONTROL@{TORQUE\_CONTROL}}
+\index{TORQUE\_CONTROL@{TORQUE\_CONTROL}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{TORQUE\_CONTROL}
+{\footnotesize\ttfamily \#define T\+O\+R\+Q\+U\+E\+\_\+\+C\+O\+N\+T\+R\+OL~0}
+
+\mbox{\label{robot__state_8cpp_afee6f2063609cb3bdc9402823f88f18d}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!TORQUE\_DISABLE@{TORQUE\_DISABLE}}
+\index{TORQUE\_DISABLE@{TORQUE\_DISABLE}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{TORQUE\_DISABLE}
+{\footnotesize\ttfamily \#define T\+O\+R\+Q\+U\+E\+\_\+\+D\+I\+S\+A\+B\+LE~0}
+
+\mbox{\label{robot__state_8cpp_a8db41fdd2468c5664c70b17a82cf339f}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!TORQUE\_ENABLE@{TORQUE\_ENABLE}}
+\index{TORQUE\_ENABLE@{TORQUE\_ENABLE}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{TORQUE\_ENABLE}
+{\footnotesize\ttfamily \#define T\+O\+R\+Q\+U\+E\+\_\+\+E\+N\+A\+B\+LE~1}
+
+\mbox{\label{robot__state_8cpp_a527eb3eaec4a1cb30a1a98470e16d5a5}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!TRIES@{TRIES}}
+\index{TRIES@{TRIES}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{TRIES}
+{\footnotesize\ttfamily \#define T\+R\+I\+ES~10}
+
+\mbox{\label{robot__state_8cpp_ad6b8ccafd6da5f89edd1930b61fc1ad9}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!VELOCITY\_CONTROL@{VELOCITY\_CONTROL}}
+\index{VELOCITY\_CONTROL@{VELOCITY\_CONTROL}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{VELOCITY\_CONTROL}
+{\footnotesize\ttfamily \#define V\+E\+L\+O\+C\+I\+T\+Y\+\_\+\+C\+O\+N\+T\+R\+OL~1}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{robot__state_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{robot\_state.cpp@{robot\_state.cpp}!main@{main}}
+\index{main@{main}!robot\_state.cpp@{robot\_state.cpp}}
+\doxysubsubsection{main()}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+

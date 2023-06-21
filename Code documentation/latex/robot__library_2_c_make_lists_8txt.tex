@@ -1,0 +1,32 @@
+\doxysection{robot\+\_\+library/\+C\+Make\+Lists.txt File Reference}
+\label{robot__library_2_c_make_lists_8txt}\index{robot\_library/CMakeLists.txt@{robot\_library/CMakeLists.txt}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\textbf{ cmake\+\_\+minimum\+\_\+required} (V\+E\+R\+S\+I\+ON 3.\+5) project(robot\+\_\+library) \textbf{ if}(N\+OT C\+M\+A\+K\+E\+\_\+\+C\+\_\+\+S\+T\+A\+N\+D\+A\+RD) set(C\+M\+A\+K\+E\+\_\+\+C\+\_\+\+S\+T\+A\+N\+D\+A\+RD 99) endif() \textbf{ if}(N\+OT C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+S\+T\+A\+N\+D\+A\+RD) set(C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+S\+T\+A\+N\+D\+A\+RD 14) endif() \textbf{ if}(C\+M\+A\+K\+E\+\_\+\+C\+O\+M\+P\+I\+L\+E\+R\+\_\+\+I\+S\+\_\+\+G\+N\+U\+C\+XX OR C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+C\+O\+M\+P\+I\+L\+E\+R\+\_\+\+ID M\+A\+T\+C\+H\+ES \char`\"{}Clang\char`\"{}) add\+\_\+compile\+\_\+options(-\/Wall -\/Wextra -\/Wpedantic) endif() find\+\_\+package(ament\+\_\+cmake R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(sensor\+\_\+msgs R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(control\+\_\+input R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(eigen3\+\_\+cmake\+\_\+module R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(Eigen3 R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(tf2\+\_\+ros R\+E\+Q\+U\+I\+R\+ED) include\+\_\+directories(include/\$
+\item 
+\textbf{ add\+\_\+library} (robot\+\_\+library S\+H\+A\+R\+ED src/robot.\+cpp) ament\+\_\+target\+\_\+dependencies(robot\+\_\+library sensor\+\_\+msgs control\+\_\+input Eigen3 tf2\+\_\+ros) ament\+\_\+export\+\_\+dependencies(eigen3\+\_\+cmake\+\_\+module) ament\+\_\+export\+\_\+dependencies(Eigen3) \textbf{ install}(D\+I\+R\+E\+C\+T\+O\+RY include/D\+E\+S\+T\+I\+N\+A\+T\+I\+ON include/) \textbf{ install}(T\+A\+R\+G\+E\+TS \$
+\item 
+A\+R\+C\+H\+I\+VE D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib L\+I\+B\+R\+A\+RY D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib R\+U\+N\+T\+I\+ME D\+E\+S\+T\+I\+N\+A\+T\+I\+ON bin \textbf{ if} (B\+U\+I\+L\+D\+\_\+\+T\+E\+S\+T\+I\+NG) find\+\_\+package(ament\+\_\+lint\+\_\+auto R\+E\+Q\+U\+I\+R\+ED) ament\+\_\+lint\+\_\+auto\+\_\+find\+\_\+test\+\_\+dependencies() endif() ament\+\_\+export\+\_\+include\+\_\+directories(include) ament\+\_\+export\+\_\+libraries(\$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{robot__library_2_c_make_lists_8txt_aaec8695a96597fe656e78699b01cbd09}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!add\_library@{add\_library}}
+\index{add\_library@{add\_library}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{add\_library()}
+{\footnotesize\ttfamily add\+\_\+library (\begin{DoxyParamCaption}\item[{robot\+\_\+library S\+H\+A\+R\+ED src/robot.}]{cpp }\end{DoxyParamCaption})}
+
+\mbox{\label{robot__library_2_c_make_lists_8txt_a6b3e99b0eec921006ed864b1f30cae98}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!cmake\_minimum\_required@{cmake\_minimum\_required}}
+\index{cmake\_minimum\_required@{cmake\_minimum\_required}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{cmake\_minimum\_required()}
+{\footnotesize\ttfamily cmake\+\_\+minimum\+\_\+required (\begin{DoxyParamCaption}\item[{V\+E\+R\+S\+I\+ON 3.}]{5 }\end{DoxyParamCaption})}
+
+\mbox{\label{robot__library_2_c_make_lists_8txt_a3be72d581aaa4300c5551419e9377df5}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!if@{if}}
+\index{if@{if}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{if()}
+{\footnotesize\ttfamily A\+R\+C\+H\+I\+VE D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib L\+I\+B\+R\+A\+RY D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib R\+U\+N\+T\+I\+ME D\+E\+S\+T\+I\+N\+A\+T\+I\+ON bin if (\begin{DoxyParamCaption}\item[{B\+U\+I\+L\+D\+\_\+\+T\+E\+S\+T\+I\+NG}]{ }\end{DoxyParamCaption})}
+

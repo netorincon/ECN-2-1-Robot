@@ -27,7 +27,6 @@
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ECN-1-2-Robot
    </div>
-   <div id="projectbrief">Development of a 1-2 Robot as part of the group project for CORO IMARO M1</div>
   </td>
  </tr>
  </tbody>
@@ -95,8 +94,8 @@ Inheritance diagram for robot_state:</div>
 <div class="dyncontent">
 <div class="center"><img src="classrobot__state__inherit__graph.png" border="0" usemap="#robot__state_inherit__map" alt="Inheritance graph"/></div>
 <map name="robot__state_inherit__map" id="robot__state_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,80,101,107"/>
-<area shape="rect" title=" " alt="" coords="25,5,81,32"/>
+<area shape="rect" title=" " alt="" coords="9,80,105,107"/>
+<area shape="rect" title=" " alt="" coords="5,5,108,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -104,29 +103,94 @@ Collaboration diagram for robot_state:</div>
 <div class="dyncontent">
 <div class="center"><img src="classrobot__state__coll__graph.png" border="0" usemap="#robot__state_coll__map" alt="Collaboration graph"/></div>
 <map name="robot__state_coll__map" id="robot__state_coll__map">
-<area shape="rect" title=" " alt="" coords="55,95,151,121"/>
-<area shape="rect" title=" " alt="" coords="5,5,61,32"/>
-<area shape="rect" href="classdynamixel_1_1_port_handler.html" title="The class for port control that inherits PortHandlerLinux, PortHandlerWindows, PortHandlerMac,..." alt="" coords="85,5,261,32"/>
+<area shape="rect" title=" " alt="" coords="9,80,105,107"/>
+<area shape="rect" title=" " alt="" coords="5,5,108,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad67f31c862656433879d5b6b8687e31e"><td class="memItemLeft" align="right" valign="top"><a id="ad67f31c862656433879d5b6b8687e31e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>robot_state</b> (rclcpp::NodeOptions options)</td></tr>
+<tr class="memitem:ad67f31c862656433879d5b6b8687e31e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot__state.html#ad67f31c862656433879d5b6b8687e31e">robot_state</a> (rclcpp::NodeOptions options)</td></tr>
 <tr class="separator:ad67f31c862656433879d5b6b8687e31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0300e04d729762eb53d34b5bdfe6085"><td class="memItemLeft" align="right" valign="top"><a id="ae0300e04d729762eb53d34b5bdfe6085"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>disableTorque</b> (uint8_t id)</td></tr>
+<tr class="memitem:ae0300e04d729762eb53d34b5bdfe6085"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot__state.html#ae0300e04d729762eb53d34b5bdfe6085">disableTorque</a> (uint8_t id)</td></tr>
 <tr class="separator:ae0300e04d729762eb53d34b5bdfe6085"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae2699f9ad8a3786bcb406f8386c1f070"><td class="memItemLeft" align="right" valign="top"><a id="ae2699f9ad8a3786bcb406f8386c1f070"></a>
-<a class="el" href="classdynamixel_1_1_port_handler.html">dynamixel::PortHandler</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>portHandler</b> = <a class="el" href="classdynamixel_1_1_port_handler.html#a1d784f9461d627e69bd2b93df6fb5a7d">dynamixel::PortHandler::getPortHandler</a>(DEVICENAME)</td></tr>
+<tr class="memitem:ae2699f9ad8a3786bcb406f8386c1f070"><td class="memItemLeft" align="right" valign="top">dynamixel::PortHandler *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrobot__state.html#ae2699f9ad8a3786bcb406f8386c1f070">portHandler</a> = dynamixel::PortHandler::getPortHandler(<a class="el" href="robot__state_8cpp.html#abca33c097566d788d5163e433fc84150">DEVICENAME</a>)</td></tr>
 <tr class="separator:ae2699f9ad8a3786bcb406f8386c1f070"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ad67f31c862656433879d5b6b8687e31e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad67f31c862656433879d5b6b8687e31e">&#9670;&nbsp;</a></span>robot_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">robot_state::robot_state </td>
+          <td>(</td>
+          <td class="paramtype">rclcpp::NodeOptions&#160;</td>
+          <td class="paramname"><em>options</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ae0300e04d729762eb53d34b5bdfe6085"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0300e04d729762eb53d34b5bdfe6085">&#9670;&nbsp;</a></span>disableTorque()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void robot_state::disableTorque </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ae2699f9ad8a3786bcb406f8386c1f070"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2699f9ad8a3786bcb406f8386c1f070">&#9670;&nbsp;</a></span>portHandler</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">dynamixel::PortHandler* robot_state::portHandler = dynamixel::PortHandler::getPortHandler(<a class="el" href="robot__state_8cpp.html#abca33c097566d788d5163e433fc84150">DEVICENAME</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/netorincon/ECN-1-2-Robot/ros2/src/mobile_robot/src/robot_state.cpp</li>
+<li>mobile_robot/src/<a class="el" href="robot__state_8cpp.html">robot_state.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

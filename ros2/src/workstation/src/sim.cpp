@@ -85,7 +85,6 @@ class sim : public rclcpp::Node
             joint_state.header.stamp=this->now();
             joint_publisher->publish(joint_state);
 
-
             //Transform that contains the chassis transform with respect to the odom frame  
             transform_stamped_=turtle4.getOdometry();
             transform_stamped_.header.stamp = this->now();
