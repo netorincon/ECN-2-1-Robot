@@ -2,8 +2,8 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>workstation</name>
-  <version>0.0.0</version>
-  <description>(1,2) mobile robot</description>
+  <version>1.0.0</version>
+  <description>This package contains the GUI and nodes to be used in the workstation</description>
   <maintainer email="kevingaitan0798@gmail.com">Kevin Gaitan</maintainer>
   <maintainer email="netorincon2@hotmail.com">Ernesto Rincon Marquez</maintainer>
   <license>TODO: License declaration</license>
