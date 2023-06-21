@@ -1,11 +1,20 @@
 var searchData=
 [
-  ['_7egroupbulkread_89',['~GroupBulkRead',['../classdynamixel_1_1_group_bulk_read.html#aac5bb69a2f6b15df6dd613938efc6b67',1,'dynamixel::GroupBulkRead']]],
-  ['_7egroupbulkwrite_90',['~GroupBulkWrite',['../classdynamixel_1_1_group_bulk_write.html#a97e0f6852e9a5927eb55f5da24c9eb90',1,'dynamixel::GroupBulkWrite']]],
-  ['_7egroupsyncread_91',['~GroupSyncRead',['../classdynamixel_1_1_group_sync_read.html#af29655fd1194e7693c063fe389373632',1,'dynamixel::GroupSyncRead']]],
-  ['_7egroupsyncwrite_92',['~GroupSyncWrite',['../classdynamixel_1_1_group_sync_write.html#aa091977790c99e956e5bc9e5788cb603',1,'dynamixel::GroupSyncWrite']]],
-  ['_7eporthandlerarduino_93',['~PortHandlerArduino',['../classdynamixel_1_1_port_handler_arduino.html#ad9a87163ea8761695aac3e571d9764d1',1,'dynamixel::PortHandlerArduino']]],
-  ['_7eporthandlerlinux_94',['~PortHandlerLinux',['../classdynamixel_1_1_port_handler_linux.html#a2d085b883f22b1a66e28e26b2b66301e',1,'dynamixel::PortHandlerLinux']]],
-  ['_7eporthandlermac_95',['~PortHandlerMac',['../classdynamixel_1_1_port_handler_mac.html#a86553b45e11184b278f054afe1b7720e',1,'dynamixel::PortHandlerMac']]],
-  ['_7eporthandlerwindows_96',['~PortHandlerWindows',['../classdynamixel_1_1_port_handler_windows.html#a8342c465d633452e479452e8dae98255',1,'dynamixel::PortHandlerWindows']]]
+  ['seteffort_129',['setEffort',['../struct_motor.html#a970c185a99c0b7f2cea0c0b375204c59',1,'Motor']]],
+  ['setmotorpositions_130',['setMotorPositions',['../class_robot.html#a8cebe5883d08576bcf8c00c06e461023',1,'Robot']]],
+  ['setmotorvelocities_131',['setMotorVelocities',['../class_robot.html#a71ba910aa5637a416e465b08914d381b',1,'Robot']]],
+  ['setpose_132',['setPose',['../class_robot.html#aa2f635c20aeae92b17ce3fe116ac28da',1,'Robot']]],
+  ['setposition_133',['setPosition',['../struct_motor.html#a17d0266c1e48f9dc18063c85e5db9b53',1,'Motor']]],
+  ['setupui_134',['setupUi',['../classwidget_1_1_ui___form.html#aa6251b0ef9b7a384e10467e57cc4da2d',1,'widget::Ui_Form']]],
+  ['setvelocity_135',['setVelocity',['../struct_motor.html#a88109e37561381cd0c1213660e9504fa',1,'Motor']]],
+  ['sim_136',['sim',['../classsim.html',1,'sim'],['../classsim.html#a7d725a20e942f519a43cdae9c0764eae',1,'sim::sim()']]],
+  ['sim_2ecpp_137',['sim.cpp',['../sim_8cpp.html',1,'']]],
+  ['simulation_138',['simulation',['../namespacesimulation.html',1,'']]],
+  ['simulation_2elaunch_2epy_139',['simulation.launch.py',['../simulation_8launch_8py.html',1,'']]],
+  ['simulation_5fradio_140',['simulation_radio',['../classwidget_1_1_ui___form.html#a885f38a22f5c371acf78cff93ec6209e',1,'widget::Ui_Form']]],
+  ['slider_5fpublisher_141',['slider_publisher',['../namespaceslider__publisher.html',1,'']]],
+  ['slider_5fpublisher_2epy_142',['slider_publisher.py',['../slider__publisher_8py.html',1,'']]],
+  ['switchtocontrollermode_143',['switchToControllerMode',['../classwidget_1_1_ui___form.html#a7e10608f2cdfa66c2722c8f6021bc4ea',1,'widget::Ui_Form']]],
+  ['switchtopositionmode_144',['switchToPositionMode',['../classwidget_1_1_ui___form.html#a159fa4d9a0c858aefed3b3503d9d68b0',1,'widget::Ui_Form']]],
+  ['switchtospeedmode_145',['switchToSpeedMode',['../classwidget_1_1_ui___form.html#a764d3a11bfa3a0d245cb866abbbabd6e',1,'widget::Ui_Form']]]
 ];

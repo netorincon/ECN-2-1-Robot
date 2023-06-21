@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['groupbulkread_98',['GroupBulkRead',['../classdynamixel_1_1_group_bulk_read.html',1,'dynamixel']]],
-  ['groupbulkwrite_99',['GroupBulkWrite',['../classdynamixel_1_1_group_bulk_write.html',1,'dynamixel']]],
-  ['groupsyncread_100',['GroupSyncRead',['../classdynamixel_1_1_group_sync_read.html',1,'dynamixel']]],
-  ['groupsyncwrite_101',['GroupSyncWrite',['../classdynamixel_1_1_group_sync_write.html',1,'dynamixel']]]
+  ['motor_192',['Motor',['../struct_motor.html',1,'']]],
+  ['motorgoal_193',['MotorGoal',['../struct_motor_goal.html',1,'']]],
+  ['motorstate_194',['MotorState',['../struct_motor_state.html',1,'']]]
 ];

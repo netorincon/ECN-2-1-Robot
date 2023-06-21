@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['isavailable_150',['isAvailable',['../classdynamixel_1_1_group_bulk_read.html#a97a3d6bf8b7964ededf1fcf3429627c4',1,'dynamixel::GroupBulkRead::isAvailable()'],['../classdynamixel_1_1_group_sync_read.html#a7ed0a2654a82a1828f59b4d62107edf0',1,'dynamixel::GroupSyncRead::isAvailable()']]],
-  ['ispackettimeout_151',['isPacketTimeout',['../classdynamixel_1_1_port_handler.html#abc93552464246fbdb514ef4b50deda85',1,'dynamixel::PortHandler::isPacketTimeout()'],['../classdynamixel_1_1_port_handler_arduino.html#a02d20ce6bc8f176f581398c27425e3a0',1,'dynamixel::PortHandlerArduino::isPacketTimeout()'],['../classdynamixel_1_1_port_handler_linux.html#a43c64b6ee5dd2559e5f4bd537f837fcd',1,'dynamixel::PortHandlerLinux::isPacketTimeout()'],['../classdynamixel_1_1_port_handler_mac.html#a66e02389bf2c66f7e50e76b2e1bde5b6',1,'dynamixel::PortHandlerMac::isPacketTimeout()'],['../classdynamixel_1_1_port_handler_windows.html#a949a37d6ffcb0ee6102cbb532a12ba2f',1,'dynamixel::PortHandlerWindows::isPacketTimeout()']]]
+  ['generate_5flaunch_5fdescription_237',['generate_launch_description',['../namespacerobot__state.html#a7bf953e58112f7553998579af584ea78',1,'robot_state.generate_launch_description()'],['../namespacegui.html#a3fa50d4596b65597efb94776e3f76320',1,'gui.generate_launch_description()'],['../namespacereal__world.html#ac89630322ee2ae92869f0d0cd27b9e3d',1,'real_world.generate_launch_description()'],['../namespacesimulation.html#a99749bce90a3fe4360c41abc42881b92',1,'simulation.generate_launch_description()']]],
+  ['geticrtransform_238',['getICRTransform',['../class_robot.html#a51082be2012de6005c97791abbf73a7d',1,'Robot']]],
+  ['getjointstates_239',['getJointStates',['../class_robot.html#a6ff95426fd2fcb63b437c2c778504bcd',1,'Robot']]],
+  ['getkinv_240',['getKInv',['../class_robot.html#a8109e934cacaa41c81d29f9596cae669',1,'Robot']]],
+  ['getodometry_241',['getOdometry',['../class_robot.html#ac5cf5d59d822754728270683aa5f3fc0',1,'Robot']]],
+  ['getstatevector_242',['getStateVector',['../class_robot.html#afa268efdb606ebf74bdbd13e2d035052',1,'Robot']]]
 ];
