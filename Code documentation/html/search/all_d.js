@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ui_5fform_78',['Ui_Form',['../classwidget_1_1_ui___form.html',1,'widget']]]
+  ['name_98',['name',['../struct_motor.html#a58421301c47da688a84e476ba78768b8',1,'Motor']]]
 ];

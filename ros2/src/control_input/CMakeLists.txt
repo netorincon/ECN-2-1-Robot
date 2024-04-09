@@ -28,8 +28,6 @@ find_package(sensor_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ControlInput.msg"
   "msg/PositionCommand.msg"
-  "msg/MotorCommand.msg"
-  "msg/SliderCommand.msg"
   "msg/StateVector.msg"
   "srv/ResetRobot.srv"
   DEPENDENCIES sensor_msgs

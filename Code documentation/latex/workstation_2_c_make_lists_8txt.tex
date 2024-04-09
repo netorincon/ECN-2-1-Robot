@@ -1,0 +1,40 @@
+\doxysection{workstation/\+C\+Make\+Lists.txt File Reference}
+\label{workstation_2_c_make_lists_8txt}\index{workstation/CMakeLists.txt@{workstation/CMakeLists.txt}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\textbf{ cmake\+\_\+minimum\+\_\+required} (V\+E\+R\+S\+I\+ON 3.\+5) project(workstation) \textbf{ if}(N\+OT C\+M\+A\+K\+E\+\_\+\+C\+\_\+\+S\+T\+A\+N\+D\+A\+RD) set(C\+M\+A\+K\+E\+\_\+\+C\+\_\+\+S\+T\+A\+N\+D\+A\+RD 99) endif() \textbf{ if}(N\+OT C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+S\+T\+A\+N\+D\+A\+RD) set(C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+S\+T\+A\+N\+D\+A\+RD 14) endif() \textbf{ if}(C\+M\+A\+K\+E\+\_\+\+C\+O\+M\+P\+I\+L\+E\+R\+\_\+\+I\+S\+\_\+\+G\+N\+U\+C\+XX OR C\+M\+A\+K\+E\+\_\+\+C\+X\+X\+\_\+\+C\+O\+M\+P\+I\+L\+E\+R\+\_\+\+ID M\+A\+T\+C\+H\+ES \char`\"{}Clang\char`\"{}) add\+\_\+compile\+\_\+options(-\/Wall -\/Wextra -\/Wpedantic) endif() find\+\_\+package(ament\+\_\+cmake R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(ament\+\_\+cmake\+\_\+python R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(rclcpp R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(rclpy R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(std\+\_\+msgs R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(sensor\+\_\+msgs R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(tf2\+\_\+ros R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(control\+\_\+input R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(eigen3\+\_\+cmake\+\_\+module R\+E\+Q\+U\+I\+R\+ED) find\+\_\+package(Eigen3) find\+\_\+package(robot\+\_\+library R\+E\+Q\+U\+I\+R\+ED) \textbf{ add\+\_\+executable}(\textbf{ sim} src/sim.\+cpp) ament\+\_\+target\+\_\+dependencies(\textbf{ sim} tf2\+\_\+ros rclcpp sensor\+\_\+msgs std\+\_\+msgs control\+\_\+input robot\+\_\+library) \textbf{ add\+\_\+executable}(\textbf{ real\+\_\+world} src/real\+\_\+world.\+cpp) ament\+\_\+target\+\_\+dependencies(\textbf{ real\+\_\+world} tf2\+\_\+ros rclcpp sensor\+\_\+msgs std\+\_\+msgs control\+\_\+input robot\+\_\+library) ament\+\_\+python\+\_\+install\+\_\+package(\$
+\item 
+\textbf{ add\+\_\+executable} (\textbf{ controller} src/controller.\+cpp) ament\+\_\+target\+\_\+dependencies(\textbf{ controller} rclcpp sensor\+\_\+msgs std\+\_\+msgs control\+\_\+input Eigen3 tf2\+\_\+ros robot\+\_\+library) ament\+\_\+export\+\_\+dependencies(eigen3\+\_\+cmake\+\_\+module) ament\+\_\+export\+\_\+dependencies(Eigen3) \textbf{ install}(T\+A\+R\+G\+E\+TS \textbf{ sim} D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$
+\item 
+\textbf{ install} (T\+A\+R\+G\+E\+TS \textbf{ real\+\_\+world} D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$\{P\+R\+O\+J\+E\+C\+T\+\_\+\+N\+A\+ME\}) install(P\+R\+O\+G\+R\+A\+MS scripts/gui.\+py D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$
+\item 
+\textbf{ install} (T\+A\+R\+G\+E\+TS \textbf{ controller} D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$\{P\+R\+O\+J\+E\+C\+T\+\_\+\+N\+A\+ME\}) \textbf{ if}(B\+U\+I\+L\+D\+\_\+\+T\+E\+S\+T\+I\+NG) find\+\_\+package(ament\+\_\+lint\+\_\+auto R\+E\+Q\+U\+I\+R\+ED) ament\+\_\+lint\+\_\+auto\+\_\+find\+\_\+test\+\_\+dependencies() endif() install(D\+I\+R\+E\+C\+T\+O\+RY config description launch D\+E\+S\+T\+I\+N\+A\+T\+I\+ON share/\$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\label{workstation_2_c_make_lists_8txt_ae88ccadfd32567d605dea2ddf001b114}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!add\_executable@{add\_executable}}
+\index{add\_executable@{add\_executable}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{add\_executable()}
+{\footnotesize\ttfamily add\+\_\+executable (\begin{DoxyParamCaption}\item[{\textbf{ controller} src/controller.}]{cpp }\end{DoxyParamCaption})}
+
+\mbox{\label{workstation_2_c_make_lists_8txt_afa1a68e7467b4295385e2b438978b653}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!cmake\_minimum\_required@{cmake\_minimum\_required}}
+\index{cmake\_minimum\_required@{cmake\_minimum\_required}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{cmake\_minimum\_required()}
+{\footnotesize\ttfamily cmake\+\_\+minimum\+\_\+required (\begin{DoxyParamCaption}\item[{V\+E\+R\+S\+I\+ON 3.}]{5 }\end{DoxyParamCaption})}
+
+\mbox{\label{workstation_2_c_make_lists_8txt_a10471d0a9ada9ef4463c95c9b60f5454}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!install@{install}}
+\index{install@{install}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{install()\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily install (\begin{DoxyParamCaption}\item[{T\+A\+R\+G\+E\+TS \textbf{ controller} D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$\{P\+R\+O\+J\+E\+C\+T\+\_\+\+N\+A\+ME\}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\label{workstation_2_c_make_lists_8txt_a5017a077da91340e1090c6a87ac948d2}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!install@{install}}
+\index{install@{install}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{install()\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily install (\begin{DoxyParamCaption}\item[{T\+A\+R\+G\+E\+TS \textbf{ real\+\_\+world} D\+E\+S\+T\+I\+N\+A\+T\+I\+ON lib/\$\{P\+R\+O\+J\+E\+C\+T\+\_\+\+N\+A\+ME\}}]{ }\end{DoxyParamCaption})}
+

@@ -1,5 +1,8 @@
 var struct_motor =
 [
+    [ "setEffort", "struct_motor.html#a970c185a99c0b7f2cea0c0b375204c59", null ],
+    [ "setPosition", "struct_motor.html#a17d0266c1e48f9dc18063c85e5db9b53", null ],
+    [ "setVelocity", "struct_motor.html#a88109e37561381cd0c1213660e9504fa", null ],
     [ "acceleration", "struct_motor.html#af7268d0455acd275e6a29d57b3827d18", null ],
     [ "effort", "struct_motor.html#a2a405b2691c402ee79112cba25bd7b03", null ],
     [ "id", "struct_motor.html#a8f21e06ef4a50e6a23c9258635844812", null ],

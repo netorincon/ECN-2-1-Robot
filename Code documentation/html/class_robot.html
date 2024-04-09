@@ -27,7 +27,6 @@
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ECN-1-2-Robot
    </div>
-   <div id="projectbrief">Development of a 1-2 Robot as part of the group project for CORO IMARO M1</div>
   </td>
  </tr>
  </tbody>
@@ -90,6 +89,8 @@ $(document).ready(function(){initNavTree('class_robot.html',''); initResizable()
 <div class="title">Robot Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="robot_8h_source.html">robot.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for Robot:</div>
 <div class="dyncontent">
@@ -106,85 +107,732 @@ Collaboration diagram for Robot:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7af7298c634441d2ffc31edd55d9a4fa"><td class="memItemLeft" align="right" valign="top"><a id="a7af7298c634441d2ffc31edd55d9a4fa"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Robot</b> (float x, float y, float theta, float wheel_radius, float chassis_length, float chassis_width, float wheel_distance, float mass)</td></tr>
-<tr class="separator:a7af7298c634441d2ffc31edd55d9a4fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b7bdc53aa4debc3791e4e8f28ffbb75"><td class="memItemLeft" align="right" valign="top"><a id="a6b7bdc53aa4debc3791e4e8f28ffbb75"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>resetPose</b> ()</td></tr>
+<tr class="memitem:a4fc7c70ae20623f05e06f2ecb388b6c4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a4fc7c70ae20623f05e06f2ecb388b6c4">Robot</a> ()</td></tr>
+<tr class="separator:a4fc7c70ae20623f05e06f2ecb388b6c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a247b2bea06a72cf123fad1b93cb4c4ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a247b2bea06a72cf123fad1b93cb4c4ff">Robot</a> (float x, float y, float theta, float <a class="el" href="class_robot.html#a7e4c430e4739eea27cc0e796cfb6607b">wheel1_radius</a>, float <a class="el" href="class_robot.html#a773c01cdfa7f05aad2cc298b757c7641">wheel2_radius</a>, float <a class="el" href="class_robot.html#a15c7825bebff3780c2fdb829d2b6bfda">chassis_length</a>, float <a class="el" href="class_robot.html#ab9e3784d02e0c2f55e88ee4613ee7b24">chassis_width</a>, float <a class="el" href="class_robot.html#a9a1a543e5623f7280f5b3ffdc155f3e1">wheel_distance</a>, float <a class="el" href="class_robot.html#afee8fb30ddb56a88cc413cd3fc4de68e">mass</a>)</td></tr>
+<tr class="separator:a247b2bea06a72cf123fad1b93cb4c4ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b7bdc53aa4debc3791e4e8f28ffbb75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a6b7bdc53aa4debc3791e4e8f28ffbb75">resetPose</a> ()</td></tr>
 <tr class="separator:a6b7bdc53aa4debc3791e4e8f28ffbb75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2f635c20aeae92b17ce3fe116ac28da"><td class="memItemLeft" align="right" valign="top"><a id="aa2f635c20aeae92b17ce3fe116ac28da"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setPose</b> (float _x, float _y, float _theta)</td></tr>
+<tr class="memitem:aa2f635c20aeae92b17ce3fe116ac28da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#aa2f635c20aeae92b17ce3fe116ac28da">setPose</a> (float _x, float _y, float _theta)</td></tr>
 <tr class="separator:aa2f635c20aeae92b17ce3fe116ac28da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cebe5883d08576bcf8c00c06e461023"><td class="memItemLeft" align="right" valign="top"><a id="a8cebe5883d08576bcf8c00c06e461023"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorPositions</b> (float _phi1, float _phi2, float _delta1, float _delta2)</td></tr>
+<tr class="memitem:a8cebe5883d08576bcf8c00c06e461023"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a8cebe5883d08576bcf8c00c06e461023">setMotorPositions</a> (float _phi1, float _phi2, float _delta1, float _delta2)</td></tr>
 <tr class="separator:a8cebe5883d08576bcf8c00c06e461023"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71ba910aa5637a416e465b08914d381b"><td class="memItemLeft" align="right" valign="top"><a id="a71ba910aa5637a416e465b08914d381b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotorVelocities</b> (float _phi1, float _phi2, float _delta1, float _delta2)</td></tr>
+<tr class="memitem:a71ba910aa5637a416e465b08914d381b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a71ba910aa5637a416e465b08914d381b">setMotorVelocities</a> (float _phi1, float _phi2, float _delta1, float _delta2)</td></tr>
 <tr class="separator:a71ba910aa5637a416e465b08914d381b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ff95426fd2fcb63b437c2c778504bcd"><td class="memItemLeft" align="right" valign="top"><a id="a6ff95426fd2fcb63b437c2c778504bcd"></a>
-sensor_msgs::msg::JointState&#160;</td><td class="memItemRight" valign="bottom"><b>getJointStates</b> ()</td></tr>
+<tr class="memitem:aec6b48917e8e1026f47570f858328bea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#aec6b48917e8e1026f47570f858328bea">applyControlInput</a> (float um, float _delta1, float _delta2, float _period)</td></tr>
+<tr class="separator:aec6b48917e8e1026f47570f858328bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ff95426fd2fcb63b437c2c778504bcd"><td class="memItemLeft" align="right" valign="top">sensor_msgs::msg::JointState&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a6ff95426fd2fcb63b437c2c778504bcd">getJointStates</a> ()</td></tr>
 <tr class="separator:a6ff95426fd2fcb63b437c2c778504bcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5cf5d59d822754728270683aa5f3fc0"><td class="memItemLeft" align="right" valign="top"><a id="ac5cf5d59d822754728270683aa5f3fc0"></a>
-geometry_msgs::msg::TransformStamped&#160;</td><td class="memItemRight" valign="bottom"><b>getOdometry</b> ()</td></tr>
+<tr class="memitem:ac5cf5d59d822754728270683aa5f3fc0"><td class="memItemLeft" align="right" valign="top">geometry_msgs::msg::TransformStamped&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ac5cf5d59d822754728270683aa5f3fc0">getOdometry</a> ()</td></tr>
 <tr class="separator:ac5cf5d59d822754728270683aa5f3fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51082be2012de6005c97791abbf73a7d"><td class="memItemLeft" align="right" valign="top"><a id="a51082be2012de6005c97791abbf73a7d"></a>
-geometry_msgs::msg::TransformStamped&#160;</td><td class="memItemRight" valign="bottom"><b>getICRTransform</b> ()</td></tr>
+<tr class="memitem:a51082be2012de6005c97791abbf73a7d"><td class="memItemLeft" align="right" valign="top">geometry_msgs::msg::TransformStamped&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a51082be2012de6005c97791abbf73a7d">getICRTransform</a> ()</td></tr>
 <tr class="separator:a51082be2012de6005c97791abbf73a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa268efdb606ebf74bdbd13e2d035052"><td class="memItemLeft" align="right" valign="top"><a id="afa268efdb606ebf74bdbd13e2d035052"></a>
-control_input::msg::StateVector&#160;</td><td class="memItemRight" valign="bottom"><b>getStateVector</b> ()</td></tr>
+<tr class="memitem:afa268efdb606ebf74bdbd13e2d035052"><td class="memItemLeft" align="right" valign="top">control_input::msg::StateVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#afa268efdb606ebf74bdbd13e2d035052">getStateVector</a> ()</td></tr>
 <tr class="separator:afa268efdb606ebf74bdbd13e2d035052"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a740ba1d131a7caaedc9fd6272d576e44"><td class="memItemLeft" align="right" valign="top"><a id="a740ba1d131a7caaedc9fd6272d576e44"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>limit_angle</b> (float angle)</td></tr>
+<tr class="memitem:a740ba1d131a7caaedc9fd6272d576e44"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a740ba1d131a7caaedc9fd6272d576e44">limit_angle</a> (float angle)</td></tr>
 <tr class="separator:a740ba1d131a7caaedc9fd6272d576e44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23d31e2e7505b2648b113b84a458402f"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a23d31e2e7505b2648b113b84a458402f">limit_phiSpeed</a> (float speed)</td></tr>
+<tr class="separator:a23d31e2e7505b2648b113b84a458402f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad04a877da2fd0473580b95e4bdb9dc15"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ad04a877da2fd0473580b95e4bdb9dc15">limit_deltaSpeed</a> (float speed)</td></tr>
+<tr class="separator:ad04a877da2fd0473580b95e4bdb9dc15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8109e934cacaa41c81d29f9596cae669"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix2f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a8109e934cacaa41c81d29f9596cae669">getKInv</a> (float e)</td></tr>
+<tr class="separator:a8109e934cacaa41c81d29f9596cae669"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a4b27425b3a348fea1c07c5b36b948090"><td class="memItemLeft" align="right" valign="top"><a id="a4b27425b3a348fea1c07c5b36b948090"></a>
-<a class="el" href="struct_pose.html">Pose</a>&#160;</td><td class="memItemRight" valign="bottom"><b>pose</b></td></tr>
+<tr class="memitem:a4b27425b3a348fea1c07c5b36b948090"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_pose.html">Pose</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a4b27425b3a348fea1c07c5b36b948090">pose</a></td></tr>
 <tr class="separator:a4b27425b3a348fea1c07c5b36b948090"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0eaf33f2fa2622a8cdafdac37de2c36"><td class="memItemLeft" align="right" valign="top"><a id="ae0eaf33f2fa2622a8cdafdac37de2c36"></a>
-<a class="el" href="struct_twist.html">Twist</a>&#160;</td><td class="memItemRight" valign="bottom"><b>twist</b></td></tr>
+<tr class="memitem:ae0eaf33f2fa2622a8cdafdac37de2c36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_twist.html">Twist</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ae0eaf33f2fa2622a8cdafdac37de2c36">twist</a></td></tr>
 <tr class="separator:ae0eaf33f2fa2622a8cdafdac37de2c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab25faad9566a078c1226078477ed54f9"><td class="memItemLeft" align="right" valign="top"><a id="ab25faad9566a078c1226078477ed54f9"></a>
-<a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>phi1</b></td></tr>
+<tr class="memitem:ab25faad9566a078c1226078477ed54f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ab25faad9566a078c1226078477ed54f9">phi1</a></td></tr>
 <tr class="separator:ab25faad9566a078c1226078477ed54f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3af642548ac011bede298d6a098bddf5"><td class="memItemLeft" align="right" valign="top"><a id="a3af642548ac011bede298d6a098bddf5"></a>
-<a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>phi2</b></td></tr>
+<tr class="memitem:a3af642548ac011bede298d6a098bddf5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a3af642548ac011bede298d6a098bddf5">phi2</a></td></tr>
 <tr class="separator:a3af642548ac011bede298d6a098bddf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45c994db00a7976fb3af2500f7caae18"><td class="memItemLeft" align="right" valign="top"><a id="a45c994db00a7976fb3af2500f7caae18"></a>
-<a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>delta1</b></td></tr>
+<tr class="memitem:a45c994db00a7976fb3af2500f7caae18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a45c994db00a7976fb3af2500f7caae18">delta1</a></td></tr>
 <tr class="separator:a45c994db00a7976fb3af2500f7caae18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9ad5c00d3f431cfca87d8292fe7363e"><td class="memItemLeft" align="right" valign="top"><a id="ae9ad5c00d3f431cfca87d8292fe7363e"></a>
-<a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>delta2</b></td></tr>
+<tr class="memitem:ae9ad5c00d3f431cfca87d8292fe7363e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_motor.html">Motor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ae9ad5c00d3f431cfca87d8292fe7363e">delta2</a></td></tr>
 <tr class="separator:ae9ad5c00d3f431cfca87d8292fe7363e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a243fc03fa3920d6e83025a55103b01a3"><td class="memItemLeft" align="right" valign="top"><a id="a243fc03fa3920d6e83025a55103b01a3"></a>
-<a class="el" href="struct_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ICRLocation</b></td></tr>
+<tr class="memitem:a243fc03fa3920d6e83025a55103b01a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a243fc03fa3920d6e83025a55103b01a3">ICRLocation</a></td></tr>
 <tr class="separator:a243fc03fa3920d6e83025a55103b01a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdb92997664dfe898cb44046d9ac9d7e"><td class="memItemLeft" align="right" valign="top"><a id="acdb92997664dfe898cb44046d9ac9d7e"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>v1</b></td></tr>
+<tr class="memitem:acdb92997664dfe898cb44046d9ac9d7e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#acdb92997664dfe898cb44046d9ac9d7e">v1</a></td></tr>
 <tr class="separator:acdb92997664dfe898cb44046d9ac9d7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fd3b9a0df55f20e7596e837f8c8c3bd"><td class="memItemLeft" align="right" valign="top"><a id="a5fd3b9a0df55f20e7596e837f8c8c3bd"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>v2</b></td></tr>
+<tr class="memitem:a5fd3b9a0df55f20e7596e837f8c8c3bd"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a5fd3b9a0df55f20e7596e837f8c8c3bd">v2</a></td></tr>
 <tr class="separator:a5fd3b9a0df55f20e7596e837f8c8c3bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf3253e69c28776887a08dc0e3f0e607"><td class="memItemLeft" align="right" valign="top"><a id="aaf3253e69c28776887a08dc0e3f0e607"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>wheel_radius</b></td></tr>
-<tr class="separator:aaf3253e69c28776887a08dc0e3f0e607"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15c7825bebff3780c2fdb829d2b6bfda"><td class="memItemLeft" align="right" valign="top"><a id="a15c7825bebff3780c2fdb829d2b6bfda"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>chassis_length</b></td></tr>
+<tr class="memitem:a7e4c430e4739eea27cc0e796cfb6607b"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a7e4c430e4739eea27cc0e796cfb6607b">wheel1_radius</a></td></tr>
+<tr class="separator:a7e4c430e4739eea27cc0e796cfb6607b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a773c01cdfa7f05aad2cc298b757c7641"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a773c01cdfa7f05aad2cc298b757c7641">wheel2_radius</a></td></tr>
+<tr class="separator:a773c01cdfa7f05aad2cc298b757c7641"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c7825bebff3780c2fdb829d2b6bfda"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a15c7825bebff3780c2fdb829d2b6bfda">chassis_length</a></td></tr>
 <tr class="separator:a15c7825bebff3780c2fdb829d2b6bfda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9e3784d02e0c2f55e88ee4613ee7b24"><td class="memItemLeft" align="right" valign="top"><a id="ab9e3784d02e0c2f55e88ee4613ee7b24"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>chassis_width</b></td></tr>
+<tr class="memitem:ab9e3784d02e0c2f55e88ee4613ee7b24"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#ab9e3784d02e0c2f55e88ee4613ee7b24">chassis_width</a></td></tr>
 <tr class="separator:ab9e3784d02e0c2f55e88ee4613ee7b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a1a543e5623f7280f5b3ffdc155f3e1"><td class="memItemLeft" align="right" valign="top"><a id="a9a1a543e5623f7280f5b3ffdc155f3e1"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>wheel_distance</b></td></tr>
+<tr class="memitem:a9a1a543e5623f7280f5b3ffdc155f3e1"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a9a1a543e5623f7280f5b3ffdc155f3e1">wheel_distance</a></td></tr>
 <tr class="separator:a9a1a543e5623f7280f5b3ffdc155f3e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afee8fb30ddb56a88cc413cd3fc4de68e"><td class="memItemLeft" align="right" valign="top"><a id="afee8fb30ddb56a88cc413cd3fc4de68e"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>mass</b></td></tr>
+<tr class="memitem:afee8fb30ddb56a88cc413cd3fc4de68e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#afee8fb30ddb56a88cc413cd3fc4de68e">mass</a></td></tr>
 <tr class="separator:afee8fb30ddb56a88cc413cd3fc4de68e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73cfb1636e43867e8a350827d0a1be74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a73cfb1636e43867e8a350827d0a1be74">wheel1_origin</a></td></tr>
+<tr class="separator:a73cfb1636e43867e8a350827d0a1be74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34217eb875b9161b7a7567cb4ac080ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a34217eb875b9161b7a7567cb4ac080ae">wheel2_origin</a></td></tr>
+<tr class="separator:a34217eb875b9161b7a7567cb4ac080ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a567318d20ef93539847dbf0069fe3d0f"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix2f&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_robot.html#a567318d20ef93539847dbf0069fe3d0f">K_inv</a></td></tr>
+<tr class="separator:a567318d20ef93539847dbf0069fe3d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a4fc7c70ae20623f05e06f2ecb388b6c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fc7c70ae20623f05e06f2ecb388b6c4">&#9670;&nbsp;</a></span>Robot() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Robot::Robot </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a247b2bea06a72cf123fad1b93cb4c4ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a247b2bea06a72cf123fad1b93cb4c4ff">&#9670;&nbsp;</a></span>Robot() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Robot::Robot </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>theta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>wheel1_radius</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>wheel2_radius</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>chassis_length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>chassis_width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>wheel_distance</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>mass</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aec6b48917e8e1026f47570f858328bea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec6b48917e8e1026f47570f858328bea">&#9670;&nbsp;</a></span>applyControlInput()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Robot::applyControlInput </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>um</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_period</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a51082be2012de6005c97791abbf73a7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51082be2012de6005c97791abbf73a7d">&#9670;&nbsp;</a></span>getICRTransform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">geometry_msgs::msg::TransformStamped Robot::getICRTransform </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6ff95426fd2fcb63b437c2c778504bcd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ff95426fd2fcb63b437c2c778504bcd">&#9670;&nbsp;</a></span>getJointStates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">sensor_msgs::msg::JointState Robot::getJointStates </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8109e934cacaa41c81d29f9596cae669"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8109e934cacaa41c81d29f9596cae669">&#9670;&nbsp;</a></span>getKInv()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix2f Robot::getKInv </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac5cf5d59d822754728270683aa5f3fc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5cf5d59d822754728270683aa5f3fc0">&#9670;&nbsp;</a></span>getOdometry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">geometry_msgs::msg::TransformStamped Robot::getOdometry </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afa268efdb606ebf74bdbd13e2d035052"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa268efdb606ebf74bdbd13e2d035052">&#9670;&nbsp;</a></span>getStateVector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">control_input::msg::StateVector Robot::getStateVector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a740ba1d131a7caaedc9fd6272d576e44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a740ba1d131a7caaedc9fd6272d576e44">&#9670;&nbsp;</a></span>limit_angle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::limit_angle </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>angle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad04a877da2fd0473580b95e4bdb9dc15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad04a877da2fd0473580b95e4bdb9dc15">&#9670;&nbsp;</a></span>limit_deltaSpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::limit_deltaSpeed </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a23d31e2e7505b2648b113b84a458402f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23d31e2e7505b2648b113b84a458402f">&#9670;&nbsp;</a></span>limit_phiSpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::limit_phiSpeed </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6b7bdc53aa4debc3791e4e8f28ffbb75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b7bdc53aa4debc3791e4e8f28ffbb75">&#9670;&nbsp;</a></span>resetPose()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Robot::resetPose </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8cebe5883d08576bcf8c00c06e461023"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cebe5883d08576bcf8c00c06e461023">&#9670;&nbsp;</a></span>setMotorPositions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Robot::setMotorPositions </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_phi1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_phi2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a71ba910aa5637a416e465b08914d381b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71ba910aa5637a416e465b08914d381b">&#9670;&nbsp;</a></span>setMotorVelocities()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Robot::setMotorVelocities </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_phi1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_phi2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_delta2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa2f635c20aeae92b17ce3fe116ac28da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2f635c20aeae92b17ce3fe116ac28da">&#9670;&nbsp;</a></span>setPose()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Robot::setPose </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>_theta</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a15c7825bebff3780c2fdb829d2b6bfda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c7825bebff3780c2fdb829d2b6bfda">&#9670;&nbsp;</a></span>chassis_length</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::chassis_length</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab9e3784d02e0c2f55e88ee4613ee7b24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e3784d02e0c2f55e88ee4613ee7b24">&#9670;&nbsp;</a></span>chassis_width</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::chassis_width</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a45c994db00a7976fb3af2500f7caae18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45c994db00a7976fb3af2500f7caae18">&#9670;&nbsp;</a></span>delta1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_motor.html">Motor</a> Robot::delta1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae9ad5c00d3f431cfca87d8292fe7363e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9ad5c00d3f431cfca87d8292fe7363e">&#9670;&nbsp;</a></span>delta2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_motor.html">Motor</a> Robot::delta2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a243fc03fa3920d6e83025a55103b01a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a243fc03fa3920d6e83025a55103b01a3">&#9670;&nbsp;</a></span>ICRLocation</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_point.html">Point</a> Robot::ICRLocation</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a567318d20ef93539847dbf0069fe3d0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a567318d20ef93539847dbf0069fe3d0f">&#9670;&nbsp;</a></span>K_inv</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix2f Robot::K_inv</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afee8fb30ddb56a88cc413cd3fc4de68e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afee8fb30ddb56a88cc413cd3fc4de68e">&#9670;&nbsp;</a></span>mass</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::mass</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab25faad9566a078c1226078477ed54f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab25faad9566a078c1226078477ed54f9">&#9670;&nbsp;</a></span>phi1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_motor.html">Motor</a> Robot::phi1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3af642548ac011bede298d6a098bddf5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3af642548ac011bede298d6a098bddf5">&#9670;&nbsp;</a></span>phi2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_motor.html">Motor</a> Robot::phi2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4b27425b3a348fea1c07c5b36b948090"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b27425b3a348fea1c07c5b36b948090">&#9670;&nbsp;</a></span>pose</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_pose.html">Pose</a> Robot::pose</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae0eaf33f2fa2622a8cdafdac37de2c36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0eaf33f2fa2622a8cdafdac37de2c36">&#9670;&nbsp;</a></span>twist</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_twist.html">Twist</a> Robot::twist</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acdb92997664dfe898cb44046d9ac9d7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdb92997664dfe898cb44046d9ac9d7e">&#9670;&nbsp;</a></span>v1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::v1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5fd3b9a0df55f20e7596e837f8c8c3bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fd3b9a0df55f20e7596e837f8c8c3bd">&#9670;&nbsp;</a></span>v2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::v2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a73cfb1636e43867e8a350827d0a1be74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73cfb1636e43867e8a350827d0a1be74">&#9670;&nbsp;</a></span>wheel1_origin</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_point.html">Point</a> Robot::wheel1_origin</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7e4c430e4739eea27cc0e796cfb6607b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e4c430e4739eea27cc0e796cfb6607b">&#9670;&nbsp;</a></span>wheel1_radius</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::wheel1_radius</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a34217eb875b9161b7a7567cb4ac080ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34217eb875b9161b7a7567cb4ac080ae">&#9670;&nbsp;</a></span>wheel2_origin</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_point.html">Point</a> Robot::wheel2_origin</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a773c01cdfa7f05aad2cc298b757c7641"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a773c01cdfa7f05aad2cc298b757c7641">&#9670;&nbsp;</a></span>wheel2_radius</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::wheel2_radius</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9a1a543e5623f7280f5b3ffdc155f3e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a1a543e5623f7280f5b3ffdc155f3e1">&#9670;&nbsp;</a></span>wheel_distance</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float Robot::wheel_distance</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/netorincon/ECN-1-2-Robot/ros2/src/robot_library/include/robot_library/<a class="el" href="robot_8h_source.html">robot.h</a></li>
-<li>/home/netorincon/ECN-1-2-Robot/ros2/src/robot_library/src/robot.cpp</li>
+<li>robot_library/include/robot_library/<a class="el" href="robot_8h_source.html">robot.h</a></li>
+<li>robot_library/src/<a class="el" href="robot_8cpp.html">robot.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

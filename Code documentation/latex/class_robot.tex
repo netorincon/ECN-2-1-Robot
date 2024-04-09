@@ -1,0 +1,300 @@
+\doxysection{Robot Class Reference}
+\label{class_robot}\index{Robot@{Robot}}
+
+
+{\ttfamily \#include $<$robot.\+h$>$}
+
+
+
+Collaboration diagram for Robot\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{class_robot__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\textbf{ Robot} ()
+\item 
+\textbf{ Robot} (float x, float y, float theta, float \textbf{ wheel1\+\_\+radius}, float \textbf{ wheel2\+\_\+radius}, float \textbf{ chassis\+\_\+length}, float \textbf{ chassis\+\_\+width}, float \textbf{ wheel\+\_\+distance}, float \textbf{ mass})
+\item 
+void \textbf{ reset\+Pose} ()
+\item 
+void \textbf{ set\+Pose} (float \+\_\+x, float \+\_\+y, float \+\_\+theta)
+\item 
+void \textbf{ set\+Motor\+Positions} (float \+\_\+phi1, float \+\_\+phi2, float \+\_\+delta1, float \+\_\+delta2)
+\item 
+void \textbf{ set\+Motor\+Velocities} (float \+\_\+phi1, float \+\_\+phi2, float \+\_\+delta1, float \+\_\+delta2)
+\item 
+void \textbf{ apply\+Control\+Input} (float um, float \+\_\+delta1, float \+\_\+delta2, float \+\_\+period)
+\item 
+sensor\+\_\+msgs\+::msg\+::\+Joint\+State \textbf{ get\+Joint\+States} ()
+\item 
+geometry\+\_\+msgs\+::msg\+::\+Transform\+Stamped \textbf{ get\+Odometry} ()
+\item 
+geometry\+\_\+msgs\+::msg\+::\+Transform\+Stamped \textbf{ get\+I\+C\+R\+Transform} ()
+\item 
+control\+\_\+input\+::msg\+::\+State\+Vector \textbf{ get\+State\+Vector} ()
+\item 
+float \textbf{ limit\+\_\+angle} (float angle)
+\item 
+float \textbf{ limit\+\_\+phi\+Speed} (float speed)
+\item 
+float \textbf{ limit\+\_\+delta\+Speed} (float speed)
+\item 
+Eigen\+::\+Matrix2f \textbf{ get\+K\+Inv} (float e)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\textbf{ Pose} \textbf{ pose}
+\item 
+\textbf{ Twist} \textbf{ twist}
+\item 
+\textbf{ Motor} \textbf{ phi1}
+\item 
+\textbf{ Motor} \textbf{ phi2}
+\item 
+\textbf{ Motor} \textbf{ delta1}
+\item 
+\textbf{ Motor} \textbf{ delta2}
+\item 
+\textbf{ Point} \textbf{ I\+C\+R\+Location}
+\item 
+float \textbf{ v1}
+\item 
+float \textbf{ v2}
+\item 
+float \textbf{ wheel1\+\_\+radius}
+\item 
+float \textbf{ wheel2\+\_\+radius}
+\item 
+float \textbf{ chassis\+\_\+length}
+\item 
+float \textbf{ chassis\+\_\+width}
+\item 
+float \textbf{ wheel\+\_\+distance}
+\item 
+float \textbf{ mass}
+\item 
+\textbf{ Point} \textbf{ wheel1\+\_\+origin}
+\item 
+\textbf{ Point} \textbf{ wheel2\+\_\+origin}
+\item 
+Eigen\+::\+Matrix2f \textbf{ K\+\_\+inv}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\label{class_robot_a4fc7c70ae20623f05e06f2ecb388b6c4}} 
+\index{Robot@{Robot}!Robot@{Robot}}
+\index{Robot@{Robot}!Robot@{Robot}}
+\doxysubsubsection{Robot()\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Robot\+::\+Robot (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a247b2bea06a72cf123fad1b93cb4c4ff}} 
+\index{Robot@{Robot}!Robot@{Robot}}
+\index{Robot@{Robot}!Robot@{Robot}}
+\doxysubsubsection{Robot()\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Robot\+::\+Robot (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{float}]{theta,  }\item[{float}]{wheel1\+\_\+radius,  }\item[{float}]{wheel2\+\_\+radius,  }\item[{float}]{chassis\+\_\+length,  }\item[{float}]{chassis\+\_\+width,  }\item[{float}]{wheel\+\_\+distance,  }\item[{float}]{mass }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\label{class_robot_aec6b48917e8e1026f47570f858328bea}} 
+\index{Robot@{Robot}!applyControlInput@{applyControlInput}}
+\index{applyControlInput@{applyControlInput}!Robot@{Robot}}
+\doxysubsubsection{applyControlInput()}
+{\footnotesize\ttfamily void Robot\+::apply\+Control\+Input (\begin{DoxyParamCaption}\item[{float}]{um,  }\item[{float}]{\+\_\+delta1,  }\item[{float}]{\+\_\+delta2,  }\item[{float}]{\+\_\+period }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a51082be2012de6005c97791abbf73a7d}} 
+\index{Robot@{Robot}!getICRTransform@{getICRTransform}}
+\index{getICRTransform@{getICRTransform}!Robot@{Robot}}
+\doxysubsubsection{getICRTransform()}
+{\footnotesize\ttfamily geometry\+\_\+msgs\+::msg\+::\+Transform\+Stamped Robot\+::get\+I\+C\+R\+Transform (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a6ff95426fd2fcb63b437c2c778504bcd}} 
+\index{Robot@{Robot}!getJointStates@{getJointStates}}
+\index{getJointStates@{getJointStates}!Robot@{Robot}}
+\doxysubsubsection{getJointStates()}
+{\footnotesize\ttfamily sensor\+\_\+msgs\+::msg\+::\+Joint\+State Robot\+::get\+Joint\+States (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a8109e934cacaa41c81d29f9596cae669}} 
+\index{Robot@{Robot}!getKInv@{getKInv}}
+\index{getKInv@{getKInv}!Robot@{Robot}}
+\doxysubsubsection{getKInv()}
+{\footnotesize\ttfamily Eigen\+::\+Matrix2f Robot\+::get\+K\+Inv (\begin{DoxyParamCaption}\item[{float}]{e }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_ac5cf5d59d822754728270683aa5f3fc0}} 
+\index{Robot@{Robot}!getOdometry@{getOdometry}}
+\index{getOdometry@{getOdometry}!Robot@{Robot}}
+\doxysubsubsection{getOdometry()}
+{\footnotesize\ttfamily geometry\+\_\+msgs\+::msg\+::\+Transform\+Stamped Robot\+::get\+Odometry (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_afa268efdb606ebf74bdbd13e2d035052}} 
+\index{Robot@{Robot}!getStateVector@{getStateVector}}
+\index{getStateVector@{getStateVector}!Robot@{Robot}}
+\doxysubsubsection{getStateVector()}
+{\footnotesize\ttfamily control\+\_\+input\+::msg\+::\+State\+Vector Robot\+::get\+State\+Vector (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a740ba1d131a7caaedc9fd6272d576e44}} 
+\index{Robot@{Robot}!limit\_angle@{limit\_angle}}
+\index{limit\_angle@{limit\_angle}!Robot@{Robot}}
+\doxysubsubsection{limit\_angle()}
+{\footnotesize\ttfamily float Robot\+::limit\+\_\+angle (\begin{DoxyParamCaption}\item[{float}]{angle }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_ad04a877da2fd0473580b95e4bdb9dc15}} 
+\index{Robot@{Robot}!limit\_deltaSpeed@{limit\_deltaSpeed}}
+\index{limit\_deltaSpeed@{limit\_deltaSpeed}!Robot@{Robot}}
+\doxysubsubsection{limit\_deltaSpeed()}
+{\footnotesize\ttfamily float Robot\+::limit\+\_\+delta\+Speed (\begin{DoxyParamCaption}\item[{float}]{speed }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a23d31e2e7505b2648b113b84a458402f}} 
+\index{Robot@{Robot}!limit\_phiSpeed@{limit\_phiSpeed}}
+\index{limit\_phiSpeed@{limit\_phiSpeed}!Robot@{Robot}}
+\doxysubsubsection{limit\_phiSpeed()}
+{\footnotesize\ttfamily float Robot\+::limit\+\_\+phi\+Speed (\begin{DoxyParamCaption}\item[{float}]{speed }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a6b7bdc53aa4debc3791e4e8f28ffbb75}} 
+\index{Robot@{Robot}!resetPose@{resetPose}}
+\index{resetPose@{resetPose}!Robot@{Robot}}
+\doxysubsubsection{resetPose()}
+{\footnotesize\ttfamily void Robot\+::reset\+Pose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a8cebe5883d08576bcf8c00c06e461023}} 
+\index{Robot@{Robot}!setMotorPositions@{setMotorPositions}}
+\index{setMotorPositions@{setMotorPositions}!Robot@{Robot}}
+\doxysubsubsection{setMotorPositions()}
+{\footnotesize\ttfamily void Robot\+::set\+Motor\+Positions (\begin{DoxyParamCaption}\item[{float}]{\+\_\+phi1,  }\item[{float}]{\+\_\+phi2,  }\item[{float}]{\+\_\+delta1,  }\item[{float}]{\+\_\+delta2 }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_a71ba910aa5637a416e465b08914d381b}} 
+\index{Robot@{Robot}!setMotorVelocities@{setMotorVelocities}}
+\index{setMotorVelocities@{setMotorVelocities}!Robot@{Robot}}
+\doxysubsubsection{setMotorVelocities()}
+{\footnotesize\ttfamily void Robot\+::set\+Motor\+Velocities (\begin{DoxyParamCaption}\item[{float}]{\+\_\+phi1,  }\item[{float}]{\+\_\+phi2,  }\item[{float}]{\+\_\+delta1,  }\item[{float}]{\+\_\+delta2 }\end{DoxyParamCaption})}
+
+\mbox{\label{class_robot_aa2f635c20aeae92b17ce3fe116ac28da}} 
+\index{Robot@{Robot}!setPose@{setPose}}
+\index{setPose@{setPose}!Robot@{Robot}}
+\doxysubsubsection{setPose()}
+{\footnotesize\ttfamily void Robot\+::set\+Pose (\begin{DoxyParamCaption}\item[{float}]{\+\_\+x,  }\item[{float}]{\+\_\+y,  }\item[{float}]{\+\_\+theta }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\label{class_robot_a15c7825bebff3780c2fdb829d2b6bfda}} 
+\index{Robot@{Robot}!chassis\_length@{chassis\_length}}
+\index{chassis\_length@{chassis\_length}!Robot@{Robot}}
+\doxysubsubsection{chassis\_length}
+{\footnotesize\ttfamily float Robot\+::chassis\+\_\+length}
+
+\mbox{\label{class_robot_ab9e3784d02e0c2f55e88ee4613ee7b24}} 
+\index{Robot@{Robot}!chassis\_width@{chassis\_width}}
+\index{chassis\_width@{chassis\_width}!Robot@{Robot}}
+\doxysubsubsection{chassis\_width}
+{\footnotesize\ttfamily float Robot\+::chassis\+\_\+width}
+
+\mbox{\label{class_robot_a45c994db00a7976fb3af2500f7caae18}} 
+\index{Robot@{Robot}!delta1@{delta1}}
+\index{delta1@{delta1}!Robot@{Robot}}
+\doxysubsubsection{delta1}
+{\footnotesize\ttfamily \textbf{ Motor} Robot\+::delta1}
+
+\mbox{\label{class_robot_ae9ad5c00d3f431cfca87d8292fe7363e}} 
+\index{Robot@{Robot}!delta2@{delta2}}
+\index{delta2@{delta2}!Robot@{Robot}}
+\doxysubsubsection{delta2}
+{\footnotesize\ttfamily \textbf{ Motor} Robot\+::delta2}
+
+\mbox{\label{class_robot_a243fc03fa3920d6e83025a55103b01a3}} 
+\index{Robot@{Robot}!ICRLocation@{ICRLocation}}
+\index{ICRLocation@{ICRLocation}!Robot@{Robot}}
+\doxysubsubsection{ICRLocation}
+{\footnotesize\ttfamily \textbf{ Point} Robot\+::\+I\+C\+R\+Location}
+
+\mbox{\label{class_robot_a567318d20ef93539847dbf0069fe3d0f}} 
+\index{Robot@{Robot}!K\_inv@{K\_inv}}
+\index{K\_inv@{K\_inv}!Robot@{Robot}}
+\doxysubsubsection{K\_inv}
+{\footnotesize\ttfamily Eigen\+::\+Matrix2f Robot\+::\+K\+\_\+inv}
+
+\mbox{\label{class_robot_afee8fb30ddb56a88cc413cd3fc4de68e}} 
+\index{Robot@{Robot}!mass@{mass}}
+\index{mass@{mass}!Robot@{Robot}}
+\doxysubsubsection{mass}
+{\footnotesize\ttfamily float Robot\+::mass}
+
+\mbox{\label{class_robot_ab25faad9566a078c1226078477ed54f9}} 
+\index{Robot@{Robot}!phi1@{phi1}}
+\index{phi1@{phi1}!Robot@{Robot}}
+\doxysubsubsection{phi1}
+{\footnotesize\ttfamily \textbf{ Motor} Robot\+::phi1}
+
+\mbox{\label{class_robot_a3af642548ac011bede298d6a098bddf5}} 
+\index{Robot@{Robot}!phi2@{phi2}}
+\index{phi2@{phi2}!Robot@{Robot}}
+\doxysubsubsection{phi2}
+{\footnotesize\ttfamily \textbf{ Motor} Robot\+::phi2}
+
+\mbox{\label{class_robot_a4b27425b3a348fea1c07c5b36b948090}} 
+\index{Robot@{Robot}!pose@{pose}}
+\index{pose@{pose}!Robot@{Robot}}
+\doxysubsubsection{pose}
+{\footnotesize\ttfamily \textbf{ Pose} Robot\+::pose}
+
+\mbox{\label{class_robot_ae0eaf33f2fa2622a8cdafdac37de2c36}} 
+\index{Robot@{Robot}!twist@{twist}}
+\index{twist@{twist}!Robot@{Robot}}
+\doxysubsubsection{twist}
+{\footnotesize\ttfamily \textbf{ Twist} Robot\+::twist}
+
+\mbox{\label{class_robot_acdb92997664dfe898cb44046d9ac9d7e}} 
+\index{Robot@{Robot}!v1@{v1}}
+\index{v1@{v1}!Robot@{Robot}}
+\doxysubsubsection{v1}
+{\footnotesize\ttfamily float Robot\+::v1}
+
+\mbox{\label{class_robot_a5fd3b9a0df55f20e7596e837f8c8c3bd}} 
+\index{Robot@{Robot}!v2@{v2}}
+\index{v2@{v2}!Robot@{Robot}}
+\doxysubsubsection{v2}
+{\footnotesize\ttfamily float Robot\+::v2}
+
+\mbox{\label{class_robot_a73cfb1636e43867e8a350827d0a1be74}} 
+\index{Robot@{Robot}!wheel1\_origin@{wheel1\_origin}}
+\index{wheel1\_origin@{wheel1\_origin}!Robot@{Robot}}
+\doxysubsubsection{wheel1\_origin}
+{\footnotesize\ttfamily \textbf{ Point} Robot\+::wheel1\+\_\+origin}
+
+\mbox{\label{class_robot_a7e4c430e4739eea27cc0e796cfb6607b}} 
+\index{Robot@{Robot}!wheel1\_radius@{wheel1\_radius}}
+\index{wheel1\_radius@{wheel1\_radius}!Robot@{Robot}}
+\doxysubsubsection{wheel1\_radius}
+{\footnotesize\ttfamily float Robot\+::wheel1\+\_\+radius}
+
+\mbox{\label{class_robot_a34217eb875b9161b7a7567cb4ac080ae}} 
+\index{Robot@{Robot}!wheel2\_origin@{wheel2\_origin}}
+\index{wheel2\_origin@{wheel2\_origin}!Robot@{Robot}}
+\doxysubsubsection{wheel2\_origin}
+{\footnotesize\ttfamily \textbf{ Point} Robot\+::wheel2\+\_\+origin}
+
+\mbox{\label{class_robot_a773c01cdfa7f05aad2cc298b757c7641}} 
+\index{Robot@{Robot}!wheel2\_radius@{wheel2\_radius}}
+\index{wheel2\_radius@{wheel2\_radius}!Robot@{Robot}}
+\doxysubsubsection{wheel2\_radius}
+{\footnotesize\ttfamily float Robot\+::wheel2\+\_\+radius}
+
+\mbox{\label{class_robot_a9a1a543e5623f7280f5b3ffdc155f3e1}} 
+\index{Robot@{Robot}!wheel\_distance@{wheel\_distance}}
+\index{wheel\_distance@{wheel\_distance}!Robot@{Robot}}
+\doxysubsubsection{wheel\_distance}
+{\footnotesize\ttfamily float Robot\+::wheel\+\_\+distance}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+robot\+\_\+library/include/robot\+\_\+library/\textbf{ robot.\+h}\item 
+robot\+\_\+library/src/\textbf{ robot.\+cpp}\end{DoxyCompactItemize}

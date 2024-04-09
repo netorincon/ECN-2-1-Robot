@@ -31,7 +31,6 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <control_input/msg/state_vector.hpp>
-#include <control_input/msg/motor_command.hpp>
 #include <control_input/msg/control_input.hpp>
 #include <control_input/msg/position_command.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -119,7 +118,7 @@ class real_world : public rclcpp::Node
         turtle4.setMotorPositions(motor->position[phi1_index],motor->position[phi2_index], motor->position[d1_index], limit_angle(motor->position[d2_index] - M_PI));
         turtle4.setMotorVelocities(motor->velocity[phi1_index], motor->velocity[phi2_index], motor->velocity[d1_index], motor->velocity[d2_index]);
         
-        turtle4.phi2.effort=motor->effort[phi1_index];
+        //turtle4.phi2.effort=motor->effort[phi1_index];
 
         //phi1d_prev=turtle4.phi1.velocity;
         //phi1d_prev=turtle4.phi2.velocity;
@@ -183,14 +182,14 @@ class real_world : public rclcpp::Node
         publishJointCommand();
 
         joint_cmd.name.push_back(turtle4.phi1.name);
-        //joint_cmd.name.push_back(turtle4.phi2.name);
+        joint_cmd.name.push_back(turtle4.phi2.name);
         joint_cmd.velocity.push_back(phi1dCmd);
-        //joint_cmd.velocity.push_back(phi2dCmd);
+        joint_cmd.velocity.push_back(phi2dCmd);
         publishJointCommand();
 
-        joint_cmd.name.push_back(turtle4.phi2.name);
-        joint_cmd.effort.push_back(turtle4.phi2.effort);
-        publishJointCommand();
+        // joint_cmd.name.push_back(turtle4.phi2.name);
+        // joint_cmd.effort.push_back(turtle4.phi2.effort);
+        // publishJointCommand();
 
 
     }
